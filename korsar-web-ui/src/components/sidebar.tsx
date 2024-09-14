@@ -1,22 +1,16 @@
-import { useState } from "react";
-import { Sidebar, SidebarItem, Button } from "flowbite-react";
+import { Sidebar } from "flowbite-react";
 import { Link } from 'react-router-dom';
-import { HiMenu, HiChartPie, HiDatabase, HiDocumentReport, HiX } from "react-icons/hi";
+import { HiChartPie, HiDatabase, HiDocumentReport } from "react-icons/hi";
 
-function SidebarComponent() {
-  const [isOpen, setIsOpen] = useState(false);
+interface SidebarComponentProps {
+  isOpen: boolean;
+}
 
-  const toggleSidebar = () => {
-    setIsOpen(!isOpen);
-  };
-
+function SidebarComponent({ isOpen }: SidebarComponentProps) {
   return (
     <>
-      <Button className="bg-korsar-azul-noche m-2" onClick={toggleSidebar}>
-        {isOpen ? <HiX /> : <HiMenu />}
-      </Button>
       {isOpen && (
-        <Sidebar aria-label="Sidebar">
+        <Sidebar className="[&>div]:bg-white shadow-md z-10">
           <div className="mt-20">
             <Sidebar.Items>
               <Sidebar.ItemGroup>

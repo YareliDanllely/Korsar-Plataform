@@ -1,14 +1,16 @@
-import { ReactNode } from 'react';
-import NavbarComponet from "./navbar";
+import { ReactNode, useState } from 'react';
+import NavbarComponent from "./navbar";
 import SidebarComponent from './sidebar';
 
 function Layout({ children }: { children: ReactNode }) {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
     <div className="flex h-screen overflow-hidden">
-      <SidebarComponent />
+      <SidebarComponent isOpen={isOpen} />
       <div className="flex flex-col flex-1">
-        <NavbarComponet />
-        <div className="bg-korsar-gris-100 flex-1 overflow-y-auto p-4">
+        <NavbarComponent setIsOpen={setIsOpen} isOpen={isOpen} />
+        <div className="bg-korsar-fondo-1 flex-1 overflow-y-auto p-4">
           {children}
         </div>
       </div>

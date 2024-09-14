@@ -29,6 +29,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+# Cambiar en produccion !!
 CSRF_TRUSTED_ORIGINS = ['http://localhost:5173']
 
 # Por desarrollo unicamente, no para produccion
@@ -37,7 +38,6 @@ CORS_ORIGIN_ALLOW_ALL = True
 
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -45,14 +45,19 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    "rest_framework",
+    'rest_framework',
     'djoser',
+    'corsheaders',
+    'usuarios',
+    'clientes',
+    'parquesEolicos',
 ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  # Correctamente antes de CommonMiddleware
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -86,10 +91,18 @@ WSGI_APPLICATION = 'korsar_api.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'korsar',
+        'USER': 'postgres',
+        'PASSWORD': '1123',
+        'HOST': 'db',
+        'PORT': '5432',
     }
 }
+
+
+# Se agrega el modelo de usuarios personalizado
+AUTH_USER_MODEL = 'usuarios.Usuario'
 
 
 # Password validation

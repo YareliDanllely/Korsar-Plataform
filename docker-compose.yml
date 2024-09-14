@@ -1,0 +1,34 @@
+services:
+  db:
+    image: postgres
+    environment:
+      POSTGRES_DB: korsar
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1123
+    ports:
+      - "5432:5432"
+
+  api:
+    build:
+      context: ./korsar-api
+    command: python korsar_api/manage.py runserver 0.0.0.0:8000  # Cambia la ruta para que apunte a 'manage.py'
+    volumes:
+      - ./korsar-api:/app
+    working_dir: /app  # Aquí se deja como '/app', pero la ruta al manage.py se ajusta en el comando
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+
+
+  web:
+    build:
+      context: ./korsar-web-ui
+    command: npm run dev -- --host 0.0.0.0
+    volumes:
+      - ./korsar-web-ui:/app
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api

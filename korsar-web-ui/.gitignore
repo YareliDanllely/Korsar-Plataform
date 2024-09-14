@@ -11,6 +11,11 @@ node_modules
 dist
 dist-ssr
 *.local
+# Ignorar el entorno virtual en korsar-api
+/korsar-api/.venv/
+
+# Ignorar todos los directorios .venv en cualquier nivel
+**/.venv/
 
 # Editor directories and files
 .vscode/*
@@ -22,3 +27,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+*.py[cod]
+__pycache__/
+**/__pycache__/
