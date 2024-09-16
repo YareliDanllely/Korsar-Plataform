@@ -1,14 +1,16 @@
+import uuid
 from django.db import models
 
-
-# Clase ParqueEolico que repesenta los parques eólicos en la base de datos
-class ParqueEolico(models.Model):
+class ParquesEolicos(models.Model):
     """
-    Definición de los componentes asociados a un Parque Eólico
+    Modelo que representa los parques eólicos.
     """
 
+    # Clave primaria UUID
+    uuid_parque = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
-    nombre_parque = models.CharField(max_length=255)
+    # Campos obligatorios
+    nombre_parque = models.CharField(max_length=255, null=False, blank=False)
     ubicacion_comuna = models.CharField(max_length=255)
     ubicacion_region = models.CharField(max_length=255)
     cantidad_turbinas = models.IntegerField()

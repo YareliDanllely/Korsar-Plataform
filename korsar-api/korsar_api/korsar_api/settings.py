@@ -51,6 +51,15 @@ INSTALLED_APPS = [
     'usuarios',
     'clientes',
     'parquesEolicos',
+    'aerogeneradores',
+    'estadoAerogeneradores',
+    'inspecciones',
+    'anomalias',
+    'imagenes',
+    'imagenesAnomalias',
+    'componentesAerogenerador',
+    'estadoComponentes',
+    'django_extensions',
 ]
 
 
@@ -136,6 +145,8 @@ REST_FRAMEWORK = {
 
 
 SIMPLE_JWT = {
+    'USER_ID_FIELD': 'uuid_usuario',
+    'USER_ID_CLAIM': 'user_id',
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': False,

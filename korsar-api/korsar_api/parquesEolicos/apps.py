@@ -1,7 +1,7 @@
 from django.apps import AppConfig
 
 
-class ParqueseolicosConfig(AppConfig):
+class ParquesEolicosConfig(AppConfig):
     """
     Configuracion de la aplicación parquesEolicos
     """

@@ -1,7 +1,7 @@
 from django.urls import reverse
 from rest_framework.test import APITestCase
 from rest_framework import status
-from .models import Usuario
+from usuarios.models import Usuario  # Modelo de usuario personalizado
 
 class AutenticacionJWTTests(APITestCase):
 
