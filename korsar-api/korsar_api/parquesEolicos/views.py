@@ -13,3 +13,5 @@ class ParqueEolicoViewSet(viewsets.ModelViewSet):
     queryset = ParquesEolicos.objects.all()
     serializer_class = ParqueEolicoSerializer
     permission_classes = [IsAuthenticated]  # Solo usuarios autenticados pueden acceder
+
+

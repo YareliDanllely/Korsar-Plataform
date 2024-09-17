@@ -49,7 +49,7 @@ INSTALLED_APPS = [
     'djoser',
     'corsheaders',
     'usuarios',
-    'clientes',
+    'empresas',
     'parquesEolicos',
     'aerogeneradores',
     'estadoAerogeneradores',

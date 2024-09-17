@@ -10,10 +10,10 @@ class Imagen(models.Model):
     """
 
     CLASIFICACION_CHOICES = (
-        ('clasificada', 'Clasificada'),
         ('no_clasificada', 'No Clasificada'),
+        ('con_dano', 'Con Daño'),
+        ('sin_dano', 'Sin Daño'),
     )
-
 
     # Clave Primaria UUID
     uuid_imagen = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -22,7 +22,6 @@ class Imagen(models.Model):
     uuid_aerogenerador = models.ForeignKey(Aerogenerador, on_delete=models.CASCADE)
     uuid_componente = models.ForeignKey(ComponenteAerogenerador, on_delete=models.CASCADE)
     uuid_inspeccion = models.ForeignKey(Inspeccion, on_delete=models.CASCADE)
-
 
     nombre_imagen = models.CharField(max_length=255)
     fecha_creacion = models.DateField()

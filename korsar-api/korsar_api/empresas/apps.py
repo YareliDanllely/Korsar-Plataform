@@ -1,9 +1,9 @@
 from django.apps import AppConfig
 
 
-class ClientesConfig(AppConfig):
+class EmpresasConfig(AppConfig):
     """
-    Configuracion de la aplicación clientes
+    Configuracion de la aplicación empresas
     """
     default_auto_field = 'django.db.models.BigAutoField' # Campo autoincremental
-    name = 'clientes' # Nombre de la aplicación
+    name = 'empresas' # Nombre de la aplicación

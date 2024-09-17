@@ -12,15 +12,16 @@ class ImagenViewSet(viewsets.ModelViewSet):
     serializer_class = ImagenSerializer
     permission_classes = [IsAuthenticated]
 
-    @action(detail=True, methods=['post'], url_path='cambiar-clasficacion')
-    def cambiar_clasificacion(self,request, pk=None):
-        nueva_clasificacion= request.data.get('estado_clasificacion')
+    # Cambiar la clasificación de una imagen por uuid_imagen
+    @action(detail=True, methods=['post'], url_path='cambiar-clasificacion')
+    def cambiar_clasificacion(self, request, pk=None):
+        nueva_clasificacion = request.data.get('estado_clasificacion')
 
-        #Verificamos que la clasificación sea válida
-        if nueva_clasificacion not in ['clasificada', 'no_clasificada']:
+        # Verificamos que la clasificación sea válida
+        if nueva_clasificacion not in ['no_clasificada', 'con_dano', 'sin_dano']:
             return Response({'estado_clasificacion': 'Clasificación no válida'}, status=status.HTTP_400_BAD_REQUEST)
 
-        #Obtenemos la imagen y actualizamos su estado
+        # Obtenemos la imagen y actualizamos su estado
         imagen = self.get_object()
         imagen.estado_clasificacion = nueva_clasificacion
         imagen.save()
@@ -28,6 +29,7 @@ class ImagenViewSet(viewsets.ModelViewSet):
         return Response({'estado_clasificacion': nueva_clasificacion}, status=status.HTTP_200_OK)
 
 
+# Obtener imagenes por componente, aerogenerador e inspeccion(*****)
 
 class ImagenFiltradaListView(generics.ListAPIView):
     """

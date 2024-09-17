@@ -1,5 +1,6 @@
 import uuid
 from django.db import models
+from empresas.models import Empresa
 
 class ParquesEolicos(models.Model):
     """
@@ -17,6 +18,10 @@ class ParquesEolicos(models.Model):
     potencia_instalada = models.FloatField()
     coordenada_longitud = models.FloatField()
     coordenada_latitud = models.FloatField()
+
+    # Relación con Empresa: Un parque está asociado a una empresa
+    empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE, related_name='parques')
+
 
     def __str__(self):
         return self.nombre_parque

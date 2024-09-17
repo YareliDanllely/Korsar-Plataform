@@ -38,3 +38,5 @@ class UsuarioViewSet(viewsets.ModelViewSet):
             return super().destroy(request, *args, **kwargs)
         return Response({"detail": "No tiene permiso para eliminar usuarios."},
                         status=status.HTTP_403_FORBIDDEN)
+
+

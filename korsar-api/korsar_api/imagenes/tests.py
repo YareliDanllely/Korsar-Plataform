@@ -142,22 +142,35 @@ class ImagenTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 0)
 
-    def test_cambiar_clasificacion_imagen(self):
+def test_cambiar_clasificacion_a_sin_dano(self):
         # Cambiar el estado de clasificación de la imagen
         url = reverse('imagenes-cambiar-clasificacion', kwargs={'pk': self.imagen.pk})
 
-        # Cambiar el estado de clasificación a 'clasificado'
+        # Cambiar el estado de clasificación a 'sin_dano'
         data = {
-            'estado_clasificacion': 'clasificada'
+            'estado_clasificacion': 'sin_dano'
         }
 
-        #Enviar solicitud
+        # Enviar solicitud
         response = self.client.post(url, data, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['estado_clasificacion'], 'clasificada')
+        self.assertEqual(response.data['estado_clasificacion'], 'sin_dano')
 
-        #verificar que el estado de clasificación haya sido actualizado
+        # Verificar que el estado de clasificación haya sido actualizado
         self.imagen.refresh_from_db()
-        self.assertEqual(self.imagen.estado_clasificacion, 'clasificada')
+        self.assertEqual(self.imagen.estado_clasificacion, 'sin_dano')
 
+def test_cambiar_clasificacion_invalida(self):
+    # Intentar cambiar el estado de clasificación a un valor no válido
+    url = reverse('imagenes-cambiar-clasificacion', kwargs={'pk': self.imagen.pk})
+
+    data = {
+        'estado_clasificacion': 'invalido'  # Clasificación no válida
+    }
+
+    # Enviar solicitud
+    response = self.client.post(url, data, format='json')
+
+    self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+    self.assertEqual(response.data['estado_clasificacion'], 'Clasificación no válida')

@@ -1,10 +1,15 @@
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from .models import Anomalia
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework import status
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from .serializers import AnomaliaSerializer
 
+
+#Vista para operaciones CRUD de Anomalias
 class AnomaliaViewSet(viewsets.ModelViewSet):
     """
     Definir la vista de AnomaliaViewSet para la API
@@ -14,8 +19,31 @@ class AnomaliaViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]  # Solo usuarios autenticados pueden acceder
 
 
-#Vista para obtener anomalias recientes por aerogenerador y componente
-#Nos permitira asociar imagenes con anomalias ya definidas previamente
+    # Definir consulta para obtener la cantidad de severidad de daños por una inspeccion
+    @action(detail=False, methods=['get'], url_path='severidades-por-inspeccion')
+    def obtener_severidades_por_inspeccion(self, request):
+        """
+        Obtener todas las severidades de anomalías asociadas a una inspección en particular.
+        """
+        uuid_inspeccion = request.query_params.get('uuid_inspeccion')
+        if not uuid_inspeccion:
+            return Response({'error': 'uuid_inspeccion es requerido'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Filtrar anomalías por inspección
+        anomalías = Anomalia.objects.filter(uuid_inspeccion=uuid_inspeccion)
+
+        # Extraer las severidades
+        severidades = anomalías.values_list('severidad_anomalia', flat=True)
+
+        return Response({'severidades': list(severidades)}, status=status.HTTP_200_OK)
+
+
+    # *********Definir cantidad de serveridad de daños por componente en una inspeccion***************
+
+
+
+
+# Vista para obtener anomalias definidas por aerogenerador, componente e inspeccion
 class AnomaliaListView(generics.ListAPIView):
     """
     Vista que permite filtrar las anomalías por aerogenerador, componente e inspección.
@@ -46,3 +74,5 @@ class AnomaliaListView(generics.ListAPIView):
             queryset = queryset.none()
 
         return queryset
+
+

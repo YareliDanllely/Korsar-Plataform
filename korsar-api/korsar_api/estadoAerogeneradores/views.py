@@ -12,3 +12,6 @@ class EstadoAerogeneradoresViewSet(viewsets.ModelViewSet):
     queryset = EstadoAerogeneradores.objects.all()
     serializer_class = EstadoAerogeneradoresSerializer
     permission_classes = [IsAuthenticated]  # Solo usuarios autenticados pueden acceder
+
+
+
