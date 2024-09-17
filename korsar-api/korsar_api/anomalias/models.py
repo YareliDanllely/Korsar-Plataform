@@ -22,7 +22,6 @@ class Anomalia(models.Model):
     # Campos
     codigo_anomalia = models.CharField(max_length=100)
 
-    # Categorías de severidad
     SEVERIDAD_CHOICES = [
         (1, 'Sin daño'),       # Sin daño
         (2, 'Menor'),          # Menor

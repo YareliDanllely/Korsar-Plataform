@@ -15,4 +15,5 @@ urlpatterns = [
     path('api/parques-eolicos/', include('parquesEolicos.urls')),  # Prefijo único para parques eólicos
     path('api/clientes/', include('clientes.urls')),  # Prefijo único para clientes
     path('api/imagenes/', include('imagenes.urls')),  # Prefijo único para imágenes
+    path('api/anomalias/', include('anomalias.urls')),  # Prefijo único para aerogeneradores
 ]
