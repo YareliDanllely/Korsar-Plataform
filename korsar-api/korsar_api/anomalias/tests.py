@@ -2,22 +2,28 @@ from django.urls import reverse
 from rest_framework.test import APITestCase
 from rest_framework import status
 from uuid import uuid4
-from uuid import UUID
-from .models import Anomalia, Aerogenerador, ComponenteAerogenerador, Inspeccion, Usuario
+from .models import Anomalia, Inspeccion, Usuario, Aerogenerador, ComponenteAerogenerador
+from empresas.models import Empresa
 from parquesEolicos.models import ParquesEolicos
-from estadoAerogeneradores.models import EstadoAerogenerador
 
 class AnomaliaViewSetTestCase(APITestCase):
 
     def setUp(self):
         """
-        Crear objetos de prueba para Aerogenerador, Componente, Inspeccion, Usuario y Anomalia.
+        Configuración de las instancias comunes para las pruebas
         """
+        # Crear la empresa
+        self.empresa = Empresa.objects.create(
+            uuid_empresa=uuid4(),
+            nombre_empresa="Empresa Test"
+        )
+
         # Crear el usuario técnico
         self.tecnico = Usuario.objects.create_user(
             username='tecnico1',
             password='password123',
-            tipo_usuario=1  # Técnico
+            tipo_usuario=1,  # Técnico
+            uuid_empresa=self.empresa
         )
 
         # Obtener el token JWT
@@ -40,21 +46,22 @@ class AnomaliaViewSetTestCase(APITestCase):
             cantidad_turbinas=10,
             potencia_instalada=50.0,
             coordenada_longitud=-70.0,
-            coordenada_latitud=-30.0
+            coordenada_latitud=-30.0,
+            uuid_empresa=self.empresa
         )
 
-        # Crear datos de prueba para inspección
+        # Crear una inspección
         self.inspeccion = Inspeccion.objects.create(
             uuid_inspeccion=uuid4(),
-            uuid_parque=self.parque,
+            uuid_parque_eolico=self.parque,
             fecha_inspeccion="2024-09-01",
             fecha_siguiente_inspeccion="2025-09-01",
-            progreso="Inspección de prueba"
+            progreso="Inspección Completada"
         )
 
-        # Crear el aerogenerador antes del estado
+        # Crear un aerogenerador
         self.aerogenerador = Aerogenerador.objects.create(
-            uuid_parque=self.parque,
+            uuid_parque_eolico=self.parque,
             numero_aerogenerador=1,
             modelo_aerogenerador="Modelo X",
             fabricante_aerogenerador="Fabricante Y",
@@ -65,16 +72,7 @@ class AnomaliaViewSetTestCase(APITestCase):
             coordenada_latitud=30.0
         )
 
-        # Crear una instancia de EstadoAerogenerador después de que se haya creado el aerogenerador
-        self.estadoAerogenerador = EstadoAerogenerador.objects.create(
-            uuid_estado=uuid4(),
-            uuid_aerogenerador=self.aerogenerador,  # Ahora el aerogenerador ya existe
-            uuid_inspeccion=self.inspeccion,
-            estado_final_clasificacion="Sin daño",
-            progreso="Completado"
-        )
-
-        # Crear datos de prueba para componente
+        # Crear un componente para el aerogenerador
         self.componente = ComponenteAerogenerador.objects.create(
             uuid_aerogenerador=self.aerogenerador,
             tipo_componente="Hélice",
@@ -83,65 +81,90 @@ class AnomaliaViewSetTestCase(APITestCase):
             ruta_imagen_visualizacion_componente="imagen.jpg"
         )
 
-        # Crear una anomalía
-        self.anomalia = Anomalia.objects.create(
+        # Crear anomalías asociadas a la inspección
+        self.anomalia_1 = Anomalia.objects.create(
             uuid_aerogenerador=self.aerogenerador,
-            uuid_componente=self.componente,
+            uuid_componente=self.componente,  # Añadir el componente
             uuid_inspeccion=self.inspeccion,
             uuid_tecnico=self.tecnico,
             codigo_anomalia="A001",
             severidad_anomalia=3,
-            dimension_anomalia="10x5",
-            orientacion_anomalia="Norte",
-            descripcion_anomalia="Fisura en la hélice",
-            observacion_anomalia="Requiere atención inmediata",
+            descripcion_anomalia="Fisura",
             coordenada_x=50.5,
             coordenada_y=-30.4
         )
+        self.anomalia_2 = Anomalia.objects.create(
+            uuid_aerogenerador=self.aerogenerador,
+            uuid_componente=self.componente,  # Añadir el componente
+            uuid_inspeccion=self.inspeccion,
+            uuid_tecnico=self.tecnico,
+            codigo_anomalia="A002",
+            severidad_anomalia=2,
+            descripcion_anomalia="Grieta",
+            coordenada_x=50.6,
+            coordenada_y=-30.5
+        )
 
-def test_get_anomalias_filtradas(self):
-    """
-    Probar si la vista devuelve las anomalías filtradas por aerogenerador, componente e inspección.
-    """
-    url = reverse('anomalia-list')  # Asegúrate que este nombre coincide con el que usas en tus rutas
+    def test_obtener_severidades_por_inspeccion(self):
+        """
+        Probar si el endpoint devuelve correctamente las severidades asociadas a una inspección.
+        """
+        url = reverse('anomalia-obtener-severidades-por-inspeccion')
+        params = {'uuid_inspeccion': str(self.inspeccion.uuid_inspeccion)}
 
-    # Parámetros para el filtro
-    params = {
-        'turbina': str(self.aerogenerador.uuid_aerogenerador),
-        'componente': str(self.componente.uuid_componente),
-        'inspeccion': str(self.inspeccion.uuid_inspeccion)
-    }
+        response = self.client.get(url, params)
 
-    # Hacer una solicitud GET con los parámetros de consulta
-    response = self.client.get(url, params)
+        # Asegurarse de que la respuesta sea 200 OK
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    # Asegurarse de que la respuesta sea 200 OK
-    self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # Verificar que se retornan dos severidades
+        self.assertEqual(len(response.data['severidades']), 2)
+        self.assertIn(3, response.data['severidades'])
+        self.assertIn(2, response.data['severidades'])
 
-    # Asegurarse de que se retorne la anomalía correcta
-    self.assertEqual(len(response.data), 1)
 
-    # Comparar los UUIDs como cadenas
-    self.assertEqual(response.data[0]['uuid_aerogenerador'], str(self.aerogenerador.uuid_aerogenerador))
-    self.assertEqual(response.data[0]['uuid_componente'], str(self.componente.uuid_componente))
-    self.assertEqual(response.data[0]['uuid_inspeccion'], str(self.inspeccion.uuid_inspeccion))
 
-def test_no_anomalias_if_wrong_filter(self):
-    """
-    Probar que no se devuelvan anomalías si se pasa un filtro incorrecto.
-    """
-    url = reverse('anomalia-list')
+    def test_obtener_severidades_por_componente(self):
+        """
+        Probar si el endpoint 'severidades-por-componente' devuelve las severidades agrupadas por componente.
+        """
+        url = reverse('anomalia-obtener-severidades-por-componente')
+        params = {'uuid_inspeccion': str(self.inspeccion.uuid_inspeccion)}
 
-    # Filtro incorrecto para la turbina
-    params = {
-        'turbina': str(uuid4()),  # UUID que no existe
-        'componente': str(self.componente.uuid_componente),
-        'inspeccion': str(self.inspeccion.uuid_inspeccion)
-    }
+        response = self.client.get(url, params)
 
-    # Hacer una solicitud GET con los parámetros incorrectos
-    response = self.client.get(url, params)
+        # Asegurarse de que la respuesta sea 200 OK
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    # Asegurarse de que no se retornen anomalías
-    self.assertEqual(response.status_code, status.HTTP_200_OK)
-    self.assertEqual(len(response.data), 0)
+        # Verificar que se retornan los resultados agrupados por componente
+        resultados = response.data['resultados']
+
+
+        self.assertEqual(len(resultados), 2)  # Un solo componente en esta prueba
+
+        # Verificar que la severidad y el componente sean correctos
+        self.assertEqual(resultados[0]['uuid_componente__tipo_componente'], self.componente.tipo_componente)
+        self.assertEqual(resultados[0]['severidad_anomalia'], 2)
+
+
+
+    def test_anomalias_filtradas_por_aerogenerador_componente_e_inspeccion(self):
+        """
+        Probar si el endpoint devuelve correctamente las anomalías filtradas por aerogenerador, componente e inspección.
+        """
+        url = reverse('anomalia-list')
+        params = {
+            'turbina': str(self.aerogenerador.uuid_aerogenerador),
+            'componente': str(self.componente.uuid_componente),
+            'inspeccion': str(self.inspeccion.uuid_inspeccion)
+        }
+
+        response = self.client.get(url, params)
+
+        # Asegurarse de que la respuesta sea 200 OK
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Verificar que se retornen 2 anomalías
+        self.assertEqual(len(response.data), 2)
+        self.assertEqual(response.data[0]['codigo_anomalia'], "A001")
+        self.assertEqual(response.data[1]['codigo_anomalia'], "A002")

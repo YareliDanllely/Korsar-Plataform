@@ -1,21 +1,35 @@
 from django.urls import reverse
 from rest_framework.test import APITestCase
 from rest_framework import status
-from usuarios.models import Usuario  # Modelo de usuario personalizado
-from .models import Imagen, Aerogenerador, ComponenteAerogenerador
+from uuid import uuid4
+from .models import Aerogenerador, ComponenteAerogenerador, Inspeccion
+from estadoComponentes.models import EstadoComponente
+from anomalias.models import Anomalia
+from usuarios.models import Usuario
+from imagenes.models import Imagen
+from empresas.models import Empresa
+from imagenesAnomalias.models import ImagenAnomalia
 from parquesEolicos.models import ParquesEolicos
 from estadoAerogeneradores.models import EstadoAerogenerador
-from inspecciones.models import Inspeccion
-import uuid
 
 class ImagenTests(APITestCase):
 
     def setUp(self):
-        # Crear un usuario de prueba (técnico) usando el modelo de usuario personalizado
+        """
+        Configurar instancias comunes para pruebas
+        """
+        # Crear la empresa
+        self.empresa = Empresa.objects.create(
+            uuid_empresa=uuid4(),
+            nombre_empresa="Empresa Test"
+        )
+
+        # Crear el usuario técnico
         self.tecnico = Usuario.objects.create_user(
             username='tecnico1',
             password='password123',
-            tipo_usuario=1  # Técnico
+            tipo_usuario=1,  # Técnico
+            uuid_empresa=self.empresa
         )
 
         # Obtener el token JWT
@@ -30,71 +44,97 @@ class ImagenTests(APITestCase):
         # Autenticar las solicitudes con el token JWT
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {self.token}')
 
-        # Crear un parque de prueba
+        # Crear una instancia de ParquesEolicos
         self.parque = ParquesEolicos.objects.create(
-            uuid_parque=uuid.uuid4(),
-            nombre_parque='Parque de Prueba',
-            ubicacion_comuna='Comuna Prueba',
-            ubicacion_region='Región Prueba',
+            uuid_parque_eolico=uuid4(),
+            nombre_parque="Parque Eólico Test",
+            ubicacion_comuna="Comuna Test",
+            ubicacion_region="Región Test",
             cantidad_turbinas=10,
             potencia_instalada=50.0,
-            coordenada_longitud=-70.123,
-            coordenada_latitud=-33.456
+            coordenada_longitud=-70.0,
+            coordenada_latitud=-30.0,
+            uuid_empresa=self.empresa
         )
 
-        # Crear una inspección de prueba asociada al parque
+        # Crear datos de prueba para inspección
         self.inspeccion = Inspeccion.objects.create(
-            uuid_inspeccion=uuid.uuid4(),
-            uuid_parque=self.parque,
-            fecha_inspeccion='2024-09-15',
-            fecha_siguiente_inspeccion='2025-09-15',
-            progreso='Completado'
+            uuid_inspeccion=uuid4(),
+            uuid_parque_eolico=self.parque,
+            fecha_inspeccion="2024-09-01",
+            fecha_siguiente_inspeccion="2025-09-01",
+            progreso="Inspección de prueba"
         )
 
-        # Crear un aerogenerador de prueba
+        # Crear el aerogenerador
         self.aerogenerador = Aerogenerador.objects.create(
-            uuid_aerogenerador=uuid.uuid4(),
-            uuid_parque=self.parque,
-            uuid_ultimo_estado=None,  # Estado no asignado (nulo)
+            uuid_parque_eolico=self.parque,
             numero_aerogenerador=1,
-            modelo_aerogenerador='Modelo 1',
-            fabricante_aerogenerador='Fabricante A',
-            altura_aerogenerador=100.0,
-            diametro_rotor=50.0,
-            potencia_nominal=3.0,
-            coordenada_longitud=-70.567,
-            coordenada_latitud=-33.678
+            modelo_aerogenerador="Modelo X",
+            fabricante_aerogenerador="Fabricante Y",
+            altura_aerogenerador=100,
+            diametro_rotor=80,
+            potencia_nominal=2.5,
+            coordenada_longitud=50.0,
+            coordenada_latitud=30.0
         )
 
-        # Crear un estado de prueba para el componente
-        self.estado_componente = EstadoAerogenerador.objects.create(
-            uuid_estado=uuid.uuid4(),
-            estado_final_clasificacion='Reparado',
-            progreso='Completado',
+        # Crear una instancia de EstadoAerogenerador
+        self.estadoAerogenerador = EstadoAerogenerador.objects.create(
+            uuid_estado=uuid4(),
             uuid_aerogenerador=self.aerogenerador,
-            uuid_inspeccion=self.inspeccion
+            uuid_inspeccion=self.inspeccion,
+            estado_final_clasificacion="Sin daño",
+            progreso="Completado"
         )
 
-        # Crear un componente de prueba relacionado con el aerogenerador
+        # Crear datos de prueba para componente
         self.componente = ComponenteAerogenerador.objects.create(
-            uuid_componente=uuid.uuid4(),
             uuid_aerogenerador=self.aerogenerador,
-            uuid_ultimo_estado=self.estado_componente,
-            tipo_componente='Rotor',
-            coordenada_longitud=-70.567,
-            coordenada_latitud=-33.678,
-            ruta_imagen_visualizacion_componente='/imagenes/rotor.jpg'
+            tipo_componente="Hélice",
+            coordenada_longitud=50.0,
+            coordenada_latitud=30.0,
+            ruta_imagen_visualizacion_componente="imagen.jpg"
         )
 
-        # Crear una imagen de prueba
+        # Crear una instancia de EstadoComponentes
+        self.estado_componente = EstadoComponente.objects.create(
+            uuid_componente=self.componente,
+            uuid_inspeccion=self.inspeccion,
+            estado_final_clasificacion="Sin daño",
+            progreso="Reparado"
+        )
+
+        # Crear una imagen asociada al aerogenerador
         self.imagen = Imagen.objects.create(
-            uuid_imagen=uuid.uuid4(),
             uuid_aerogenerador=self.aerogenerador,
             uuid_componente=self.componente,
             uuid_inspeccion=self.inspeccion,
-            nombre_imagen='imagen1.jpg',
-            fecha_creacion='2024-09-15',
-            ruta_imagen='/imagenes/imagen1.jpg'
+            nombre_imagen="imagen_prueba.jpg",
+            fecha_creacion="2024-09-16",
+            ruta_imagen="ruta/a/imagen_prueba.jpg",
+        )
+
+        # Crear una anomalía
+        self.anomalia = Anomalia.objects.create(
+            uuid_aerogenerador=self.aerogenerador,
+            uuid_componente=self.componente,
+            uuid_inspeccion=self.inspeccion,
+            uuid_tecnico=self.tecnico,
+            codigo_anomalia="A001",
+            severidad_anomalia=3,
+            dimension_anomalia="10x5",
+            orientacion_anomalia="Norte",
+            descripcion_anomalia="Fisura en la hélice",
+            observacion_anomalia="Requiere atención inmediata",
+            coordenada_x=50.5,
+            coordenada_y=-30.4
+        )
+
+        # Crear una imagen de anomalía
+        self.imagen_anomalia = ImagenAnomalia.objects.create(
+            uuid_imagen=self.imagen,
+            uuid_anomalia=self.anomalia
         )
 
     def test_listar_imagenes(self):
@@ -123,11 +163,10 @@ class ImagenTests(APITestCase):
         url = reverse('imagenes-filtradas')
 
         response = self.client.get(url, {
-            'turbina': str(self.aerogenerador.uuid_aerogenerador),
+            'aerogeneradores': str(self.aerogenerador.uuid_aerogenerador),
             'componente': str(self.componente.uuid_componente),
-            'parque': str(self.parque.uuid_parque)
+            'parque_eolico': str(self.parque.uuid_parque_eolico)  # Aquí usa el campo correcto
         })
-
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
@@ -135,14 +174,13 @@ class ImagenTests(APITestCase):
     def test_filtro_sin_parametros(self):
         url = reverse('imagenes-filtradas')
         response = self.client.get(url, {
-            'turbina': str(self.aerogenerador.uuid_aerogenerador),
-            # Falta 'componente' y 'parque'
+            'aerogeneradores': str(self.aerogenerador.uuid_aerogenerador),
         })
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 0)
 
-def test_cambiar_clasificacion_a_sin_dano(self):
+    def test_cambiar_clasificacion_a_sin_dano(self):
         # Cambiar el estado de clasificación de la imagen
         url = reverse('imagenes-cambiar-clasificacion', kwargs={'pk': self.imagen.pk})
 
@@ -161,16 +199,16 @@ def test_cambiar_clasificacion_a_sin_dano(self):
         self.imagen.refresh_from_db()
         self.assertEqual(self.imagen.estado_clasificacion, 'sin_dano')
 
-def test_cambiar_clasificacion_invalida(self):
-    # Intentar cambiar el estado de clasificación a un valor no válido
-    url = reverse('imagenes-cambiar-clasificacion', kwargs={'pk': self.imagen.pk})
+    def test_cambiar_clasificacion_invalida(self):
+        # Intentar cambiar el estado de clasificación a un valor no válido
+        url = reverse('imagenes-cambiar-clasificacion', kwargs={'pk': self.imagen.pk})
 
-    data = {
-        'estado_clasificacion': 'invalido'  # Clasificación no válida
-    }
+        data = {
+            'estado_clasificacion': 'invalido'  # Clasificación no válida
+        }
 
-    # Enviar solicitud
-    response = self.client.post(url, data, format='json')
+        # Enviar solicitud
+        response = self.client.post(url, data, format='json')
 
-    self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-    self.assertEqual(response.data['estado_clasificacion'], 'Clasificación no válida')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['estado_clasificacion'], 'Clasificación no válida')

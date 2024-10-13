@@ -1,16 +1,27 @@
 from django.urls import reverse
 from rest_framework.test import APITestCase
 from rest_framework import status
-from usuarios.models import Usuario  # Modelo de usuario personalizado
-
+from usuarios.models import Usuario
+from empresas.models import Empresa  # Importar el modelo Empresa
+from uuid import uuid4
 class AutenticacionJWTTests(APITestCase):
 
     def setUp(self):
-        # Crear un usuario de prueba
+        """
+        Crear un usuario técnico con una empresa asociada
+        """
+        # Crear una empresa de prueba
+        self.empresa = Empresa.objects.create(
+            uuid_empresa=uuid4(),
+            nombre_empresa="Empresa Test"
+        )
+
+        # Crear un usuario de prueba asociado a la empresa
         self.tecnico = Usuario.objects.create_user(
             username='tecnico1',
             password='password123',
-            tipo_usuario=1  # Técnico
+            tipo_usuario=1,  # Técnico
+            uuid_empresa=self.empresa  # Asignar empresa al usuario
         )
 
     def test_obtener_token_jwt(self):

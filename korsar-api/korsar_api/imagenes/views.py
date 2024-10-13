@@ -47,16 +47,16 @@ class ImagenFiltradaListView(generics.ListAPIView):
         queryset = Imagen.objects.all()
 
         #Recuperamos los parametros de la url
-        uuid_aerogenerador_url = self.request.query_params.get('turbina')
+        uuid_aerogenerador_url = self.request.query_params.get('aerogeneradores')
         uuid_componente_url = self.request.query_params.get('componente')
-        uuid_parque_url = self.request.query_params.get('parque')
+        uuid_parque_url = self.request.query_params.get('parque_eolico')
 
 
         if uuid_aerogenerador_url and uuid_componente_url and uuid_parque_url:
             queryset = queryset.filter(
                 uuid_aerogenerador=uuid_aerogenerador_url,  # Filtrar por UUID del aerogenerador
                 uuid_componente=uuid_componente_url,  # Filtrar por UUID del componente
-                uuid_aerogenerador__uuid_parque=uuid_parque_url  # Filtrar por UUID del parque
+                uuid_aerogenerador__uuid_parque_eolico=uuid_parque_url  # Filtrar por UUID del parque
             )
         else:
             queryset = queryset.none()

@@ -17,4 +17,7 @@ urlpatterns = [
     path('api/imagenes/', include('imagenes.urls')),  # Prefijo único para imágenes
     path('api/anomalias/', include('anomalias.urls')),  # Prefijo único para aerogeneradores
     path('api/imagenes-anomalias/', include('imagenesAnomalias.urls')),  # Prefijo único para imágenes de aerogeneradores
+    path('api/aerogeneradores/', include('aerogeneradores.urls')),  # Prefijo único para aerogeneradores
+    path('api/componentes-aerogenerador/', include('componentesAerogenerador.urls')),  # Prefijo único para componentes de aerogeneradores')
+    path('api/inspecciones/', include('inspecciones.urls')),  # Prefijo único para inspecciones
 ]

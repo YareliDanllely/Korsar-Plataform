@@ -4,16 +4,12 @@ from .models import Empresa
 @admin.register(Empresa)
 class EmpresaAdmin(admin.ModelAdmin):
     """
-    Definir la clase EmpresaAdmin para personalizar la interfaz de administrador de Django.
+    Configuración de la interfaz de administrador para el modelo Empresa.
     """
 
-    # Mostrar los campos del modelo Empresa en la lista
-    list_display = ('uuid_empresa', 'nombre_empresa', 'get_nombre_parque')
+    # Mostrar solo los campos uuid_empresa y nombre_empresa en la vista de lista
+    list_display = ('uuid_empresa', 'nombre_empresa')
 
-    # Permitir la búsqueda por nombre de empresa y nombre de parque
-    search_fields = ('nombre_empresa', 'uuid_parque_eolico__nombre_parque')
+    # Permitir la búsqueda por nombre de empresa
+    search_fields = ('nombre_empresa',)
 
-    # Método para mostrar el nombre del parque eólico asociado
-    def get_nombre_parque(self, obj):
-        return obj.uuid_parque_eolico.nombre_parque  # Mostrar el nombre del parque eólico
-    get_nombre_parque.short_description = 'Nombre del Parque Eólico'

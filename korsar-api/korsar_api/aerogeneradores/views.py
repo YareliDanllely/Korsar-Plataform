@@ -16,40 +16,36 @@ class AerogeneradorViewSet(viewsets.ModelViewSet):
     serializer_class = AerogeneradorSerializer
     permission_classes = [IsAuthenticated]  # Solo usuarios autenticados pueden acceder
 
-
-    # Obtener listado de todos los aerogeneradors con su estado final, por parque e inspeccion en especifico
-    @action(datail=False, methods=['get'], url_path='estado-por-inspeccion')
+    # Obtener listado de todos los aerogeneradores con su estado final, por parque e inspección en específico
+    @action(detail=False, methods=['get'], url_path='estado-por-inspeccion')
     def listar_por_parque_inspeccion(self, request):
         """
-        Listar todos los aerogeneradores con su estado final, por parque e inspeccion en especifico
+        Listar todos los aerogeneradores con su estado final, por parque e inspección en específico
         """
-        # Obtener los parametros de la URL
-        uuid_parque_url = request.query_params.get('uuid_parque')
+        # Obtener los parámetros de la URL
+        uuid_parque_eolico_url = request.query_params.get('uuid_parque_eolico')
         uuid_inspeccion_url = request.query_params.get('uuid_inspeccion')
 
-        # Validar que los parametros no sean nulos
-        if not uuid_parque_url or not uuid_inspeccion_url:
-            return Response({'error': 'Parametros uuid_parque y uuid_inspeccion son requeridos'}, status=status.HTTP_400_BAD_REQUEST)
+        # Validar que los parámetros no sean nulos
+        if not uuid_parque_eolico_url or not uuid_inspeccion_url:
+            return Response({'error': 'Parámetros uuid_parque_eolico y uuid_inspeccion son requeridos'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Filtear los aerogeneradores por parque
-        aerogeneradores = Aerogenerador.objects.filter(uuid_parque=uuid_parque_url)
+        # Filtrar los aerogeneradores por parque
+        aerogeneradores = Aerogenerador.objects.filter(uuid_parque_eolico=uuid_parque_eolico_url)
 
-        # Filtrar el estado final de los aerogeneradores por inspeccion
+        # Filtrar el estado final de los aerogeneradores por inspección
         aerogeneradores_con_estado = []
-        for aerogeneradores in aerogeneradores:
+        for aerogenerador in aerogeneradores:
+            # Obtener el estado final del aerogenerador en la inspección
+            estado_final = EstadoAerogenerador.objects.filter(uuid_aerogenerador=aerogenerador.uuid_aerogenerador, uuid_inspeccion=uuid_inspeccion_url).first()
 
-            # Obtener el estado final del aerogenerador en la inspeccion
-            estado_final = EstadoAerogenerador.objects.filter(uuid_aerogenerador=aerogeneradores.uuid_aerogenerador, uuid_inspeccion=uuid_inspeccion_url).first()
-
-            #Si existe un estado lo agregamos a la cola
+            # Si existe un estado lo agregamos a la lista
             if estado_final:
                 aerogeneradores_con_estado.append({
-                    'uuid_aerogenerador': aerogeneradores.uuid_aerogenerador,
-                    'numero_aerogenerador': aerogeneradores.numero_aerogenerador,
+                    'uuid_aerogenerador': aerogenerador.uuid_aerogenerador,
+                    'numero_aerogenerador': aerogenerador.numero_aerogenerador,
                     'estado_final': estado_final.estado_final_clasificacion,
                     'progreso': estado_final.progreso
                 })
 
-
         return Response(aerogeneradores_con_estado, status=status.HTTP_200_OK)
-

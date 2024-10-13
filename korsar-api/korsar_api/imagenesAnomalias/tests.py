@@ -1,22 +1,39 @@
 from django.urls import reverse
 from rest_framework.test import APITestCase
 from rest_framework import status
-from usuarios.models import Usuario  # Modelo de usuario personalizado
-from .models import Imagen, ImagenAnomalia, Anomalia
+from datetime import date
+
+from uuid import uuid4
+from .models import Anomalia
+from estadoComponentes.models import EstadoComponente
+from imagenes.models import Imagen
+from empresas.models import Empresa
+from imagenesAnomalias.models import ImagenAnomalia
+from parquesEolicos.models import ParquesEolicos
+from usuarios.models import Usuario
 from aerogeneradores.models import Aerogenerador
 from componentesAerogenerador.models import ComponenteAerogenerador
-from parquesEolicos.models import ParquesEolicos
-from estadoAerogeneradores.models import EstadoAerogenerador
 from inspecciones.models import Inspeccion
-import uuid
-class ImagenTests(APITestCase):
+from estadoAerogeneradores.models import EstadoAerogenerador
+
+class ImagenAnomaliaViewSetTestCase(APITestCase):
 
     def setUp(self):
-        # Crear un usuario de prueba (técnico)
+        """
+        Configurar instancias comunes para pruebas
+        """
+        # Crear la empresa
+        self.empresa = Empresa.objects.create(
+            uuid_empresa=uuid4(),
+            nombre_empresa="Empresa Test"
+        )
+
+        # Crear el usuario técnico
         self.tecnico = Usuario.objects.create_user(
             username='tecnico1',
             password='password123',
-            tipo_usuario=1  # Técnico
+            tipo_usuario=1,  # Técnico
+            uuid_empresa=self.empresa
         )
 
         # Obtener el token JWT
@@ -31,98 +48,103 @@ class ImagenTests(APITestCase):
         # Autenticar las solicitudes con el token JWT
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {self.token}')
 
-        # Crear un parque de prueba
+        # Crear una instancia de ParquesEolicos
         self.parque = ParquesEolicos.objects.create(
-            uuid_parque=uuid.uuid4(),
-            nombre_parque='Parque de Prueba',
-            ubicacion_comuna='Comuna Prueba',
-            ubicacion_region='Región Prueba',
+            nombre_parque="Parque Eólico Test",
+            ubicacion_comuna="Comuna Test",
+            ubicacion_region="Región Test",
             cantidad_turbinas=10,
             potencia_instalada=50.0,
-            coordenada_longitud=-70.123,
-            coordenada_latitud=-33.456
+            coordenada_longitud=-70.0,
+            coordenada_latitud=-30.0,
+            uuid_empresa=self.empresa
         )
 
-        # Crear una inspección de prueba asociada al parque
+        # Crear datos de prueba para inspección
         self.inspeccion = Inspeccion.objects.create(
-            uuid_inspeccion=uuid.uuid4(),
-            uuid_parque=self.parque,
-            fecha_inspeccion='2024-09-15',
-            fecha_siguiente_inspeccion='2025-09-15',
-            progreso='Completado'
+            uuid_inspeccion=uuid4(),
+            uuid_parque_eolico=self.parque,
+            fecha_inspeccion="2024-09-01",
+            fecha_siguiente_inspeccion="2025-09-01",
+            progreso="Inspección de prueba"
         )
 
-        # Crear un aerogenerador de prueba
+        # Crear el aerogenerador
         self.aerogenerador = Aerogenerador.objects.create(
-            uuid_aerogenerador=uuid.uuid4(),
-            uuid_parque=self.parque,
-            uuid_ultimo_estado=None,  # Estado no asignado (nulo)
+            uuid_parque_eolico=self.parque,
             numero_aerogenerador=1,
-            modelo_aerogenerador='Modelo 1',
-            fabricante_aerogenerador='Fabricante A',
-            altura_aerogenerador=100.0,
-            diametro_rotor=50.0,
-            potencia_nominal=3.0,
-            coordenada_longitud=-70.567,
-            coordenada_latitud=-33.678
+            modelo_aerogenerador="Modelo X",
+            fabricante_aerogenerador="Fabricante Y",
+            altura_aerogenerador=100,
+            diametro_rotor=80,
+            potencia_nominal=2.5,
+            coordenada_longitud=50.0,
+            coordenada_latitud=30.0
         )
 
-        # Crear un estado de prueba para el componente
-        self.estado_componente = EstadoAerogenerador.objects.create(
-            uuid_estado=uuid.uuid4(),
-            estado_final_clasificacion='Reparado',
-            progreso='Completado',
+        # Crear una instancia de EstadoAerogenerador
+        self.estadoAerogenerador = EstadoAerogenerador.objects.create(
+            uuid_estado=uuid4(),
             uuid_aerogenerador=self.aerogenerador,
-            uuid_inspeccion=self.inspeccion
+            uuid_inspeccion=self.inspeccion,
+            estado_final_clasificacion="Sin daño",
+            progreso="Completado"
         )
 
-        # Crear un componente de prueba relacionado con el aerogenerador
+        # Crear datos de prueba para componente
         self.componente = ComponenteAerogenerador.objects.create(
-            uuid_componente=uuid.uuid4(),
             uuid_aerogenerador=self.aerogenerador,
-            uuid_ultimo_estado=self.estado_componente,
-            tipo_componente='Rotor',
-            coordenada_longitud=-70.567,
-            coordenada_latitud=-33.678,
-            ruta_imagen_visualizacion_componente='/imagenes/rotor.jpg'
+            tipo_componente="Hélice",
+            coordenada_longitud=50.0,
+            coordenada_latitud=30.0,
+            ruta_imagen_visualizacion_componente="imagen.jpg"
         )
 
-        # Crear una imagen de prueba
+        # Crear una instancia de EstadoComponentes
+        self.estado_componente = EstadoComponente.objects.create(
+            uuid_componente=self.componente,
+            uuid_inspeccion=self.inspeccion,
+            estado_final_clasificacion="Sin daño",
+            progreso="Reparado"
+        )
+
+        # Crear una imagen asociada al aerogenerador
         self.imagen = Imagen.objects.create(
-            uuid_imagen=uuid.uuid4(),
             uuid_aerogenerador=self.aerogenerador,
+            nombre_imagen="imagen_prueba.jpg",
             uuid_componente=self.componente,
             uuid_inspeccion=self.inspeccion,
-            nombre_imagen='imagen1.jpg',
-            fecha_creacion='2024-09-15',
-            ruta_imagen='/imagenes/imagen1.jpg'
+            ruta_imagen="ruta/a/imagen_prueba.jpg",
+            estado_clasificacion="",
+            fecha_creacion=date.today()  # Proporcionar la fecha de creación
         )
 
-        # Crear una anomalía de prueba
+        # Crear una anomalía
         self.anomalia = Anomalia.objects.create(
-            uuid_anomalia=uuid.uuid4(),
             uuid_aerogenerador=self.aerogenerador,
             uuid_componente=self.componente,
-            codigo_anomalia='A001',
-            severidad_anomalia=5,
-            dimension_anomalia='10x10',
-            orientacion_anomalia='Noroeste',
-            descripcion_anomalia='Fisura en la pala del rotor.',
-            observacion_anomalia='Debe repararse urgentemente.',
-            coordenada_x=-70.567,
-            coordenada_y=-33.678,
             uuid_inspeccion=self.inspeccion,
-            uuid_tecnico=self.tecnico
+            uuid_tecnico=self.tecnico,
+            codigo_anomalia="A001",
+            severidad_anomalia=3,
+            dimension_anomalia="10x5",
+            orientacion_anomalia="Norte",
+            descripcion_anomalia="Fisura en la hélice",
+            observacion_anomalia="Requiere atención inmediata",
+            coordenada_x=50.5,
+            coordenada_y=-30.4
         )
 
-        # Relacionar la imagen con la anomalía
+        # Crear una imagen de anomalía
         self.imagen_anomalia = ImagenAnomalia.objects.create(
-            uuid_imagen_anomalia = uuid.uuid4(),
             uuid_imagen=self.imagen,
             uuid_anomalia=self.anomalia
         )
 
     def test_obtener_imagenes_por_anomalia(self):
+        """
+        Probar si se obtienen correctamente las imágenes asociadas a una anomalía.
+        """
         # Definimos la URL para obtener las imágenes asociadas a la anomalía
         url = reverse('imagenanomalia-listar-imagenes-por-anomalia', kwargs={'pk': str(self.anomalia.uuid_anomalia)})
 

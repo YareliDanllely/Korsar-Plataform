@@ -2,6 +2,8 @@ import uuid
 from django.db import models
 from aerogeneradores.models import Aerogenerador
 from estadoAerogeneradores.models import EstadoAerogenerador
+from inspecciones.models import Inspeccion
+
 
 class ComponenteAerogenerador(models.Model):
     """
@@ -13,12 +15,9 @@ class ComponenteAerogenerador(models.Model):
 
     # Relación con Aerogenerador y EstadoAerogenerador usando UUID
     uuid_aerogenerador = models.ForeignKey(Aerogenerador, on_delete=models.CASCADE)
-    uuid_ultimo_estado = models.ForeignKey(EstadoAerogenerador, on_delete=models.CASCADE, null=True, blank=True)  # Permitir nulos  # Relación con Estado Aerogenerador
 
     # Campos
     tipo_componente = models.CharField(max_length=255)
-    coordenada_longitud = models.FloatField()
-    coordenada_latitud = models.FloatField()
     ruta_imagen_visualizacion_componente = models.CharField(max_length=255)
 
 

@@ -15,40 +15,43 @@ class InspeccionViewSet(viewsets.ModelViewSet):
     serializer_class = InspeccionSerializer
     permission_classes = [IsAuthenticated]
 
-    # Definir consulta para obtener informacion de la ultima inspeccion, asociado a un parque en especifico
-    @action(detail=False, methods=['get'], url_path='ultima-inspeccion-parque')
+    @action(detail=False, methods=['get'], url_path='ultima-inspeccion-parque-eolico')
     def ultima_inspeccion_parque(self, request):
-        uuid_parque = request.query_params.get('uuid_parque')
+        """
+        Obtener la última inspección de un parque eólico en específico
+        """
+        uuid_parque_eolico = request.query_params.get('uuid_parque_eolico')
 
-        if uuid_parque is None:
-            return Response({'error': 'uuid_parque es requerido'}, status=status.HTTP_400_BAD_REQUEST)
+        if not uuid_parque_eolico:
+            return Response({'error': 'uuid_parque_eolico es requerido'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            ultima_inspeccion = Inspeccion.objects.filter(parque__uuid=uuid_parque).latest('fecha')
+            # Filtrar la última inspección por parque eólico
+            ultima_inspeccion = Inspeccion.objects.filter(uuid_parque_eolico=uuid_parque_eolico).latest('fecha_inspeccion')
             serializer = self.get_serializer(ultima_inspeccion)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response({'ultima_inspeccion': serializer.data}, status=status.HTTP_200_OK)
         except Inspeccion.DoesNotExist:
             return Response({'error': 'No se encontró inspección'}, status=status.HTTP_404_NOT_FOUND)
 
+    @action(detail=False, methods=['get'], url_path='ultima-proxima-inspeccion-parque-eolico')
+    def ultima_proxima_inspeccion(self, request):
+        """
+        Obtener la última inspección pasada y la próxima inspección futura de un parque eólico en específico
+        """
+        uuid_parque_eolico = request.query_params.get('uuid_parque_eolico')
 
-    # Definir consulta para obtener de una inspeccion en especifico
-    # ultima inspeccion y proxima
-    @action(detail=False, methods=['get'], url_path='inspeccion-ultima-proxima')
-    def ultima_proxima_inspeccion(self,request):
-        uuid_parque = request.query_params.get('uuid_parque')
-
-        if not uuid_parque:
-            return Response({'error': 'uuid_parque es requerido'}, status=status.HTTP_400_BAD_REQUEST)
+        if not uuid_parque_eolico:
+            return Response({'error': 'uuid_parque_eolico es requerido'}, status=status.HTTP_400_BAD_REQUEST)
 
         # Última inspección (más reciente en el pasado)
         try:
-            ultima_inspeccion = Inspeccion.objects.filter(uuid_parque=uuid_parque).latest('fecha_inspeccion')
+            ultima_inspeccion = Inspeccion.objects.filter(uuid_parque_eolico=uuid_parque_eolico).latest('fecha_inspeccion')
         except Inspeccion.DoesNotExist:
             ultima_inspeccion = None
 
         # Próxima inspección (la más cercana en el futuro)
         try:
-            proxima_inspeccion = Inspeccion.objects.filter(uuid_parque=uuid_parque, fecha_inspeccion__gt=ultima_inspeccion.fecha_inspeccion).earliest('fecha_inspeccion')
+            proxima_inspeccion = Inspeccion.objects.filter(uuid_parque_eolico=uuid_parque_eolico, fecha_inspeccion__gt=ultima_inspeccion.fecha_inspeccion).earliest('fecha_inspeccion')
         except Inspeccion.DoesNotExist:
             proxima_inspeccion = None
 
@@ -57,4 +60,3 @@ class InspeccionViewSet(viewsets.ModelViewSet):
             'proxima_inspeccion': self.get_serializer(proxima_inspeccion).data if proxima_inspeccion else None
         }
         return Response(data, status=status.HTTP_200_OK)
-

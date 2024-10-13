@@ -10,8 +10,7 @@ class AerogeneradorAdmin(admin.ModelAdmin):
     # Mostrar todos los campos del modelo Aerogenerador en la lista
     list_display = (
         'uuid_aerogenerador',
-        'get_nombre_parque',  # Mostrar el nombre del parque, no el UUID
-        'get_ultimo_estado',  # Mostrar el estado final
+        'get_nombre_parque_eolico',  # Mostrar el nombre del parque, no el UUID
         'numero_aerogenerador',
         'modelo_aerogenerador',
         'fabricante_aerogenerador',
@@ -29,11 +28,8 @@ class AerogeneradorAdmin(admin.ModelAdmin):
     list_filter = ('fabricante_aerogenerador', 'potencia_nominal')
 
     # Mostrar el nombre del parque en lugar del UUID
-    def get_nombre_parque(self, obj):
-        return obj.uuid_parque.nombre_parque  # Acceder al nombre del parque relacionado
-    get_nombre_parque.short_description = 'Nombre del Parque'
+    def get_nombre_parque_eolico(self, obj):
+        return obj.uuid_parque_eolico.nombre_parque  # Acceder al nombre del parque relacionado
+    get_nombre_parque_eolico.short_description = 'Nombre del Parque'
 
-    # Mostrar el estado final del aerogenerador
-    def get_ultimo_estado(self, obj):
-        return obj.id_ultimo_estado.estado_final_clasificacion  # Acceder al estado relacionado
-    get_ultimo_estado.short_description = 'Último Estado'
+    # Si id_ultimo_estado no existe en el modelo, se omite get_ultimo_estado

@@ -5,7 +5,7 @@ from .views import EstadoAerogeneradoresViewSet
 
 ## Definir el enrutador para la API
 router = DefaultRouter()
-router.register(r'estado_aerogeneradores', EstadoAerogeneradoresViewSet)
+router.register(r'items', EstadoAerogeneradoresViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),

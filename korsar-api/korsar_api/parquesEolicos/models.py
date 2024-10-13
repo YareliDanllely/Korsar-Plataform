@@ -8,7 +8,7 @@ class ParquesEolicos(models.Model):
     """
 
     # Clave primaria UUID
-    uuid_parque = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    uuid_parque_eolico = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     # Campos obligatorios
     nombre_parque = models.CharField(max_length=255, null=False, blank=False)
@@ -20,7 +20,7 @@ class ParquesEolicos(models.Model):
     coordenada_latitud = models.FloatField()
 
     # Relación con Empresa: Un parque está asociado a una empresa
-    empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE, related_name='parques')
+    uuid_empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE, related_name='parques')
 
 
     def __str__(self):

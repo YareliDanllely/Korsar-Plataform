@@ -9,9 +9,8 @@ class Aerogenerador(models.Model):
     # Llave primaria UUID
     uuid_aerogenerador = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
-    # Relaciones con otros modelos
-    uuid_parque = models.ForeignKey('parquesEolicos.ParquesEolicos', on_delete=models.CASCADE)
-    uuid_ultimo_estado = models.ForeignKey('estadoAerogeneradores.EstadoAerogenerador', on_delete=models.CASCADE, null=True, blank=True) # permitir nulos
+    # Relaciones con parque eólico
+    uuid_parque_eolico = models.ForeignKey('parquesEolicos.ParquesEolicos', on_delete=models.CASCADE)
 
     # Campos
     numero_aerogenerador = models.IntegerField()
