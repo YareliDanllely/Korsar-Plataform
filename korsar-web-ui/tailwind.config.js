@@ -10,6 +10,7 @@ export default {
           'azul-noche': '#183859',
           'azul-agua': '#004C6D',
           'turquesa-viento': '#34B0AD',
+          'turquesa-viente-transparent': 'rgba(52, 176, 173, 0.2)',
           'naranja-sol': '#D9514E',
           'arena-luz': '#F9F6E7',
           'verde-brillante': '#53AF0C',

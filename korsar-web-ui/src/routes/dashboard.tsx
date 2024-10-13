@@ -1,6 +1,4 @@
-import { Card, Button, Table } from 'flowbite-react';
-import { Chart as ChartJS, ArcElement, Tooltip, Legend, TooltipItem, ChartTypeRegistry, ChartOptions } from "chart.js";
-import { Doughnut } from "react-chartjs-2";
+import { Chart as ChartJS, ArcElement, Tooltip, Legend} from "chart.js";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 

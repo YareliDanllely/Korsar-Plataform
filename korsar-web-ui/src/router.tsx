@@ -4,7 +4,8 @@ import PrivateRoute from './routes/privateRoute';
 import Login from "./routes/login";
 import Layout from "./components/layout";
 import ParquesEolicos from "./routes/parquesEolicos";
-import Reportes from "./routes/reportes";
+import Inspecciones from "./routes/inspecciones";
+import RevisarInspeccion from "./routes/revisarInspeccion";
 
 const router = (
   <Router>
@@ -26,10 +27,18 @@ const router = (
           </Layout>
         </PrivateRoute>
         } />
-        <Route path="/reportes" element={
+        <Route path="/inspecciones" element={
           <PrivateRoute>
           <Layout>
-            <Reportes />
+            <Inspecciones />
+          </Layout>
+        </PrivateRoute>
+        } />
+
+        <Route path="/revisar/:uuid_inspeccion/:uuid_parque" element={
+          <PrivateRoute>
+          <Layout>
+            <RevisarInspeccion />
           </Layout>
         </PrivateRoute>
         } />

@@ -25,7 +25,6 @@ function Login() {
         console.log(`Token: ${token}`);
         // Aquí puedes guardar el token en algún lugar para usarlo en futuras solicitudes
         localStorage.setItem('token', token);
-
         // Navega al dashboard
         navigate('/dashboard');
       } catch (error) {

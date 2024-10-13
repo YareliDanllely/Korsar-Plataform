@@ -1,32 +1,3 @@
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
-
-node_modules
-dist
-dist-ssr
-*.local
-# Ignorar el entorno virtual en korsar-api
-/korsar-api/.venv/
-
-# Ignorar todos los directorios .venv en cualquier nivel
-**/.venv/
-
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-*.py[cod]
-__pycache__/
-**/__pycache__/
+node_modules/
+dist/
+# Otros patrones de archivos que deseas ignorar

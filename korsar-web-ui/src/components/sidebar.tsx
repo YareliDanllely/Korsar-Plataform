@@ -27,13 +27,14 @@ function SidebarComponent({ isOpen }: SidebarComponentProps) {
                   </Link>
                 </Sidebar.Item>
                 <Sidebar.Item as="div">
-                  <Link to="/reportes" className="flex items-center">
+                  <Link to="/inspecciones" className="flex items-center">
                     <HiDocumentReport className="mr-2" />
-                    Reportes
+                    Inspecciones
                   </Link>
                 </Sidebar.Item>
               </Sidebar.ItemGroup>
             </Sidebar.Items>
+
           </div>
         </Sidebar>
       )}
