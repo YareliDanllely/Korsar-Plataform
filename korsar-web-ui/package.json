@@ -14,6 +14,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@dnd-kit/core": "^6.1.0",
     "axios": "^1.7.2",
     "chart.js": "^4.4.3",
     "dropzone": "^6.0.0-beta.2",

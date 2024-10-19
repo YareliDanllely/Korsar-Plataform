@@ -1,19 +1,18 @@
-import { useState } from "react";
 import { TextInput, Textarea } from "flowbite-react";
-import DropZone from "./AgregarImagenAnomalia";
 import SelectorCategoria from "./selectorCategoria";
+import { DropZone } from "./dropZone"; // Importa el DropZone
 
-interface FormularioAnomaliasProps {
-  imageIds: string[]; // Recibir los IDs seleccionados desde PanelAnomalias
+interface Imagen {
+  uuid_imagen: string;
+  ruta_imagen: string;
 }
 
-export function FormularioAnomalias({ imageIds }: FormularioAnomaliasProps) {
-  const [localImageIds, setLocalImageIds] = useState<string[]>(imageIds);
+interface FormularioAnomaliasProps {
+  droppedImages: Imagen[]; // Recibe las imágenes desde el abuelo
+  onRemoveImage: (imageId: string) => void; // Recibe la función para eliminar una imagen
+}
 
-  const handleIdsAddedFromDropzone = (ids: string[]) => {
-    setLocalImageIds((prev) => [...prev, ...ids]);
-  };
-
+export function FormularioAnomalias({ droppedImages, onRemoveImage }: FormularioAnomaliasProps) {
   return (
     <div className="flex flex-col p-2 space-y-4">
       <h2 className="text-xl text-korsar-negro-90 font-semibold mb-1">Seleccionar Severidad</h2>
@@ -28,7 +27,7 @@ export function FormularioAnomalias({ imageIds }: FormularioAnomaliasProps) {
       <div className="flex w-full flex-row">
         <SelectorCategoria />
       </div>
-      <hr className="my-4 border-gray-300" /> {/* Línea divisora */}
+      <hr className="my-4 border-gray-300" />
 
       <h2 className="text-xl text-korsar-negro-90 font-semibold mb-1">Orientación de la Anomalía</h2>
       <p className="text-korsar-text-1">Ingrese la ubicación u orientación del daño en el componente</p>
@@ -40,7 +39,7 @@ export function FormularioAnomalias({ imageIds }: FormularioAnomaliasProps) {
         </div>
       </div>
 
-      <hr className="my-4 border-gray-300" /> {/* Línea divisora */}
+      <hr className="my-4 border-gray-300" />
 
       <h2 className="text-xl text-korsar-negro-90 font-semibold mb-1">Descripción de la Anomalía</h2>
       <p className="text-korsar-text-1">Proporcione detalles específicos sobre el daño observado</p>
@@ -66,23 +65,13 @@ export function FormularioAnomalias({ imageIds }: FormularioAnomaliasProps) {
         </div>
       </div>
 
-      <hr className="my-4 border-gray-300" /> {/* Línea divisora */}
+      <hr className="my-4 border-gray-300" />
 
-      <h2 className="text-xl text-korsar-negro-90 font-semibold mb-1">Asociación de Imagenes</h2>
-      <p className="text-korsar-text-1">Arrastre todas las imagenes asociadas a esta anomalía</p>
+      <h2 className="text-xl text-korsar-negro-90 font-semibold mb-1">Asociación de Imágenes</h2>
+      <p className="text-korsar-text-1">Arrastre todas las imágenes asociadas a esta anomalía</p>
 
       {/* DropZone */}
-      <DropZone onIdsAdded={handleIdsAddedFromDropzone} />
-
-      {/* Previsualización de IDs seleccionados */}
-      <div className="mt-4">
-        <h3>IDs de imágenes seleccionadas:</h3>
-        <ul>
-          {localImageIds.map((id, index) => (
-            <li key={index}>{id}</li>
-          ))}
-        </ul>
-      </div>
+      <DropZone droppedImages={droppedImages} onRemoveImage={onRemoveImage} />
     </div>
   );
 }

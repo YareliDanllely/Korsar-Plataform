@@ -4,12 +4,18 @@ import { obtenerAnomaliasFiltradas } from "../services/anomalias";
 import { Anomalia } from "../interfaces";
 import {FormularioAnomalias} from "./anomaliasFormulario";
 
+interface Imagen {
+  uuid_imagen: string;
+  ruta_imagen: string;
+}
+
 interface PanelAnomaliasProps {
   uuid_turbina: string;
   uuid_componente: string;
   uuid_inspeccion: string;
   busquedaActivada: boolean;
-  imageIds: string[]; // Recibe los IDs de las imágenes seleccionadas
+  droppedImages: Imagen[]; // Recibe las imágenes desde el abuelo
+  onRemoveImage: (imageId: string) => void; // Recibe la función para eliminar una imagen
 }
 
 export const PanelAnomalias: React.FC<PanelAnomaliasProps> = ({
@@ -17,7 +23,8 @@ export const PanelAnomalias: React.FC<PanelAnomaliasProps> = ({
   uuid_componente,
   uuid_inspeccion,
   busquedaActivada,
-  imageIds, // Pasar los IDs seleccionados
+  droppedImages,
+  onRemoveImage
 }) => {
   const [anomalies, setAnomalies] = useState<Anomalia[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -44,6 +51,9 @@ export const PanelAnomalias: React.FC<PanelAnomaliasProps> = ({
       cargarAnomalias();
     }
   }, [busquedaActivada, uuid_turbina, uuid_componente, uuid_inspeccion]);
+
+
+
 
   return (
     <div className="relative w-full h-full flex flex-col max-w-3xl mx-auto ">
@@ -92,7 +102,10 @@ export const PanelAnomalias: React.FC<PanelAnomaliasProps> = ({
 
             {/*Formulario Anomalias */}
             <div className="h-full w-full p-4 ">
-              <FormularioAnomalias imageIds={imageIds} />
+              <FormularioAnomalias
+              droppedImages={droppedImages}
+              onRemoveImage={onRemoveImage}
+              />
             </div>
 
           </Tabs.Item>

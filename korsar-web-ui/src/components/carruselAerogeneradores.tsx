@@ -38,7 +38,7 @@ export function AerogeneradorCarrusel({ uuid_parque_eolico, uuid_inspeccion }: {
       ) : (
         <Carousel
           slide={false}
-          leftControl={<HiArrowCircleLeft className="h-8 w-8 text-korsar-turquesa-viento opacity-40" />}
+          leftControl={<HiArrowCircleLeft className="h-8 w-8 text-korsar-turquesa-viento opacity-40 " />}
           rightControl={<HiArrowCircleRight className="h-8 w-8 text-korsar-turquesa-viento opacity-40" />}
         >
           {turbineGroups.map((group, index) => (

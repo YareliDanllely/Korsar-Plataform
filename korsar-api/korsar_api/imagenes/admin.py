@@ -11,13 +11,13 @@ class ImagenAdmin(admin.ModelAdmin):
     search_fields = ('nombre_imagen', 'estado_clasificacion')
 
     def get_aerogenerador(self, obj):
-        return obj.id_aerogenerador.numero_aerogenerador  # Mostrar número del aerogenerador
+        return obj.uuid_aerogenerador.numero_aerogenerador  # Mostrar número del aerogenerador
     get_aerogenerador.short_description = 'Número Aerogenerador'
 
     def get_componente(self, obj):
-        return obj.id_componente.tipo_componente  # Mostrar tipo de componente
+        return obj.uuid_componente.tipo_componente  # Mostrar tipo de componente
     get_componente.short_description = 'Componente'
 
     def get_inspeccion(self, obj):
-        return obj.id_inspeccion.fecha_inspeccion  # Mostrar fecha de inspección
+        return obj.uuid_inspeccion.fecha_inspeccion  # Mostrar fecha de inspección
     get_inspeccion.short_description = 'Fecha Inspección'

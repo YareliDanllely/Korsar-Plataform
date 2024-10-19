@@ -2,8 +2,13 @@ import { Dropdown, Button } from "flowbite-react";
 import { useEffect, useState } from 'react';
 import { obtenerAerogeneradores } from "../services/aerogeneradores";
 import { obtenerComponentesAerogenerador } from "../services/componentesAerogeneradores";
-import CarruselImagenes from './carruselImagenes'; // Importa el carrusel de imágenes
+import { DragZone } from "./dragZone";
 import { Aerogenerador, ComponenteAerogenerador } from "../interfaces";
+
+interface Imagen {
+  uuid_imagen: string;
+  ruta_imagen: string;
+}
 
 interface MenuDesplegableAerogeneradoresProps {
   uuid_parque_eolico: string;
@@ -11,7 +16,7 @@ interface MenuDesplegableAerogeneradoresProps {
   setUuidTurbina: React.Dispatch<React.SetStateAction<string | null>>;
   setUuidComponente: React.Dispatch<React.SetStateAction<string | null>>;
   onBuscar: () => void;
-  onImageSelect: (ids: string[]) => void; // Nueva propiedad para manejar los IDs seleccionados
+  onDragStart: (imagen: Imagen) => void; // Notificar cuando se arrastra una imagen
 }
 
 export function MenuDesplegableAerogeneradores({
@@ -20,13 +25,12 @@ export function MenuDesplegableAerogeneradores({
   setUuidTurbina,
   setUuidComponente,
   onBuscar,
-  onImageSelect, // Recibe la función desde RevisarInspeccion
+  onDragStart,
 }: MenuDesplegableAerogeneradoresProps) {
   const [aerogeneradores, setAerogeneradores] = useState<Aerogenerador[]>([]);
   const [componentes, setComponentes] = useState<ComponenteAerogenerador[]>([]);
   const [selectedAerogenerador, setSelectedAerogenerador] = useState<Aerogenerador | null>(null);
   const [selectedComponente, setSelectedComponente] = useState<ComponenteAerogenerador | null>(null);
-
 
   useEffect(() => {
     const fetchAerogeneradores = async () => {
@@ -54,9 +58,8 @@ export function MenuDesplegableAerogeneradores({
     fetchComponentes();
   }, [selectedAerogenerador, uuid_inspeccion]);
 
-
   return (
-    <div className="flex flex-col items-center gap-y"> {/* Separa los elementos más con gap-6 */}
+    <div className="flex flex-col items-center gap-y">
       {/* Dropdown de Aerogeneradores */}
       <div className="flex items-center gap-2 flex-wrap">
         <Dropdown
@@ -105,19 +108,17 @@ export function MenuDesplegableAerogeneradores({
         </Button>
       </div>
 
-      {/* Carrusel de Imágenes */}
+      {/* Carrusel de Imágenes (DragZone) */}
       {selectedAerogenerador && selectedComponente && (
-        <div className="w-full flex items-center mt-4 p-10 py-10"> {/* Asegúrate de que el carrusel tenga margen superior */}
-          <CarruselImagenes
+        <div className="w-full flex items-center centering mt-4 p-10 py-10">
+          <DragZone
             uuid_aerogenerador={selectedAerogenerador.uuid_aerogenerador}
             uuid_componente={selectedComponente.uuid_componente}
             uuid_parque={uuid_parque_eolico}
-            onImageSelect={onImageSelect} // Pasar la función para manejar la selección de imágenes
+            onDragStart={onDragStart} // Notificar al padre que una imagen fue arrastrada
           />
         </div>
       )}
-
-
     </div>
   );
 }

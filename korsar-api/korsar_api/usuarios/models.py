@@ -17,7 +17,7 @@ class Usuario(AbstractUser):
     )
 
     tipo_usuario = models.IntegerField(choices=TIPO_USUARIO_CHOICES, default=2)
-    uuid_empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE)
+    uuid_empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE, null=True, blank=True)  # Permitir valores nulos
     telefono = models.CharField(max_length=20, blank=True, null=True)
 
     groups = models.ManyToManyField(
