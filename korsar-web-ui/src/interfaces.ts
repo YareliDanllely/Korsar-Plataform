@@ -61,3 +61,18 @@ export interface Anomalia {
     coordenada_latitud: number;           // Coordenada de latitud del componente
     ruta_imagen_visualizacion_componente: string; // Ruta de la imagen de visualización del componente
   }
+
+
+
+  export interface Imagen {
+    uuid_imagen: string;                 // UUID como string
+    uuid_aerogenerador: string;          // ForeignKey representado como UUID string
+    uuid_componente: string;             // ForeignKey representado como UUID string
+    uuid_inspeccion: string;             // ForeignKey representado como UUID string
+
+    nombre_imagen: string;               // Nombre de la imagen
+    fecha_creacion: string;              // Fecha en formato ISO, tipado como string
+    ruta_imagen: string;                 // Ruta de la imagen
+
+    estado_clasificacion: 'no_clasificada' | 'con_dano' | 'sin_dano'; // Clasificación restringida a los valores posibles
+  }

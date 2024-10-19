@@ -9,13 +9,12 @@ export default {
         korsar: {
           'azul-noche': '#183859',
           'azul-agua': '#004C6D',
-          'turquesa-viento': '#34B0AD',
-          'turquesa-viente-transparent': 'rgba(52, 176, 173, 0.2)',
-          'naranja-sol': '#D9514E',
+          'turquesa-viento': '#34B0AD', // Categoria 2
+          'naranja-sol': '#D9514E',    // Categoria 5
           'arena-luz': '#F9F6E7',
-          'verde-brillante': '#53AF0C',
-          'amarillo-dorado': '#F9F6E7',
-          'naraja-brillante': '#F9F6E7',
+          'verde-brillante': '#53AF0C', // Categoria 1
+          'amarillo-dorado': '#FCD023', // Categoria 3
+          'naranja-brillante': '#FF9500', // Categoria 4
           'fondo-1': '#FAFAFA',
           'negro-90': '#43454B',
           'text-1': '#7B7B7D',

@@ -1,74 +1,123 @@
-import { Dropdown } from "flowbite-react";
+import { Dropdown, Button } from "flowbite-react";
 import { useEffect, useState } from 'react';
 import { obtenerAerogeneradores } from "../services/aerogeneradores";
 import { obtenerComponentesAerogenerador } from "../services/componentesAerogeneradores";
+import CarruselImagenes from './carruselImagenes'; // Importa el carrusel de imágenes
 import { Aerogenerador, ComponenteAerogenerador } from "../interfaces";
 
-export function MenuDesplegableAerogeneradores({ uuid_parque_eolico, uuid_inspeccion }: { uuid_parque_eolico: string; uuid_inspeccion: string }) {
-    const [aerogeneradores, setAerogeneradores] = useState<Aerogenerador[]>([]);
-    const [componentes, setComponentes] = useState<ComponenteAerogenerador[]>([]);
-    const [error, setError] = useState<string | null>(null);
-    const [selectedAerogenerador, setSelectedAerogenerador] = useState<Aerogenerador | null>(null);
+interface MenuDesplegableAerogeneradoresProps {
+  uuid_parque_eolico: string;
+  uuid_inspeccion: string;
+  setUuidTurbina: React.Dispatch<React.SetStateAction<string | null>>;
+  setUuidComponente: React.Dispatch<React.SetStateAction<string | null>>;
+  onBuscar: () => void;
+  onImageSelect: (ids: string[]) => void; // Nueva propiedad para manejar los IDs seleccionados
+}
 
-    useEffect(() => {
-        const fetchAerogeneradores = async () => {
-            try {
-                const data = await obtenerAerogeneradores(uuid_parque_eolico, uuid_inspeccion);
-                setAerogeneradores(data);
-                console.log('Aerogeneradores:', data);
-                if (data.length > 0) {
-                    setSelectedAerogenerador(data[0]); // Seleccionar el primer aerogenerador por defecto
-                }
-            } catch (error) {
-                setError('Error al obtener los Aerogeneradores');
-                console.error('Error al obtener los Aerogeneradores:', error);
-            }
-        };
-        fetchAerogeneradores();
-    }, [uuid_parque_eolico, uuid_inspeccion]);
-
-    useEffect(() => {
-        const fetchComponentes = async () => {
-            if (selectedAerogenerador) {
-                try {
-                    const data = await obtenerComponentesAerogenerador(selectedAerogenerador.uuid_aerogenerador, uuid_inspeccion);
-                    console.log('Componentes:', data);
-                    setComponentes(data);
-                } catch (error) {
-                    setError('Error al obtener los Componentes');
-                    console.error('Error al obtener los Componentes:', error);
-                }
-            } else {
-                setComponentes([]);
-            }
-        };
-        fetchComponentes();
-    }, [selectedAerogenerador, uuid_inspeccion]);
-
-    return (
-        <div className="flex items-center gap-4">
-            {error && <p className="text-red-500">{error}</p>}
-
-            {/* Dropdown de Componentes en la parte superior */}
-            {selectedAerogenerador && (
-                <Dropdown label="Componentes">
-                    {componentes.map((componente) => (
-                        <Dropdown.Item key={componente.uuid_componente}>
-                            Tipo Componente: {componente.tipo_componente}
-                        </Dropdown.Item>
-                    ))}
-                </Dropdown>
-            )}
+export function MenuDesplegableAerogeneradores({
+  uuid_parque_eolico,
+  uuid_inspeccion,
+  setUuidTurbina,
+  setUuidComponente,
+  onBuscar,
+  onImageSelect, // Recibe la función desde RevisarInspeccion
+}: MenuDesplegableAerogeneradoresProps) {
+  const [aerogeneradores, setAerogeneradores] = useState<Aerogenerador[]>([]);
+  const [componentes, setComponentes] = useState<ComponenteAerogenerador[]>([]);
+  const [selectedAerogenerador, setSelectedAerogenerador] = useState<Aerogenerador | null>(null);
+  const [selectedComponente, setSelectedComponente] = useState<ComponenteAerogenerador | null>(null);
 
 
-            {/* Dropdown de Aerogeneradores */}
-            <Dropdown label={selectedAerogenerador ? `Aerogenerador ${selectedAerogenerador.numero_aerogenerador}` : 'Seleccione Aerogenerador'}>
-                {aerogeneradores.map((aero) => (
-                    <Dropdown.Item key={aero.uuid_aerogenerador} onClick={() => setSelectedAerogenerador(aero)}>
-                        Número Aerogenerador: {aero.numero_aerogenerador}
-                    </Dropdown.Item>
-                ))}
-            </Dropdown>
+  useEffect(() => {
+    const fetchAerogeneradores = async () => {
+      const data = await obtenerAerogeneradores(uuid_parque_eolico, uuid_inspeccion);
+      setAerogeneradores(data);
+      if (data.length > 0) {
+        setSelectedAerogenerador(data[0]);
+        setUuidTurbina(data[0].uuid_aerogenerador);
+      }
+    };
+    fetchAerogeneradores();
+  }, [uuid_parque_eolico, uuid_inspeccion]);
+
+  useEffect(() => {
+    const fetchComponentes = async () => {
+      if (selectedAerogenerador) {
+        const data = await obtenerComponentesAerogenerador(selectedAerogenerador.uuid_aerogenerador, uuid_inspeccion);
+        setComponentes(data);
+        if (data.length > 0) {
+          setSelectedComponente(data[0]);
+          setUuidComponente(data[0].uuid_componente);
+        }
+      }
+    };
+    fetchComponentes();
+  }, [selectedAerogenerador, uuid_inspeccion]);
+
+
+  return (
+    <div className="flex flex-col items-center gap-y"> {/* Separa los elementos más con gap-6 */}
+      {/* Dropdown de Aerogeneradores */}
+      <div className="flex items-center gap-2 flex-wrap">
+        <Dropdown
+          label={selectedAerogenerador ? `Aerogenerador: ${selectedAerogenerador.numero_aerogenerador}` : 'Seleccione Aerogenerador'}
+          size="xs"
+        >
+          {aerogeneradores.map((aero) => (
+            <Dropdown.Item
+              key={aero.uuid_aerogenerador}
+              onClick={() => {
+                setSelectedAerogenerador(aero);
+                setUuidTurbina(aero.uuid_aerogenerador);
+              }}
+              className="text-sm"
+            >
+              Número Aerogenerador: {aero.numero_aerogenerador}
+            </Dropdown.Item>
+          ))}
+        </Dropdown>
+
+        {/* Dropdown de Componentes */}
+        <Dropdown
+          label={selectedComponente ? `Componente: ${selectedComponente.tipo_componente}` : 'Seleccione Componente'}
+          size="xs"
+        >
+          {componentes.map((componente) => (
+            <Dropdown.Item
+              key={componente.uuid_componente}
+              onClick={() => {
+                setSelectedComponente(componente);
+                setUuidComponente(componente.uuid_componente);
+              }}
+              className="text-sm"
+            >
+              Tipo Componente: {componente.tipo_componente}
+            </Dropdown.Item>
+          ))}
+        </Dropdown>
+
+        {/* Botón de Búsqueda */}
+        <Button
+          onClick={onBuscar}
+          className="text-sm py-0 px-1 bg-korsar-turquesa-viento text-white rounded-xl ml-auto"
+        >
+          Buscar
+        </Button>
+      </div>
+
+      {/* Carrusel de Imágenes */}
+      {selectedAerogenerador && selectedComponente && (
+        <div className="w-full flex items-center mt-4 p-10 py-10"> {/* Asegúrate de que el carrusel tenga margen superior */}
+          <CarruselImagenes
+            uuid_aerogenerador={selectedAerogenerador.uuid_aerogenerador}
+            uuid_componente={selectedComponente.uuid_componente}
+            uuid_parque={uuid_parque_eolico}
+            onImageSelect={onImageSelect} // Pasar la función para manejar la selección de imágenes
+          />
         </div>
-    );
+      )}
+
+
+    </div>
+  );
 }

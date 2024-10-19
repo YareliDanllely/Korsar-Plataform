@@ -20,22 +20,22 @@ function NavbarComponent({ setIsOpen, isOpen }: NavbarComponentProps) {
   };
 
   return (
-    <Navbar fluid rounded className="w-full bg-white shadow-md z-10">
+    <Navbar fluid rounded className="w-full bg-white shadow-md z-10 py-2"> {/* Ajuste en el padding vertical */}
       <div className="flex w-full justify-between items-center">
 
         <div className="flex justify-start">
-          <Button className="bg-korsar-turquesa-viento m-2" onClick={toggleSidebar}>
+          <Button className="bg-korsar-turquesa-viento m-1 p-1.2" onClick={toggleSidebar}>
             <HiMenu />
           </Button>
         </div>
 
         <div className="flex justify-center w-full">
-          <img src="/LogoKorsar_Agua_horizontal.png" className="h-12 sm:h-16" alt="Logo" />
+          <img src="/LogoKorsar_Agua_horizontal.png" className="h-8 sm:h-12" alt="Logo" /> {/* Logo más pequeño */}
         </div>
 
         <div className="flex flex-wrap">
           <Button
-            className="bg-korsar-turquesa-viento text-white whitespace-nowrap px-1 py-1 m-0"
+            className="bg-korsar-turquesa-viento text-white whitespace-nowrap px-2 py-1.2 m-0"
             onClick={logout}>
             Cerrar sesión
           </Button>

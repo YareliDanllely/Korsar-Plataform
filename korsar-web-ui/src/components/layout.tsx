@@ -10,7 +10,7 @@ function Layout({ children }: { children: ReactNode }) {
       <SidebarComponent isOpen={isOpen} />
       <div className="flex flex-col flex-1">
         <NavbarComponent setIsOpen={setIsOpen} isOpen={isOpen} />
-        <div className="bg-korsar-fondo-1 flex-1 overflow-y-auto p-4">
+        <div className="bg-korsar-fondo-1 flex-1 overflow-y-auto p-3">
           {children}
         </div>
       </div>

@@ -1,46 +1,70 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { AerogeneradorCarrusel } from '../components/carruselAerogeneradores';
 import { MenuDesplegableAerogeneradores } from '../components/menuDesplegableAerogeneradores';
-
+import { PanelAnomalias } from '../components/anomaliasPanel';
 
 const RevisarInspeccion: React.FC = () => {
   const { uuid_inspeccion, uuid_parque } = useParams<{ uuid_inspeccion: string; uuid_parque: string }>();
+  const [uuidTurbina, setUuidTurbina] = useState<string | null>(null);
+  const [uuidComponente, setUuidComponente] = useState<string | null>(null);
+  const [busquedaActivada, setBusquedaActivada] = useState<boolean>(false);
+  const [imageIds, setImageIds] = useState<string[]>([]); // Estado para los IDs de imágenes seleccionadas
 
-  console.log("UUID Inspección:", uuid_inspeccion);
-  console.log("UUID Parque Eólico:", uuid_parque);
+  const handleBuscar = () => {
+    setBusquedaActivada((prev) => !prev);
+  };
+
+  const handleImageSelect = (ids: string[]) => {
+    setImageIds((prevIds) => [...prevIds, ...ids]); // Añadir los IDs de imágenes seleccionadas
+  };
 
   return (
     <div className="w-full flex items-center justify-center min-h-screen">
-      <div className="w-full max-w-5xl h-[120vh] grid grid-cols-2 gap-5 p-5" style={{ gridTemplateRows: "minmax(100px, 1fr) 3fr" }}>
+      <div className="w-full max-w-7xl h-screen overflow-y-auto grid grid-cols-2 gap-3 p-5" style={{ gridTemplateRows: "min-content 0.7fr 2fr" }}>
 
-        {/* Cuadrante 1 */}
-        <div className="flex items-center justify-center bg-white w-full h-full shadow-md rounded-lg">
+        {/* Título de la inspección */}
+        <div className="col-span-2 flex flex-col items-start py-2 px-3">
+          <h2 className="text-2xl font-semibold">Inspección</h2>
+          <p className="text-korsar-azul-noche underline mt-1">Fecha: 2023-10-01</p>
+        </div>
+
+        {/* Carrusel de Aerogeneradores */}
+        <div className="bg-white w-full h-full shadow-md rounded-lg col-start-1 row-start-2">
           <AerogeneradorCarrusel
             uuid_inspeccion={uuid_inspeccion || ''}
             uuid_parque_eolico={uuid_parque || ''}
           />
         </div>
 
-        {/* Cuadrante 2 */}
-        <div className="flex items-center justify-center bg-white w-full h-full shadow-md rounded-lg">
-          2
+        {/* Panel de Anomalías */}
+        <div className="bg-white w-full h-full shadow-md rounded-lg row-span-2 col-start-2 row-start-2 overflow-y-auto">
+          {uuidTurbina && uuidComponente ? (
+            <PanelAnomalias
+              uuid_turbina={uuidTurbina}
+              uuid_componente={uuidComponente}
+              uuid_inspeccion={uuid_inspeccion || ''}
+              busquedaActivada={busquedaActivada}
+              imageIds={imageIds} // Pasar los IDs de imágenes seleccionadas al PanelAnomalias
+            />
+          ) : (
+            <p>Seleccione un aerogenerador y un componente para ver las anomalías.</p>
+          )}
         </div>
 
-        {/* Cuadrante 3 */}
-        <div className=" flex flex-col max-w-3xl mx-auto bg-white w-full h-full shadow-md rounded-lg">
-           <div className="p-5 border-b border-gray-200">
-          <MenuDesplegableAerogeneradores
-            uuid_parque_eolico={uuid_parque || ''}
-            uuid_inspeccion={uuid_inspeccion || ''}
-          />
-
+        {/* Menú Desplegable de Aerogeneradores */}
+        <div className="bg-white w-full h-full shadow-md rounded-lg col-start-1 row-start-3">
+          <div className="p-5">
+            <MenuDesplegableAerogeneradores
+              uuid_parque_eolico={uuid_parque || ''}
+              uuid_inspeccion={uuid_inspeccion || ''}
+              setUuidTurbina={setUuidTurbina}
+              setUuidComponente={setUuidComponente}
+              onBuscar={handleBuscar}
+              onImageSelect={handleImageSelect} // Pasar la función para seleccionar imágenes
+            />
           </div>
-        </div>
 
-        {/* Cuadrante 4 */}
-        <div className="flex items-center justify-center bg-white w-full h-full shadow-md rounded-lg">
-          4
         </div>
       </div>
     </div>

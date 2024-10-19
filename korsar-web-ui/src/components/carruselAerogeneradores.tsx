@@ -8,7 +8,6 @@ export function AerogeneradorCarrusel({ uuid_parque_eolico, uuid_inspeccion }: {
   const [aerogeneradores, setAerogeneradores] = useState<AerogeneradorConEstado[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [selectedTurbine, setSelectedTurbine] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchAerogeneradores = async () => {
@@ -24,10 +23,6 @@ export function AerogeneradorCarrusel({ uuid_parque_eolico, uuid_inspeccion }: {
     };
     fetchAerogeneradores();
   }, [uuid_parque_eolico, uuid_inspeccion]);
-
-  const handleViewClick = (turbineId: string) => {
-    setSelectedTurbine(turbineId);
-  };
 
   const turbineGroups = [];
   for (let i = 0; i < aerogeneradores.length; i += 4) {
@@ -51,10 +46,7 @@ export function AerogeneradorCarrusel({ uuid_parque_eolico, uuid_inspeccion }: {
               {group.map((turbine) => (
                 <div
                   key={turbine.uuid_aerogenerador}
-                  onClick={() => handleViewClick(turbine.uuid_aerogenerador)} // Seleccionar al hacer clic
-                  className={`flex-none w-20 sm:w-15 md:w-15 h-48 flex flex-col items-center justify-center space-y-2 p-3 cursor-pointer ${
-                    selectedTurbine === turbine.uuid_aerogenerador ? "bg-korsar-azul-noche text-white" : "bg-white"
-                  } rounded-lg`}
+                  className="flex-none w-20 sm:w-15 md:w-15 h-48 flex flex-col items-center justify-center space-y-2 p-3 bg-white rounded-lg"
                 >
                   <span className="text-lg font-semibold">#{turbine.numero_aerogenerador}</span>
                   {turbine.progreso === "Completado" ? (

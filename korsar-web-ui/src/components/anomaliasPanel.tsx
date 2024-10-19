@@ -1,86 +1,102 @@
-"use client";
-
-import { Button, Accordion, Tabs } from "flowbite-react";
-import { useEffect, useRef, useState } from "react";
-import { HiClipboardList, HiPlusCircle } from "react-icons/hi";
+import { Accordion, Tabs, Button } from "flowbite-react";
+import { useEffect, useState } from "react";
 import { obtenerAnomaliasFiltradas } from "../services/anomalias";
-import { Anomalia } from "../interfaces"; // Importa la interfaz Anomalia
+import { Anomalia } from "../interfaces";
+import {FormularioAnomalias} from "./anomaliasFormulario";
 
-// Definición de la función con tipado directo en los props
-export function PanelAnomalias({
-  uuid_turbina,
-  uuid_componente,
-  uuid_inspeccion,
-}: {
+interface PanelAnomaliasProps {
   uuid_turbina: string;
   uuid_componente: string;
   uuid_inspeccion: string;
-}) {
-  const tabsRef = useRef(null);
-  const [activeTab, setActiveTab] = useState(0);
-  const [anomalies, setAnomalies] = useState<Anomalia[]>([]); // Estado tipado como Anomalia[]
+  busquedaActivada: boolean;
+  imageIds: string[]; // Recibe los IDs de las imágenes seleccionadas
+}
+
+export const PanelAnomalias: React.FC<PanelAnomaliasProps> = ({
+  uuid_turbina,
+  uuid_componente,
+  uuid_inspeccion,
+  busquedaActivada,
+  imageIds, // Pasar los IDs seleccionados
+}) => {
+  const [anomalies, setAnomalies] = useState<Anomalia[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const cargarAnomalias = async () => {
-      setIsLoading(true);
-      setError(null);
+    if (busquedaActivada) { // Ejecutar solo cuando se active la búsqueda
+      const cargarAnomalias = async () => {
+        setIsLoading(true);
+        setError(null);
 
-      try {
-        const data = await obtenerAnomaliasFiltradas(uuid_turbina, uuid_componente, uuid_inspeccion);
-        setAnomalies(data); // Asegura que 'data' sea de tipo Anomalia[]
-      } catch (error) {
-        setError('No se pudo cargar las anomalías');
-        console.error('Error al cargar anomalías:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+        try {
+          const data = await obtenerAnomaliasFiltradas(uuid_turbina, uuid_componente, uuid_inspeccion);
+          console.log('anomalias', data);
+          setAnomalies(data);
+        } catch (error) {
+          setError('No se pudo cargar las anomalías');
+          console.error('Error al cargar anomalías:', error);
+        } finally {
+          setIsLoading(false);
+        }
+      };
 
-    cargarAnomalias();
-  }, [uuid_turbina, uuid_componente, uuid_inspeccion]);
+      cargarAnomalias();
+    }
+  }, [busquedaActivada, uuid_turbina, uuid_componente, uuid_inspeccion]);
 
   return (
-    <div className="w-full h-screen flex flex-col max-w-3xl mx-auto bg-white shadow-lg rounded-lg">
-      <div className="p-5 border-b border-gray-200">
+    <div className="relative w-full h-full flex flex-col max-w-3xl mx-auto ">
+      <div className="p-5">
         <h2 className="text-2xl font-semibold mb-4">Anomalías</h2>
-        <Tabs
-          aria-label="Anomalías Tabs"
-          ref={tabsRef}
-          onActiveTabChange={(tab) => setActiveTab(tab)}
-        >
-          <Tabs.Item active title="Anomalías Clasificadas" icon={HiClipboardList}>
+        <Tabs aria-label="Anomalías Tabs">
+          <Tabs.Item active title="Anomalías Clasificadas">
             <div className="mt-4">
               {isLoading ? (
-                <p className="text-gray-500">Cargando anomalías...</p>
+                <p>Cargando anomalías...</p>
               ) : error ? (
-                <p className="text-red-500">{error}</p>
+                <p>{error}</p>
+              ) : !busquedaActivada ? (
+                // Mensaje para cuando no se ha realizado la búsqueda
+                <p>Seleccione turbina y componente para cargar datos.</p>
+              ) : anomalies.length === 0 ? (
+                // Mensaje para cuando no existen anomalías asociadas tras la búsqueda
+                <p>No existen anomalías asociadas.</p>
               ) : (
+                // Mostrar anomalías cuando existan
                 <Accordion collapseAll>
                   {anomalies.map((anomaly) => (
                     <Accordion.Panel key={anomaly.uuid_anomalia}>
                       <Accordion.Title>{anomaly.codigo_anomalia}</Accordion.Title>
                       <Accordion.Content>
-                        <p className="text-sm text-gray-400">Clasificación: Tipo {anomaly.severidad_anomalia}</p>
+                        <div className="grid gap-3 grid-flow-2 auto-rows-max">
+                          <div>
+                            <p>Clasificación: <span className="text-gray-500">{anomaly.severidad_anomalia}</span></p>
+                          </div>
+                          <div>
+                            <p>Descripción: <span className="text-gray-500">{anomaly.descripcion_anomalia} </span></p>
+                          </div>
+                          <div>
+                            <Button className="text-sm py-0 px-1 rounded-xl ml-auto">Ver Más</Button>
+                          </div>
+                        </div>
                       </Accordion.Content>
+
                     </Accordion.Panel>
                   ))}
                 </Accordion>
               )}
             </div>
           </Tabs.Item>
-          <Tabs.Item title="Crear Nueva Anomalía" icon={HiPlusCircle}>
-            <div className="mt-4">
-              <p className="text-gray-500">Formulario para crear una nueva anomalía aquí.</p>
+          <Tabs.Item title="Crear Nueva Anomalía">
+
+            {/*Formulario Anomalias */}
+            <div className="h-full w-full p-4 ">
+              <FormularioAnomalias imageIds={imageIds} />
             </div>
+
           </Tabs.Item>
         </Tabs>
-      </div>
-
-      <div className="p-5 border-t border-gray-200 flex justify-center">
-        <Button color="gray">Anterior</Button>
-        <Button color="gray" className="ml-2">Siguiente</Button>
       </div>
     </div>
   );
