@@ -58,11 +58,13 @@ export function MenuDesplegableAerogeneradores({
     fetchComponentes();
   }, [selectedAerogenerador, uuid_inspeccion]);
 
+
+
   return (
-    <div className="flex flex-col items-center gap-y">
+    <div className="flex flex-col  gap-2">
       {/* Dropdown de Aerogeneradores */}
-      <div className="flex items-center gap-2 flex-wrap">
-        <Dropdown
+      <div className="flex items-start justify-start gap-5 flex-wrap">
+      <Dropdown
           label={selectedAerogenerador ? `Aerogenerador: ${selectedAerogenerador.numero_aerogenerador}` : 'Seleccione Aerogenerador'}
           size="xs"
         >
@@ -110,8 +112,8 @@ export function MenuDesplegableAerogeneradores({
 
       {/* Carrusel de Imágenes (DragZone) */}
       {selectedAerogenerador && selectedComponente && (
-        <div className="w-full flex items-center centering mt-4 p-10 py-10">
-          <DragZone
+        <div className="w-full flex justify-center items-center mt-4 p-10 py-10">
+        <DragZone
             uuid_aerogenerador={selectedAerogenerador.uuid_aerogenerador}
             uuid_componente={selectedComponente.uuid_componente}
             uuid_parque={uuid_parque_eolico}

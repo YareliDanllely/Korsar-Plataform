@@ -2,9 +2,29 @@ from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework_simplejwt.views import TokenObtainPairView
 from .models import Usuario
 from .serializers import UsuarioSerializer
 from .permissions import IsTechnician  # Importar el permiso correcto
+
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    def post(self, request, *args, **kwargs):
+        # Llama al método post del padre para obtener la respuesta estándar de JWT
+        response = super().post(request, *args, **kwargs)
+
+        # Obtenemos el serializer y los datos validados
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        # Obtenemos el usuario desde el serializer
+        user = serializer.user
+
+        # Agregar el user_id (o uuid_usuario si es personalizado) a la respuesta
+        response.data['user_id'] = str(user.uuid_usuario)  # Usa 'id' o 'uuid_usuario', según tu modelo
+
+        return response
+
 
 class UsuarioViewSet(viewsets.ModelViewSet):
     queryset = Usuario.objects.all()

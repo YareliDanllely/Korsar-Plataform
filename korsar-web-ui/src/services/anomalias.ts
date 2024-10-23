@@ -34,53 +34,49 @@ export const obtenerAnomaliasFiltradas = async (uuid_turbina:string, uuid_compon
 };
 
 
+interface AnomaliaData {
+  uuid_aerogenerador: string;
+  uuid_componente: string;
+  uuid_inspeccion: string;
+  uuid_tecnico: string | null;
+  codigo_anomalia: string;
+  severidad_anomalia: number;
+  dimension_anomalia: string;
+  orientacion_anomalia: string;
+  descripcion_anomalia: string;
+  observacion_anomalia?: string;
+  coordenada_x: number;
+  coordenada_y: number;
+}
 
+export const crearAnomalia = async (data: AnomaliaData): Promise<Anomalia> => {
+  const token = localStorage.getItem('token');
+  const response = await api.post<Anomalia>('/anomalias/items/', data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+  });
+  return response.data;
+};
 
-// Función para crear una nueva anomalía con la interfaz Anomalia
-export const crearAnomalia = async (
-  uuid_aerogenerador: string,
-  uuid_componente: string,
-  uuid_inspeccion: string,
-  uuid_tecnico: string | null,
-  codigo_anomalia: string,
-  severidad_anomalia: number,
-  dimension_anomalia: string,
-  orientacion_anomalia: string,
-  descripcion_anomalia: string | undefined,
-  observacion_anomalia: string | undefined,
-  coordenada_x: number,
-  coordenada_y: number
-): Promise<Anomalia> => {
+// Función para obtener el siguiente número de daño para un componente específico
+export const obtenerSiguienteNumeroDano = async (uuid_componente: string): Promise<string> => {
   const token = localStorage.getItem('token');
 
   try {
-    const response = await api.post<Anomalia>(
-      '/anomalias/items/',
-      {
-        uuid_aerogenerador,
-        uuid_componente,
-        uuid_inspeccion,
-        uuid_tecnico,
-        codigo_anomalia,
-        severidad_anomalia,
-        dimension_anomalia,
-        orientacion_anomalia,
-        descripcion_anomalia,
-        observacion_anomalia,
-        coordenada_x,
-        coordenada_y,
+    const response = await api.get('/anomalias/items/siguiente-numero-dano/', {
+      headers: {
+        Authorization: `Bearer ${token}`,
       },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+      params: {
+        uuid_componente, // Usar el UUID del componente
+      },
+    });
 
-    return response.data;
+    return response.data.siguiente_numero_dano; // Devuelve el siguiente número de daño en formato de 4 dígitos
   } catch (error) {
-    console.error('Error al crear la anomalía:', error);
+    console.error('Error al obtener el siguiente número de daño:', error);
     throw error;
   }
 };

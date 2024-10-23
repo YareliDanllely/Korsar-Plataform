@@ -12,6 +12,7 @@ class ParquesEolicos(models.Model):
 
     # Campos obligatorios
     nombre_parque = models.CharField(max_length=255, null=False, blank=False)
+    abreviatura_parque = models.CharField(max_length=255, null=False, blank=False)
     ubicacion_comuna = models.CharField(max_length=255)
     ubicacion_region = models.CharField(max_length=255)
     cantidad_turbinas = models.IntegerField()

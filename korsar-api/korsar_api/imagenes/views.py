@@ -30,7 +30,6 @@ class ImagenViewSet(viewsets.ModelViewSet):
 
 
 # Obtener imagenes por componente, aerogenerador e inspeccion(*****)
-
 class ImagenFiltradaListView(generics.ListAPIView):
     """
     Vista que permite filtrar las imágenes por parque, aerogenerador y componente.

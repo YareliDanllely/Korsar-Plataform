@@ -49,3 +49,17 @@ class AerogeneradorViewSet(viewsets.ModelViewSet):
                 })
 
         return Response(aerogeneradores_con_estado, status=status.HTTP_200_OK)
+
+    # Obtener el número de un aerogenerador basado en su UUID
+    @action(detail=False, methods=['get'], url_path='numero-aerogenerador')
+    def obtener_numero_aerogenerador(self, request):
+        uuid_aerogenerador = request.query_params.get('uuid_aerogenerador')
+
+        if not uuid_aerogenerador:
+            return Response({'error': 'El parámetro uuid_aerogenerador es requerido'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            aerogenerador = Aerogenerador.objects.get(pk=uuid_aerogenerador)
+            return Response({'numero_aerogenerador': aerogenerador.numero_aerogenerador}, status=status.HTTP_200_OK)
+        except Aerogenerador.DoesNotExist:
+            return Response({'error': 'Aerogenerador no encontrado'}, status=status.HTTP_404_NOT_FOUND)

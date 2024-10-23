@@ -20,3 +20,4 @@ class Inspeccion(models.Model):
 
     def __str__(self):
         return f"Inspección {self.uuid_inspeccion} del Parque {self.uuid_parque_eolico.nombre_parque}"
+

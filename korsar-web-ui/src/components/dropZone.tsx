@@ -18,12 +18,11 @@ export const DropZone: React.FC<DropZoneProps> = ({ droppedImages, onRemoveImage
   return (
       <div
         ref={setNodeRef}
-        className={`w-full h-32 min-h-[150px] border-2 border-gray-500 border-dashed rounded-lg flex justify-center items-center ${isOver ? 'bg-green-100' : ''}`}
+        className={`w-full h-32 min-h-[150px] border-2 border-korsar-text-1 border-dashed rounded-lg flex justify-center items-center ${isOver ? 'bg-green-100' : ''}`}
       >
 
-
       {droppedImages.length === 0 ? (
-        <p>Arrastra las imágenes aquí</p>
+        <p className='text-korsar-text-2'>Imagenes</p>
       ) : (
         <div className="flex flex-wrap space-x-4">
           {droppedImages.map((img) => (

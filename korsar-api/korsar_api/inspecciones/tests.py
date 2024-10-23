@@ -83,7 +83,6 @@ class InspeccionViewSetTestCase(APITestCase):
         url = reverse('inspeccion-ultima-inspeccion-parque')
 
 
-
         # Hacer la solicitud GET con el UUID del parque
         response = self.client.get(url, {'uuid_parque_eolico': str(self.parque.uuid_parque_eolico)})
 

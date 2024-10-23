@@ -1,10 +1,16 @@
-import { useState } from "react";
+import React, { useState } from "react";
 
-const SelectorCategoria = () => {
+interface SelectorCategoriaProps {
+  onCategoriaSelected: (number: number) => void;
+}
+
+const SelectorCategoria: React.FC<SelectorCategoriaProps> = ({ onCategoriaSelected }) => {
     const [selected, setSelected] = useState<number | null>(null);
+
 
     const handleSelection = (number: number): void => {
         setSelected(number);
+        onCategoriaSelected(number);
     };
 
     return (

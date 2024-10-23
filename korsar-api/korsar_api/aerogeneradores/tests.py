@@ -44,6 +44,7 @@ class AerogeneradorViewSetTestCase(APITestCase):
         # Crear el parque eólico
         self.parque = ParquesEolicos.objects.create(
             nombre_parque="Parque Eólico Test",
+            abreviatura_parque="PET",
             ubicacion_comuna="Comuna Test",
             ubicacion_region="Región Test",
             cantidad_turbinas=5,
@@ -96,7 +97,6 @@ class AerogeneradorViewSetTestCase(APITestCase):
             progreso="Completado"
         )
 
-
         self.estado_aerogenerador_2 = EstadoAerogenerador.objects.create(
             uuid_estado=uuid4(),
             uuid_aerogenerador=self.aerogenerador_2,
@@ -105,34 +105,81 @@ class AerogeneradorViewSetTestCase(APITestCase):
             progreso="En progreso"
         )
 
-def test_listar_por_parque_inspeccion(self):
-    """
-    Probar si el endpoint devuelve correctamente los aerogeneradores y sus estados finales
-    filtrados por parque e inspección.
-    """
-    url = reverse('items-listar-por-parque-inspeccion')
+    def test_listar_por_parque_inspeccion(self):
+        """
+        Probar si el endpoint devuelve correctamente los aerogeneradores y sus estados finales
+        filtrados por parque e inspección.
+        """
+        url = reverse('items-estado-por-inspeccion')
 
-    # Hacer una solicitud GET con los parámetros uuid_parque y uuid_inspeccion
-    params = {
-        'uuid_parque_eolico': str(self.parque.uuid_parque),
-        'uuid_inspeccion': str(self.inspeccion.uuid_inspeccion)
-    }
-    response = self.client.get(url, params)
+        # Hacer una solicitud GET con los parámetros uuid_parque y uuid_inspeccion
+        params = {
+            'uuid_parque_eolico': str(self.parque.uuid_parque),
+            'uuid_inspeccion': str(self.inspeccion.uuid_inspeccion)
+        }
+        response = self.client.get(url, params)
 
-    # Asegurarse de que la respuesta sea 200 OK
-    self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # Asegurarse de que la respuesta sea 200 OK
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    # Verificar que se retornen 2 aerogeneradores con sus estados
-    self.assertEqual(len(response.data), 2)
+        # Verificar que se retornen 2 aerogeneradores con sus estados
+        self.assertEqual(len(response.data), 2)
 
-    # Verificar que los detalles del primer aerogenerador sean correctos
-    self.assertEqual(str(response.data[0]['uuid_aerogenerador']), str(self.aerogenerador_1.uuid_aerogenerador))
-    self.assertEqual(response.data[0]['numero_aerogenerador'], self.aerogenerador_1.numero_aerogenerador)
-    self.assertEqual(response.data[0]['estado_final'], self.estado_aerogenerador_1.estado_final_clasificacion)
-    self.assertEqual(response.data[0]['progreso'], self.estado_aerogenerador_1.progreso)
+        # Verificar que los detalles del primer aerogenerador sean correctos
+        self.assertEqual(str(response.data[0]['uuid_aerogenerador']), str(self.aerogenerador_1.uuid_aerogenerador))
+        self.assertEqual(response.data[0]['numero_aerogenerador'], self.aerogenerador_1.numero_aerogenerador)
+        self.assertEqual(response.data[0]['estado_final'], self.estado_aerogenerador_1.estado_final_clasificacion)
+        self.assertEqual(response.data[0]['progreso'], self.estado_aerogenerador_1.progreso)
 
-    # Verificar que los detalles del segundo aerogenerador sean correctos
-    self.assertEqual(str(response.data[1]['uuid_aerogenerador']), str(self.aerogenerador_2.uuid_aerogenerador))
-    self.assertEqual(response.data[1]['numero_aerogenerador'], self.aerogenerador_2.numero_aerogenerador)
-    self.assertEqual(response.data[1]['estado_final'], self.estado_aerogenerador_2.estado_final_clasificacion)
-    self.assertEqual(response.data[1]['progreso'], self.estado_aerogenerador_2.progreso)
+        # Verificar que los detalles del segundo aerogenerador sean correctos
+        self.assertEqual(str(response.data[1]['uuid_aerogenerador']), str(self.aerogenerador_2.uuid_aerogenerador))
+        self.assertEqual(response.data[1]['numero_aerogenerador'], self.aerogenerador_2.numero_aerogenerador)
+        self.assertEqual(response.data[1]['estado_final'], self.estado_aerogenerador_2.estado_final_clasificacion)
+        self.assertEqual(response.data[1]['progreso'], self.estado_aerogenerador_2.progreso)
+
+    def test_obtener_numero_aerogenerador_exitoso(self):
+        """
+        Verificar que se puede obtener el número de un aerogenerador por UUID
+        """
+        url = reverse('items-numero-aerogenerador')  # Ajusta esta URL a tu configuración de rutas
+        params = {
+            'uuid_aerogenerador': str(self.aerogenerador_1.uuid_aerogenerador)
+        }
+
+        # Hacer la solicitud GET
+        response = self.client.get(url, params)
+
+        # Verificar que el estado sea 200 OK
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Verificar que el número del aerogenerador sea correcto
+        self.assertEqual(response.data['numero_aerogenerador'], self.aerogenerador_1.numero_aerogenerador)
+
+    def test_obtener_numero_aerogenerador_no_encontrado(self):
+        """
+        Verificar que el error 404 se devuelve si no se encuentra el aerogenerador
+        """
+        url = reverse('items-numero-aerogenerador')
+        params = {
+            'uuid_aerogenerador': str(uuid4())  # UUID aleatorio que no existe
+        }
+
+        # Hacer la solicitud GET
+        response = self.client.get(url, params)
+
+        # Verificar que el estado sea 404 Not Found
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.data['error'], 'Aerogenerador no encontrado')
+
+    def test_obtener_numero_aerogenerador_parametro_faltante(self):
+        """
+        Verificar que se devuelve un error si falta el parámetro uuid_aerogenerador
+        """
+        url = reverse('items-numero-aerogenerador')
+
+        # Hacer la solicitud GET sin pasar el parámetro uuid_aerogenerador
+        response = self.client.get(url)
+
+        # Verificar que el estado sea 400 Bad Request
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['error'], 'El parámetro uuid_aerogenerador es requerido')

@@ -51,6 +51,30 @@ class AnomaliaViewSet(viewsets.ModelViewSet):
         return Response({'resultados': list(resultados)}, status=status.HTTP_200_OK)
 
 
+    # Definir consulta para obtener el siguiente número de daño
+    @action(detail=False, methods=['get'], url_path='siguiente-numero-dano')
+    def obtener_siguiente_numero_damage(self, request):
+        uuid_componente = request.query_params.get('uuid_componente')
+        if not uuid_componente:
+            return Response({'error': 'uuid_componente es requerido'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Filtrar anomalías por uuid_componente
+        anomalias = Anomalia.objects.filter(codigo_anomalia__contains=uuid_componente)
+
+        # Lista para almacenar números de daño
+        numero_damage = []
+
+        for anomalia in anomalias:
+            # Usar expresión regular para extraer el número de daño
+            match = re.search(r'-\d{4}-(\d+)-', anomalia.codigo_anomalia)
+            if match:
+                numero_damage.append(int(match.group(1)))  # Agregar el número de daño a la lista
+
+        # Calcular el siguiente número de daño
+        siguiente_numero_dano = (max(numero_damage) + 1) if numero_damage else 1
+
+        return Response({'siguiente_numero_dano': f"{siguiente_numero_dano:04d}"}, status=status.HTTP_200_OK)
+
 # Vista para obtener anomalías definidas por aerogenerador, componente e inspección
 class AnomaliaListView(generics.ListAPIView):
     """
