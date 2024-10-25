@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { ComponenteAerogenerador } from '../interfaces';
+import { ComponenteAerogenerador } from '../utils/interfaces';
 const BASE_URL = 'http://localhost:8000/api';
 
 // Crea una instancia de axios con una configuración personalizada.

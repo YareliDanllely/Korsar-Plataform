@@ -33,10 +33,9 @@ class Anomalia(models.Model):
 
     dimension_anomalia = models.CharField(max_length=255)
     orientacion_anomalia = models.CharField(max_length=255)
-    descripcion_anomalia = models.TextField(blank=True, null=True)
+    descripcion_anomalia = models.TextField()
     observacion_anomalia = models.TextField(blank=True, null=True)
-    coordenada_x = models.FloatField()
-    coordenada_y = models.FloatField()
+
 
 
     def __str__(self):

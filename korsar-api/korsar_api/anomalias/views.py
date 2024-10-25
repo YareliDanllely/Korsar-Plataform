@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import generics
 from .serializers import AnomaliaSerializer
-
+import re
 
 # Vista para operaciones CRUD de Anomalias
 class AnomaliaViewSet(viewsets.ModelViewSet):

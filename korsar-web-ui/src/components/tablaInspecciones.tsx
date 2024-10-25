@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Table } from "flowbite-react";
 import { useNavigate } from 'react-router-dom';
-import { Inspeccion } from '../interfaces';
+import { Inspeccion } from '../utils/interfaces';
 
 interface TablaInspeccionesProps {
   data: Inspeccion[];

@@ -1,10 +1,13 @@
-import React, { useEffect, useState } from 'react'; // Asegúrate de importar useEffect y useState
-import { TextInput, Textarea, Button } from "flowbite-react"; // Importa Button para el envío
+import React, { useEffect, useState } from 'react';
+import { TextInput, Textarea, Button } from "flowbite-react";
 import SelectorCategoria from "./selectorCategoria";
-import { DropZone } from "./dropZone"; // Importa el DropZone
-import { obtenerSiguienteNumeroDano, crearAnomalia } from '../services/anomalias'; // Asegúrate de importar estas funciones
+import { DropZone } from "./dropZone";
+import { obtenerSiguienteNumeroDano, crearAnomalia } from '../services/anomalias';
 import { obtenerAbreviaturaParque } from '../services/parqueEolico';
 import { obtenerNumeroAerogenerador } from '../services/aerogeneradores';
+import { validarFormularioAnomalia } from '../utils/validacionesAnomalia';
+import { ValidacionErrores } from "../utils/interfaces";
+import { ConfirmacionModal } from './modalConfirmacion';
 
 interface Imagen {
   uuid_imagen: string;
@@ -12,31 +15,31 @@ interface Imagen {
 }
 
 interface FormularioAnomaliasProps {
-  droppedImages: Imagen[]; // Recibe las imágenes desde el abuelo
-  onRemoveImage: (imageId: string) => void; // Recibe la función para eliminar una imagen
-  uuid_aerogenerador: string; // UUID del aerogenerador
-  uuid_componente: string; // UUID del componente
+  droppedImages: Imagen[];
+  onRemoveImage: (imageId: string) => void;
+  uuid_aerogenerador: string;
+  uuid_componente: string;
   uuid_inspeccion: string;
-  uuid_parque: string; // UUID del parque
+  uuid_parque: string;
 }
 
 export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogenerador, uuid_componente, uuid_inspeccion, uuid_parque }: FormularioAnomaliasProps) {
-  const [siguienteNumeroDano, setSiguienteNumeroDano] = useState<string>(''); // Estado para almacenar el siguiente número de daño
-  const [abreviaturaParque, setAbreviaturaParque] = useState<string>(''); // Estado para almacenar la abreviatura del parque
-  const [numeroAerogenerador, setNumeroAerogenerador] = useState<number>(0); // Estado para almacenar el número del aerogenerador
-  const [codigoAnomalia, setCodigoAnomalia] = useState<string>(''); // Estado para almacenar el código de la anomalía
+  const [siguienteNumeroDano, setSiguienteNumeroDano] = useState<string>('');
+  const [abreviaturaParque, setAbreviaturaParque] = useState<string>('');
+  const [numeroAerogenerador, setNumeroAerogenerador] = useState<number>(0);
+  const [codigoAnomalia, setCodigoAnomalia] = useState<string>('');
   const [categoriaDaño, setCategoriaDaño] = useState<number>(0);
-  const [orientacionAnomalia, setOrientacionAnomalia] = useState<string>(''); // Estado para almacenar la orientación de la anomalía
-  const [dimensionAnomalia, setDimensionAnomalia] = useState<string>(''); // Estado para almacenar la dimensión de la anomalía
-  const [descripcionAnomalia, setDescripcionAnomalia] = useState<string>(''); // Estado para almacenar la descripción de la anomalía
-  const [observacionAnomalia, setObservacionAnomalia] = useState<string>(''); // Estado para almacenar la observación de la anomalía
+  const [orientacionAnomalia, setOrientacionAnomalia] = useState<string>('');
+  const [dimensionAnomalia, setDimensionAnomalia] = useState<string>('');
+  const [descripcionAnomalia, setDescripcionAnomalia] = useState<string>('');
+  const [observacionAnomalia, setObservacionAnomalia] = useState<string>('');
   const [userId, setUserId] = useState<string | null>(null);
-
+  const [errores, setErrores] = useState<ValidacionErrores>({});
+  const [openModal, setOpenModal] = useState(false);  // Controla el estado del modal
 
   useEffect(() => {
     const storedUserId = localStorage.getItem('userId');
     setUserId(storedUserId);
-    console.log(`User ID: ${storedUserId}`);
   }, []);
 
   useEffect(() => {
@@ -44,7 +47,6 @@ export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogen
       try {
         const numero = await obtenerSiguienteNumeroDano(uuid_componente);
         setSiguienteNumeroDano(numero);
-        console.log('Siguiente número de daño:', numero);
       } catch (error) {
         console.error('Error al obtener el siguiente número de daño:', error);
       }
@@ -60,7 +62,6 @@ export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogen
       try {
         const abreviatura = await obtenerAbreviaturaParque(uuid_parque);
         setAbreviaturaParque(abreviatura);
-        console.log('Abreviatura del parque:', abreviatura);
       } catch (error) {
         console.error('Error al obtener la abreviatura del parque:', error);
       }
@@ -77,9 +78,6 @@ export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogen
         const numero = await obtenerNumeroAerogenerador(uuid_aerogenerador);
         if (numero) {
           setNumeroAerogenerador(numero);
-          console.log('Número del aerogenerador obtenido:', numero);
-        } else {
-          console.error('El número del aerogenerador es nulo o indefinido');
         }
       } catch (error) {
         console.error('Error al obtener el número del aerogenerador:', error);
@@ -92,9 +90,8 @@ export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogen
   }, [uuid_aerogenerador]);
 
   const handleCategoriaSelected = (categoria: number) => {
-    setCategoriaDaño(categoria); // Actualiza la categoría
+    setCategoriaDaño(categoria);
   };
-
 
   useEffect(() => {
     if (categoriaDaño !== 0) {
@@ -102,45 +99,68 @@ export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogen
     }
   }, [categoriaDaño]);
 
-
-
   const generarCodigoAnomalia = () => {
     const fechaActual = new Date();
     const codigo = `${abreviaturaParque}-${fechaActual.toLocaleDateString('es-ES').replace(/\//g, '')}-${numeroAerogenerador}-${siguienteNumeroDano}-${categoriaDaño}`;
     setCodigoAnomalia(codigo);
-    console.log('Código de anomalía generado:', codigo);
   };
 
-
-  const handleSubmit = async (event: React.FormEvent) => {
+  const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    generarCodigoAnomalia(); // Genera el código antes de enviar el formulario
 
+    console.log('validando entradas');
+    const validacionErrores = validarFormularioAnomalia(
+      categoriaDaño,
+      dimensionAnomalia,
+      orientacionAnomalia,
+      descripcionAnomalia,
+      observacionAnomalia
+    );
+
+    if (Object.keys(validacionErrores).length > 0) {
+      setErrores(validacionErrores);
+      return;
+    }
+
+    console.log('enviando formulario');
+
+    // Abrir el modal si la validación es exitosa
+    setOpenModal(true);
+  };
+
+  const confirmarEnvio = async () => {
+    console.log('confirmar envío');
     try {
       const response = await crearAnomalia({
         uuid_aerogenerador: uuid_aerogenerador,
         uuid_componente: uuid_componente,
         uuid_inspeccion: uuid_inspeccion,
-        uuid_tecnico: userId, // Puedes ajustar esto según tu lógica
+        uuid_tecnico: userId,
         codigo_anomalia: codigoAnomalia,
-        severidad_anomalia: categoriaDaño, // Ajusta esto según tu lógica
-        dimension_anomalia: dimensionAnomalia, // Se recoge desde el formulario
-        orientacion_anomalia: orientacionAnomalia, // Se recoge desde el formulario
-        descripcion_anomalia: descripcionAnomalia, // Se recoge desde el formulario
-        observacion_anomalia: observacionAnomalia, // Se recoge desde el formulario
-        coordenada_x: 0, // Ajusta esto según tu lógica
-        coordenada_y: 0, // Ajusta esto según tu lógica
+        severidad_anomalia: categoriaDaño,
+        dimension_anomalia: dimensionAnomalia,
+        orientacion_anomalia: orientacionAnomalia,
+        descripcion_anomalia: descripcionAnomalia,
+        observacion_anomalia: observacionAnomalia,
       });
 
-      console.log('Anomalía creada:', response);
+      console.log("Anomalía creada:", response);
+      setOpenModal(false);  // Cierra el modal después de confirmar el envío
     } catch (error) {
-      console.error('Error al crear la anomalía:', error);
+      console.error("Error al crear la anomalía:", error);
+      setOpenModal(false);  // Cierra el modal en caso de error
     }
   };
 
-
   return (
     <form onSubmit={handleSubmit} className="flex flex-col p-2 space-y-4">
+      {/* Mostrar mensajes de error */}
+      {errores.severidadAnomalia && <p className="text-red-500">{errores.severidadAnomalia}</p>}
+      {errores.dimensionAnomalia && <p className="text-red-500">{errores.dimensionAnomalia}</p>}
+      {errores.orientacionAnomalia && <p className="text-red-500">{errores.orientacionAnomalia}</p>}
+      {errores.descripcionAnomalia && <p className="text-red-500">{errores.descripcionAnomalia}</p>}
+      {errores.observacionAnomalia && <p className="text-red-500">{errores.observacionAnomalia}</p>}
+
       <h2 className="text-xl text-korsar-negro-90 font-semibold mb-1">Seleccionar Severidad</h2>
       <ul className="text-korsar-text-2">
         <li>1- Sin daño</li>
@@ -151,83 +171,78 @@ export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogen
       </ul>
 
       <div className="flex w-full flex-row space-x-20">
-        <SelectorCategoria onCategoriaSelected={handleCategoriaSelected} /> {/* Pasar la función para actualizar la categoría */}
-        {/* Mostrar código de anomalía */}
+        <SelectorCategoria onCategoriaSelected={handleCategoriaSelected} />
         <div className="flex flex-col">
           <h2 className="text-lg text-korsar-text-1 mb-1">Código de Anomalía</h2>
-            <p className="text-korsar-turquesa-viento underline">{codigoAnomalia}</p>
+          <p className="text-korsar-turquesa-viento underline">{codigoAnomalia}</p>
         </div>
-
       </div>
 
-
       <hr className="my-4 border-gray-300" />
-
 
       <h2 className="text-xl text-korsar-negro-90 font-semibold mb-1">Orientación de la Anomalía</h2>
       <p className="text-korsar-text-1">Ingrese la ubicación u orientación del daño en el componente</p>
-
-      <div className="flex flex-col">
-        <h2 className="text-lg text-korsar-negro-90 mb-1">Orientación</h2>
-        <TextInput
-          id="orientacion-anomalia"
-          placeholder=""
-          onChange={(e) => setOrientacionAnomalia(e.target.value)} // Manejo de cambios
-          required
-        />
-      </div>
+      <TextInput
+        id="orientacion-anomalia"
+        placeholder="Ingrese orientación"
+        onChange={(e) => setOrientacionAnomalia(e.target.value)}
+        required
+      />
 
       <hr className="my-4 border-gray-300" />
 
+      <h2 className="text-xl text-korsar-negro-90 font-semibold mb-1">Dimensiones de la Anomalía</h2>
+      <p className="text-korsar-text-1">Ingrese la dimensiones del daño en el componente</p>
+      <TextInput
+        id="orientacion-anomalia"
+        placeholder="Ingrese dimension"
+        onChange={(e) => setDimensionAnomalia(e.target.value)}
+        required
+      />
+
+      <hr className="my-4 border-gray-300" />
+
+
       <h2 className="text-xl text-korsar-negro-90 font-semibold mb-1">Descripción de la Anomalía</h2>
       <p className="text-korsar-text-1">Proporcione detalles específicos sobre el daño observado</p>
+      <Textarea
+        id="descripcion-anomalia"
+        placeholder="Ingrese descripción"
+        value={descripcionAnomalia}
+        onChange={(e) => setDescripcionAnomalia(e.target.value)}
+        required
+        rows={3}
+        className="w-full h-full resize-none"
+      />
 
-      <div className="flex flex-col">
-        <h2 className="text-lg text-korsar-negro-90 mb-1">Dimensión</h2>
-        <TextInput
-          id="dimension-anomalia"
-          placeholder=""
-          value={dimensionAnomalia}
-          onChange={(e) => setDimensionAnomalia(e.target.value)} // Manejo de cambios
-          required
-        />
-      </div>
+      <hr className="my-4 border-gray-300" />
 
-      <div className="flex flex-col">
-        <h2 className="text-lg text-korsar-negro-90 mb-1">Descripción</h2>
-        <Textarea
-          id="descripcion-anomalia"
-          placeholder=""
-          value={descripcionAnomalia}
-          onChange={(e) => setDescripcionAnomalia(e.target.value)} // Manejo de cambios
-          required
-          rows={3}
-          className="w-full h-full resize-none"
-        />
-      </div>
-
-      <div className="flex flex-col">
-        <h2 className="text-lg text-korsar-negro-90 mb-1">Observaciones</h2>
-        <Textarea
-          id="observacion-anomalia"
-          placeholder=""
-          value={observacionAnomalia}
-          onChange={(e) => setObservacionAnomalia(e.target.value)} // Manejo de cambios
-          required
-          rows={3}
-          className="w-full h-full resize-none"
-        />
-      </div>
+      <h2 className="text-xl text-korsar-negro-90 font-semibold mb-1">Observación de la Anomalía</h2>
+      <p className="text-korsar-text-1">Proporcione observaciones específicos sobre el daño observado</p>
+      <Textarea
+        id="descripcion-anomalia"
+        placeholder="Ingrese descripción"
+        value={observacionAnomalia}
+        onChange={(e) => setObservacionAnomalia(e.target.value)}
+        required
+        rows={3}
+        className="w-full h-full resize-none"
+      />
 
       <hr className="my-4 border-gray-300" />
 
       <h2 className="text-xl text-korsar-negro-90 font-semibold mb-1">Asociación de Imágenes</h2>
-      <p className="text-korsar-text-1">Haz click en las imagenes asociadas a esta anomalía</p>
-
-      {/* DropZone */}
+      <p className="text-korsar-text-1">Haz click en las imágenes asociadas a esta anomalía</p>
       <DropZone droppedImages={droppedImages} onRemoveImage={onRemoveImage} />
 
-      <Button type="submit" >Crear Anomalía</Button>
+      <Button type="submit">Crear Anomalía</Button>
+
+      {/* Modal de confirmación */}
+      <ConfirmacionModal
+        openModal={openModal}
+        onConfirm={confirmarEnvio}  // Se llama cuando el usuario confirma
+        onClose={() => setOpenModal(false)}  // Cierra el modal si el usuario cancela
+      />
     </form>
   );
 }

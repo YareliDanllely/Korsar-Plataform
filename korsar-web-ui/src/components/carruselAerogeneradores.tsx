@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Carousel } from "flowbite-react";
 import { HiCheckCircle, HiOutlineCheckCircle, HiArrowCircleRight, HiArrowCircleLeft } from "react-icons/hi";
 import { obtenerAerogeneradores } from "../services/aerogeneradores";
-import { AerogeneradorConEstado } from "../interfaces";
+import { AerogeneradorConEstado } from "../utils/interfaces";
 
 export function AerogeneradorCarrusel({ uuid_parque_eolico, uuid_inspeccion }: { uuid_parque_eolico: string; uuid_inspeccion: string }) {
   const [aerogeneradores, setAerogeneradores] = useState<AerogeneradorConEstado[]>([]);

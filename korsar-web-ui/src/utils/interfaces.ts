@@ -13,11 +13,9 @@ export interface Anomalia {
 
     dimension_anomalia: string;      // CharField mapeado a string
     orientacion_anomalia: string;    // CharField mapeado a string
-    descripcion_anomalia?: string;   // TextField, opcional en TypeScript
+    descripcion_anomalia: string;   // TextField, opcional en TypeScript
     observacion_anomalia?: string;   // TextField, opcional en TypeScript
 
-    coordenada_x: number;            // FloatField mapeado a number
-    coordenada_y: number;            // FloatField mapeado a number
   }
 
 
@@ -75,4 +73,14 @@ export interface Anomalia {
     ruta_imagen: string;                 // Ruta de la imagen
 
     estado_clasificacion: 'no_clasificada' | 'con_dano' | 'sin_dano'; // Clasificación restringida a los valores posibles
+  }
+
+
+
+  export interface ValidacionErrores {
+    severidadAnomalia?: string;
+    dimensionAnomalia?: string;
+    orientacionAnomalia?: string;
+    descripcionAnomalia?: string;
+    observacionAnomalia?: string;
   }

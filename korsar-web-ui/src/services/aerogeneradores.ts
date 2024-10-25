@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { AerogeneradorConEstado } from '../interfaces';
+import { AerogeneradorConEstado } from '../utils/interfaces';
 
 const BASE_URL = 'http://localhost:8000/api';
 

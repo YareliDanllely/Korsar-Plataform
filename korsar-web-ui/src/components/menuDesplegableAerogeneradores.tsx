@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { obtenerAerogeneradores } from "../services/aerogeneradores";
 import { obtenerComponentesAerogenerador } from "../services/componentesAerogeneradores";
 import { DragZone } from "./dragZone";
-import { Aerogenerador, ComponenteAerogenerador } from "../interfaces";
+import { Aerogenerador, ComponenteAerogenerador } from "../utils/interfaces";
 
 interface Imagen {
   uuid_imagen: string;

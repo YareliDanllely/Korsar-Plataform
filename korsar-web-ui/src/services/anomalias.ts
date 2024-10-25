@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Anomalia } from '../interfaces';
+import { Anomalia } from '../utils/interfaces';
 
 const BASE_URL = 'http://localhost:8000/api';
 
@@ -45,8 +45,6 @@ interface AnomaliaData {
   orientacion_anomalia: string;
   descripcion_anomalia: string;
   observacion_anomalia?: string;
-  coordenada_x: number;
-  coordenada_y: number;
 }
 
 export const crearAnomalia = async (data: AnomaliaData): Promise<Anomalia> => {
