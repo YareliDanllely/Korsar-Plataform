@@ -47,6 +47,10 @@ export interface Anomalia {
     progreso: string;
   }
 
+export interface ImagenAnomalia {
+    uuid_imagen: string;
+    ruta_imagen: string;
+  }
 
 
   export interface ComponenteAerogenerador {

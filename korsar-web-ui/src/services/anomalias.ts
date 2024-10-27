@@ -47,7 +47,7 @@ interface AnomaliaData {
   observacion_anomalia?: string;
 }
 
-export const crearAnomalia = async (data: AnomaliaData): Promise<Anomalia> => {
+export const  crearAnomalia = async (data: AnomaliaData): Promise<Anomalia> => {
   const token = localStorage.getItem('token');
   const response = await api.post<Anomalia>('/anomalias/items/', data, {
     headers: {

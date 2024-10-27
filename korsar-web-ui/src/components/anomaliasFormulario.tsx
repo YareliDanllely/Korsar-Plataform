@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import { TextInput, Textarea, Button } from "flowbite-react";
 import SelectorCategoria from "./selectorCategoria";
 import { DropZone } from "./dropZone";
@@ -108,6 +109,20 @@ export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogen
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
 
+    console.log('Datos que se enviarán:', {
+      uuid_aerogenerador,
+      uuid_componente_aerogenerador: uuid_componente, // Asegúrate de usar el nombre correcto
+      uuid_inspeccion,
+      uuid_tecnico: userId,
+      codigo_anomalia: codigoAnomalia,
+      severidad_anomalia: categoriaDaño,
+      dimension_anomalia: dimensionAnomalia,
+      orientacion_anomalia: orientacionAnomalia,
+      descripcion_anomalia: descripcionAnomalia,
+      observacion_anomalia: observacionAnomalia,
+    });
+
+
     console.log('validando entradas');
     const validacionErrores = validarFormularioAnomalia(
       categoriaDaño,
@@ -131,6 +146,7 @@ export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogen
   const confirmarEnvio = async () => {
     console.log('confirmar envío');
     try {
+      console.log('Antes de llamar a crearAnomalia');
       const response = await crearAnomalia({
         uuid_aerogenerador: uuid_aerogenerador,
         uuid_componente: uuid_componente,
@@ -144,11 +160,26 @@ export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogen
         observacion_anomalia: observacionAnomalia,
       });
 
+      console.log('Después de llamar a crearAnomalia');
+
       console.log("Anomalía creada:", response);
       setOpenModal(false);  // Cierra el modal después de confirmar el envío
     } catch (error) {
-      console.error("Error al crear la anomalía:", error);
-      setOpenModal(false);  // Cierra el modal en caso de error
+      if (axios.isAxiosError(error)) {
+        if (error.response) {
+          console.error("Error en la respuesta del servidor:", error.response.data);
+          alert(`Error: ${JSON.stringify(error.response.data)}`);
+        } else if (error.request) {
+          console.error("No se recibió respuesta del servidor:", error.request);
+          alert('No se recibió respuesta del servidor.');
+        } else {
+          console.error("Error al configurar la solicitud:", error.message);
+          alert(`Error: ${error.message}`);
+        }
+      } else {
+        console.error("Error desconocido:", error);
+        alert('Ocurrió un error desconocido.');
+      }
     }
   };
 
