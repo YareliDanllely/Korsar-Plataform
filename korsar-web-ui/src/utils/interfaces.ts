@@ -47,9 +47,14 @@ export interface Anomalia {
     progreso: string;
   }
 
-export interface ImagenAnomalia {
+export interface ImagenAnomaliaFront {
     uuid_imagen: string;
     ruta_imagen: string;
+  }
+
+export interface ImagenAnomaliaPost {
+    uuid_imagen: string;
+    uuid_anomalia: string;
   }
 
 
@@ -87,4 +92,5 @@ export interface ImagenAnomalia {
     orientacionAnomalia?: string;
     descripcionAnomalia?: string;
     observacionAnomalia?: string;
+    imagenesAnomalia?: string;
   }

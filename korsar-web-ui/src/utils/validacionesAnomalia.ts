@@ -1,11 +1,14 @@
 import { ValidacionErrores } from "../utils/interfaces";
+import { ImagenAnomaliaFront } from "../utils/interfaces";
 
   export const validarFormularioAnomalia = (
     severidadAnomalia: number,
     dimensionAnomalia: string,
     orientacionAnomalia: string,
     descripcionAnomalia: string,
-    observacionAnomalia: string | null
+    observacionAnomalia: string | null,
+    imagenes: ImagenAnomaliaFront[]
+
   ): ValidacionErrores => {
     const errores: ValidacionErrores = {};
 
@@ -36,6 +39,11 @@ import { ValidacionErrores } from "../utils/interfaces";
     // Validación para la observación (opcional)
     if (observacionAnomalia && observacionAnomalia.length > 1000) {
       errores.observacionAnomalia = "Las observaciones no pueden exceder los 1000 caracteres.";
+    }
+
+    // Validación para las imágenes
+    if (imagenes.length === 0) {
+      errores.imagenesAnomalia= "Debe asociar al menos una imagen.";
     }
 
     return errores;

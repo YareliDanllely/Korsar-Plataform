@@ -38,6 +38,10 @@ const RevisarInspeccion: React.FC = () => {
     setDroppedImages((prev) => prev.filter((img) => img.uuid_imagen !== imageId));
   };
 
+  const resetDroppedImages = () => {
+    setDroppedImages([]);
+  };
+
   return (
     <DndContext onDragEnd={handleDrop}>
       <div className="w-full flex items-center justify-center min-h-screen">
@@ -68,6 +72,7 @@ const RevisarInspeccion: React.FC = () => {
                 busquedaActivada={busquedaActivada}
                 droppedImages={droppedImages} // Pasar imágenes soltadas a PanelAnomalias
                 onRemoveImage={handleRemoveImage} // Función para remover imagenes
+                resetDroppedImages={resetDroppedImages} // Función para limpiar las imágenes
               />
             ) : (
               <p>Seleccione un aerogenerador y un componente para ver las anomalías.</p>

@@ -17,6 +17,7 @@ interface PanelAnomaliasProps {
   busquedaActivada: boolean;
   droppedImages: Imagen[]; // Recibe las imágenes desde el abuelo
   onRemoveImage: (imageId: string) => void; // Recibe la función para eliminar una imagen
+  resetDroppedImages: () => void;
 }
 
 export const PanelAnomalias: React.FC<PanelAnomaliasProps> = ({
@@ -27,32 +28,33 @@ export const PanelAnomalias: React.FC<PanelAnomaliasProps> = ({
   droppedImages,
   uuid_parque,
   onRemoveImage,
+  resetDroppedImages,
 }) => {
   const [anomalies, setAnomalies] = useState<Anomalia[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (busquedaActivada) { // Ejecutar solo cuando se active la búsqueda
-      const cargarAnomalias = async () => {
-        setIsLoading(true);
-        setError(null);
+    const cargarAnomalias = async () => {
+      setIsLoading(true);
+      setError(null);
 
-        try {
-          const data = await obtenerAnomaliasFiltradas(uuid_turbina, uuid_componente, uuid_inspeccion);
-          console.log('anomalias', data);
-          setAnomalies(data);
-        } catch (error) {
-          setError('No se pudo cargar las anomalías');
-          console.error('Error al cargar anomalías:', error);
-        } finally {
-          setIsLoading(false);
-        }
-      };
+      try {
+        const data = await obtenerAnomaliasFiltradas(uuid_turbina, uuid_componente, uuid_inspeccion);
+        console.log('Anomalías:', data);
+        setAnomalies(data);
+      } catch (error) {
+        setError('No se pudo cargar las anomalías');
+        console.error('Error al cargar anomalías:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
+    if (uuid_turbina && uuid_componente) {
       cargarAnomalias();
     }
-  }, [busquedaActivada, uuid_turbina, uuid_componente, uuid_inspeccion]);
+  }, [uuid_turbina, uuid_componente, uuid_inspeccion]);
 
 
   return (
@@ -66,14 +68,9 @@ export const PanelAnomalias: React.FC<PanelAnomaliasProps> = ({
                 <p>Cargando anomalías...</p>
               ) : error ? (
                 <p>{error}</p>
-              ) : !busquedaActivada ? (
-                // Mensaje para cuando no se ha realizado la búsqueda
-                <p>Seleccione turbina y componente para cargar datos.</p>
               ) : anomalies.length === 0 ? (
-                // Mensaje para cuando no existen anomalías asociadas tras la búsqueda
-                <p>No existen anomalías asociadas.</p>
+                <p>No existen anomalías asociadas al componente seleccionado.</p>
               ) : (
-                // Mostrar anomalías cuando existan
                 <Accordion collapseAll>
                   {anomalies.map((anomaly) => (
                     <Accordion.Panel key={anomaly.uuid_anomalia}>
@@ -84,14 +81,13 @@ export const PanelAnomalias: React.FC<PanelAnomaliasProps> = ({
                             <p>Clasificación: <span className="text-gray-500">{anomaly.severidad_anomalia}</span></p>
                           </div>
                           <div>
-                            <p>Descripción: <span className="text-gray-500">{anomaly.descripcion_anomalia} </span></p>
+                            <p>Descripción: <span className="text-gray-500">{anomaly.descripcion_anomalia}</span></p>
                           </div>
                           <div>
                             <Button className="text-sm py-0 px-1 rounded-xl ml-auto">Ver Más</Button>
                           </div>
                         </div>
                       </Accordion.Content>
-
                     </Accordion.Panel>
                   ))}
                 </Accordion>
@@ -110,6 +106,7 @@ export const PanelAnomalias: React.FC<PanelAnomaliasProps> = ({
               uuid_inspeccion={uuid_inspeccion}
               uuid_componente={uuid_componente}
               uuid_parque={uuid_parque}
+              resetDroppedImages={resetDroppedImages}
               />
             </div>
 

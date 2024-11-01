@@ -22,6 +22,9 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 
         # Agregar el user_id (o uuid_usuario si es personalizado) a la respuesta
         response.data['user_id'] = str(user.uuid_usuario)  # Usa 'id' o 'uuid_usuario', según tu modelo
+        response.data['empresa_id'] = str(user.uuid_empresa.id_empresa) if user.uuid_empresa else None
+        response.data['username'] = user.username  # Incluye el nombre de usuario
+
 
         return response
 

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { ImagenAnomalia } from '../utils/interfaces';
+import { ImagenAnomaliaPost } from '../utils/interfaces';
 
 const BASE_URL = 'http://localhost:8000/api';
 
@@ -10,7 +10,7 @@ const api = axios.create({
 
 
 
-export const crearImagenAnomalia = async (data: ImagenAnomalia): Promise<void> => {
+export const crearImagenAnomalia = async (data: ImagenAnomaliaPost): Promise<void> => {
     const token = localStorage.getItem('token');
 
     try {

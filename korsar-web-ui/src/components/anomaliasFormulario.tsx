@@ -9,22 +9,20 @@ import { obtenerNumeroAerogenerador } from '../services/aerogeneradores';
 import { validarFormularioAnomalia } from '../utils/validacionesAnomalia';
 import { ValidacionErrores } from "../utils/interfaces";
 import { ConfirmacionModal } from './modalConfirmacion';
-
-interface Imagen {
-  uuid_imagen: string;
-  ruta_imagen: string;
-}
-
+import { crearImagenAnomalia } from '../services/imagenesAnomalia';
+import { ImagenAnomaliaFront } from '../utils/interfaces';
+import { ErrorAlert } from './alertForm';
 interface FormularioAnomaliasProps {
-  droppedImages: Imagen[];
+  droppedImages: ImagenAnomaliaFront[];
   onRemoveImage: (imageId: string) => void;
   uuid_aerogenerador: string;
   uuid_componente: string;
   uuid_inspeccion: string;
   uuid_parque: string;
+  resetDroppedImages: () => void;
 }
 
-export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogenerador, uuid_componente, uuid_inspeccion, uuid_parque }: FormularioAnomaliasProps) {
+export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogenerador, uuid_componente, uuid_inspeccion, uuid_parque, resetDroppedImages }: FormularioAnomaliasProps) {
   const [siguienteNumeroDano, setSiguienteNumeroDano] = useState<string>('');
   const [abreviaturaParque, setAbreviaturaParque] = useState<string>('');
   const [numeroAerogenerador, setNumeroAerogenerador] = useState<number>(0);
@@ -37,16 +35,45 @@ export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogen
   const [userId, setUserId] = useState<string | null>(null);
   const [errores, setErrores] = useState<ValidacionErrores>({});
   const [openModal, setOpenModal] = useState(false);  // Controla el estado del modal
+  const [errorVisibility, setErrorVisibility] = useState({
+    severidadAnomalia: true,
+    orientacionAnomalia: true,
+    dimensionAnomalia: true,
+    descripcionAnomalia: true,
+    observacionAnomalia: true,
+    imagenesAnomalia: true,
+  });
 
+  /** ----------------------------------- Efectos -----------------------------------**/
+
+
+  /**
+   * Genera el código de la anomalía cuando se selecciona una categoría
+   */
+  useEffect(() => {
+    if (categoriaDaño !== 0) {
+      generarCodigoAnomalia();
+    }
+  }, [categoriaDaño,siguienteNumeroDano]);
+
+
+  /**
+   * Obtiene el ID del usuario almacenado en el almacenamiento local
+   */
   useEffect(() => {
     const storedUserId = localStorage.getItem('userId');
     setUserId(storedUserId);
   }, []);
 
+
+  /**
+   * Obtiene el siguiente número de daño cuando se selecciona un componente
+   */
   useEffect(() => {
     const fetchSiguienteNumeroDano = async () => {
       try {
         const numero = await obtenerSiguienteNumeroDano(uuid_componente);
+        console.log('Siguiente número de daño:', numero);
         setSiguienteNumeroDano(numero);
       } catch (error) {
         console.error('Error al obtener el siguiente número de daño:', error);
@@ -56,8 +83,11 @@ export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogen
     if (uuid_componente) {
       fetchSiguienteNumeroDano();
     }
-  }, [uuid_componente]);
+  }, [uuid_componente, uuid_aerogenerador, categoriaDaño]);
 
+  /**
+   * Obtiene la abreviatura del parque eólico cuando se selecciona un parque
+   */
   useEffect(() => {
     const fetchAbreviaturaParque = async () => {
       try {
@@ -73,6 +103,9 @@ export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogen
     }
   }, [uuid_parque]);
 
+  /**
+   * Obtiene el número del aerogenerador cuando se selecciona uno
+   */
   useEffect(() => {
     const fetchNumeroAerogenerador = async () => {
       try {
@@ -90,21 +123,45 @@ export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogen
     }
   }, [uuid_aerogenerador]);
 
+
+  /**----------------------------- Maneja Cambios en variables ------------------------------*/
+
+  /**
+   * Maneja cambios en la categoría seleccionada
+   * @param categoria
+   */
   const handleCategoriaSelected = (categoria: number) => {
     setCategoriaDaño(categoria);
   };
 
-  useEffect(() => {
-    if (categoriaDaño !== 0) {
-      generarCodigoAnomalia();
-    }
-  }, [categoriaDaño]);
+  /**
+   * Maneja cambios en alertas de errores
+   * @param errorKey
+   */
+  const handleCloseErrorAlert = (errorKey: keyof ValidacionErrores) => {
+    setErrorVisibility((prev) => ({ ...prev, [errorKey]: false }));
+  };
 
+
+  /**----------------------------- Generar Codigo de Anomalia ------------------------------*/
+
+  /**
+   * Genera el código de la anomalía
+   */
   const generarCodigoAnomalia = () => {
     const fechaActual = new Date();
     const codigo = `${abreviaturaParque}-${fechaActual.toLocaleDateString('es-ES').replace(/\//g, '')}-${numeroAerogenerador}-${siguienteNumeroDano}-${categoriaDaño}`;
     setCodigoAnomalia(codigo);
   };
+
+  /** -------------------Validacion de Formulario----------------------------------**/
+
+
+  /**
+   * Valida los campos del formulario y abre modal de confirmación
+   * @param event
+   * @returns
+   */
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
@@ -129,11 +186,20 @@ export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogen
       dimensionAnomalia,
       orientacionAnomalia,
       descripcionAnomalia,
-      observacionAnomalia
+      observacionAnomalia,
+      droppedImages
     );
 
     if (Object.keys(validacionErrores).length > 0) {
       setErrores(validacionErrores);
+      setErrorVisibility({
+        severidadAnomalia: true,
+        orientacionAnomalia: true,
+        dimensionAnomalia: true,
+        descripcionAnomalia: true,
+        observacionAnomalia: true,
+        imagenesAnomalia: true,
+      });
       return;
     }
 
@@ -143,6 +209,35 @@ export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogen
     setOpenModal(true);
   };
 
+  /** -------------------Logica de Post----------------------------------**/
+
+  /**
+   * Restablece los campos del formulario después de enviar los datos
+   */
+
+  const resetForm = () => {
+    // Restablece los estados de los campos de entrada y el selector de categoría
+    setCategoriaDaño(0);
+    setOrientacionAnomalia('');
+    setDimensionAnomalia('');
+    setDescripcionAnomalia('');
+    setObservacionAnomalia('');
+    setCodigoAnomalia(''); // Restablece el código de anomalía
+    setErrores({});
+    resetDroppedImages(); // Limpia las imágenes soltadas
+    setErrorVisibility({
+      severidadAnomalia: false,
+      orientacionAnomalia: false,
+      dimensionAnomalia: false,
+      descripcionAnomalia: false,
+      observacionAnomalia: false,
+      imagenesAnomalia: false,
+    });
+  };
+
+  /**
+   * Envía los datos del formulario al servidor
+   */
   const confirmarEnvio = async () => {
     console.log('confirmar envío');
     try {
@@ -163,7 +258,21 @@ export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogen
       console.log('Después de llamar a crearAnomalia');
 
       console.log("Anomalía creada:", response);
+
+      // Subir las imágenes asociadas a la anomalía
+      for (const imagen of droppedImages) {
+        console.log('Subiendo imagen:', imagen);
+        await crearImagenAnomalia({
+          uuid_imagen: imagen.uuid_imagen,
+          uuid_anomalia: response.uuid_anomalia,
+        });
+      }
+
       setOpenModal(false);  // Cierra el modal después de confirmar el envío
+      resetForm();  // Restablece el formulario después de enviar los datos
+
+
+
     } catch (error) {
       if (axios.isAxiosError(error)) {
         if (error.response) {
@@ -185,15 +294,11 @@ export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogen
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col p-2 space-y-4">
-      {/* Mostrar mensajes de error */}
-      {errores.severidadAnomalia && <p className="text-red-500">{errores.severidadAnomalia}</p>}
-      {errores.dimensionAnomalia && <p className="text-red-500">{errores.dimensionAnomalia}</p>}
-      {errores.orientacionAnomalia && <p className="text-red-500">{errores.orientacionAnomalia}</p>}
-      {errores.descripcionAnomalia && <p className="text-red-500">{errores.descripcionAnomalia}</p>}
-      {errores.observacionAnomalia && <p className="text-red-500">{errores.observacionAnomalia}</p>}
 
       <h2 className="text-xl text-korsar-negro-90 font-semibold mb-1">Seleccionar Severidad</h2>
-      <ul className="text-korsar-text-2">
+      {errores.severidadAnomalia && errorVisibility.severidadAnomalia && (
+      <ErrorAlert message={errores.severidadAnomalia} onClose={() => handleCloseErrorAlert('severidadAnomalia')} />)}
+        <ul className="text-korsar-text-2">
         <li>1- Sin daño</li>
         <li>2- Daño menor</li>
         <li>3- Daño significativo</li>
@@ -202,8 +307,7 @@ export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogen
       </ul>
 
       <div className="flex w-full flex-row space-x-20">
-        <SelectorCategoria onCategoriaSelected={handleCategoriaSelected} />
-        <div className="flex flex-col">
+      <SelectorCategoria onCategoriaSelected={handleCategoriaSelected} selectedCategoria={categoriaDaño} />        <div className="flex flex-col">
           <h2 className="text-lg text-korsar-text-1 mb-1">Código de Anomalía</h2>
           <p className="text-korsar-turquesa-viento underline">{codigoAnomalia}</p>
         </div>
@@ -213,22 +317,30 @@ export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogen
 
       <h2 className="text-xl text-korsar-negro-90 font-semibold mb-1">Orientación de la Anomalía</h2>
       <p className="text-korsar-text-1">Ingrese la ubicación u orientación del daño en el componente</p>
+      {errores.orientacionAnomalia && errorVisibility.orientacionAnomalia && (
+        <ErrorAlert message={errores.orientacionAnomalia} onClose={() => handleCloseErrorAlert('orientacionAnomalia')} />
+      )}
       <TextInput
         id="orientacion-anomalia"
         placeholder="Ingrese orientación"
+        value = {orientacionAnomalia}
         onChange={(e) => setOrientacionAnomalia(e.target.value)}
-        required
       />
 
       <hr className="my-4 border-gray-300" />
 
       <h2 className="text-xl text-korsar-negro-90 font-semibold mb-1">Dimensiones de la Anomalía</h2>
       <p className="text-korsar-text-1">Ingrese la dimensiones del daño en el componente</p>
+      {errores.dimensionAnomalia && errorVisibility.dimensionAnomalia && (
+        <ErrorAlert message={errores.dimensionAnomalia} onClose={() => handleCloseErrorAlert('dimensionAnomalia')} />
+      )}
+
+
       <TextInput
-        id="orientacion-anomalia"
+        id="dimension-anomalia"
         placeholder="Ingrese dimension"
+        value = {dimensionAnomalia}
         onChange={(e) => setDimensionAnomalia(e.target.value)}
-        required
       />
 
       <hr className="my-4 border-gray-300" />
@@ -236,12 +348,15 @@ export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogen
 
       <h2 className="text-xl text-korsar-negro-90 font-semibold mb-1">Descripción de la Anomalía</h2>
       <p className="text-korsar-text-1">Proporcione detalles específicos sobre el daño observado</p>
+      {errores.descripcionAnomalia && errorVisibility.descripcionAnomalia && (
+        <ErrorAlert message={errores.descripcionAnomalia} onClose={() => handleCloseErrorAlert('descripcionAnomalia')} />
+      )}
+
       <Textarea
         id="descripcion-anomalia"
         placeholder="Ingrese descripción"
         value={descripcionAnomalia}
         onChange={(e) => setDescripcionAnomalia(e.target.value)}
-        required
         rows={3}
         className="w-full h-full resize-none"
       />
@@ -250,12 +365,14 @@ export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogen
 
       <h2 className="text-xl text-korsar-negro-90 font-semibold mb-1">Observación de la Anomalía</h2>
       <p className="text-korsar-text-1">Proporcione observaciones específicos sobre el daño observado</p>
+      {errores.observacionAnomalia && errorVisibility.observacionAnomalia && (
+        <ErrorAlert message={errores.observacionAnomalia} onClose={() => handleCloseErrorAlert('observacionAnomalia')} />
+      )}
       <Textarea
         id="descripcion-anomalia"
         placeholder="Ingrese descripción"
         value={observacionAnomalia}
         onChange={(e) => setObservacionAnomalia(e.target.value)}
-        required
         rows={3}
         className="w-full h-full resize-none"
       />
@@ -264,6 +381,10 @@ export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogen
 
       <h2 className="text-xl text-korsar-negro-90 font-semibold mb-1">Asociación de Imágenes</h2>
       <p className="text-korsar-text-1">Haz click en las imágenes asociadas a esta anomalía</p>
+      {errores.imagenesAnomalia && errorVisibility.imagenesAnomalia && (
+        <ErrorAlert message={errores.imagenesAnomalia} onClose={() => handleCloseErrorAlert('imagenesAnomalia')} />
+      )}
+
       <DropZone droppedImages={droppedImages} onRemoveImage={onRemoveImage} />
 
       <Button type="submit">Crear Anomalía</Button>
