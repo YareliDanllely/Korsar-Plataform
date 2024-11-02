@@ -1,5 +1,5 @@
 import { Accordion, Tabs, Button } from "flowbite-react";
-import { useEffect, useState } from "react";
+import { act, useEffect, useState } from "react";
 import { obtenerAnomaliasFiltradas } from "../services/anomalias";
 import { Anomalia } from "../utils/interfaces";
 import {FormularioAnomalias} from "./anomaliasFormulario";
@@ -15,7 +15,10 @@ interface PanelAnomaliasProps {
   uuid_inspeccion: string;
   uuid_parque: string;
   busquedaActivada: boolean;
+  cambioEstadoFinalAero: boolean;
+  actualizarCrearAnomalia: (crearAnomalia: boolean) => void;
   droppedImages: Imagen[]; // Recibe las imágenes desde el abuelo
+  actualizarEstadoFinalAero: (cambioEstadoFinalAero: boolean) => void;
   onRemoveImage: (imageId: string) => void; // Recibe la función para eliminar una imagen
   resetDroppedImages: () => void;
 }
@@ -24,17 +27,31 @@ export const PanelAnomalias: React.FC<PanelAnomaliasProps> = ({
   uuid_turbina,
   uuid_componente,
   uuid_inspeccion,
-  busquedaActivada,
   droppedImages,
   uuid_parque,
   onRemoveImage,
   resetDroppedImages,
+  actualizarEstadoFinalAero,
+  actualizarCrearAnomalia,
+  cambioEstadoFinalAero,
 }) => {
   const [anomalies, setAnomalies] = useState<Anomalia[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+
+  const handleTabChange = (activeTabIndex: number) => {
+    if (activeTabIndex === 0) {
+      actualizarCrearAnomalia(false);
+    } else if (activeTabIndex === 1) {
+      actualizarCrearAnomalia(true);
+    }
+  };
+
+
+
   useEffect(() => {
+
     const cargarAnomalias = async () => {
       setIsLoading(true);
       setError(null);
@@ -61,7 +78,7 @@ export const PanelAnomalias: React.FC<PanelAnomaliasProps> = ({
     <div className="relative w-full h-full flex flex-col max-w-3xl mx-auto ">
       <div className="p-5">
         <h2 className="text-2xl font-semibold mb-4">Anomalías</h2>
-        <Tabs aria-label="Anomalías Tabs">
+        <Tabs aria-label="Anomalías Tabs" onActiveTabChange={handleTabChange}>
         <Tabs.Item active title="Anomalías Clasificadas">
             <div className="mt-4">
               {isLoading ? (
@@ -94,7 +111,7 @@ export const PanelAnomalias: React.FC<PanelAnomaliasProps> = ({
               )}
             </div>
           </Tabs.Item>
-          <Tabs.Item title="Crear Nueva Anomalía">
+          <Tabs.Item title="Crear Nueva Anomalía"  >
 
             {/*Formulario Anomalias */}
 
@@ -107,6 +124,8 @@ export const PanelAnomalias: React.FC<PanelAnomaliasProps> = ({
               uuid_componente={uuid_componente}
               uuid_parque={uuid_parque}
               resetDroppedImages={resetDroppedImages}
+              cambioEstadoFinalAero={cambioEstadoFinalAero}
+              actualizarEstadoFinalAero={actualizarEstadoFinalAero}
               />
             </div>
 

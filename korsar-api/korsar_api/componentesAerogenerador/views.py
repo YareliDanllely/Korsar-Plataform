@@ -50,3 +50,6 @@ class ComponenteAerogeneradorViewSet(viewsets.ModelViewSet):
                 })
 
         return Response(componentes_con_estado, status=status.HTTP_200_OK)
+
+
+

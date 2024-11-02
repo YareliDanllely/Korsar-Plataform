@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { AerogeneradorCarrusel } from '../components/carruselAerogeneradores';
 import { MenuDesplegableAerogeneradores } from '../components/menuDesplegableAerogeneradores';
@@ -17,6 +17,21 @@ const RevisarInspeccion: React.FC = () => {
   const [busquedaActivada, setBusquedaActivada] = useState<boolean>(false);
   const [droppedImages, setDroppedImages] = useState<Imagen[]>([]);
   const [draggingImage, setDraggingImage] = useState<Imagen | null>(null);
+  const [cambioEstadoFinalAero, setCambioEstadoFinalAero] = useState<boolean>(false);
+  const [onCreateAnomalia, setOnCreateAnomalia] = useState<boolean>(false);
+
+
+  useEffect(() => {
+    console.log("createAnomalia",onCreateAnomalia);
+  },[onCreateAnomalia]);
+
+  const actualizarEstadoCrearAnomalia = (crearAnomalia: boolean) => {
+    setOnCreateAnomalia(crearAnomalia);
+  }
+
+  const actualizarCambioEstadoFinalAero = (cambioEstadoFinalAero: boolean) => {
+    setCambioEstadoFinalAero(cambioEstadoFinalAero);
+  }
 
   const handleBuscar = () => {
     setBusquedaActivada((prev) => !prev);
@@ -58,6 +73,8 @@ const RevisarInspeccion: React.FC = () => {
             <AerogeneradorCarrusel
               uuid_inspeccion={uuid_inspeccion || ''}
               uuid_parque_eolico={uuid_parque || ''}
+              cambioEstadoFinalAero={cambioEstadoFinalAero}
+
             />
           </div>
 
@@ -73,6 +90,9 @@ const RevisarInspeccion: React.FC = () => {
                 droppedImages={droppedImages} // Pasar imágenes soltadas a PanelAnomalias
                 onRemoveImage={handleRemoveImage} // Función para remover imagenes
                 resetDroppedImages={resetDroppedImages} // Función para limpiar las imágenes
+                cambioEstadoFinalAero={cambioEstadoFinalAero}
+                actualizarEstadoFinalAero={actualizarCambioEstadoFinalAero}
+                actualizarCrearAnomalia={actualizarEstadoCrearAnomalia}
               />
             ) : (
               <p>Seleccione un aerogenerador y un componente para ver las anomalías.</p>
@@ -89,6 +109,7 @@ const RevisarInspeccion: React.FC = () => {
                 setUuidComponente={setUuidComponente}
                 onBuscar={handleBuscar}
                 onDragStart={handleDragStart} // Pasar la función para seleccionar imágenes
+                onCreateAnomalia={onCreateAnomalia}
               />
             </div>
           </div>

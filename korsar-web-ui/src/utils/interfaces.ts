@@ -43,8 +43,7 @@ export interface Anomalia {
   }
 
   export interface AerogeneradorConEstado extends Aerogenerador {
-    estado_final: string;
-    progreso: string;
+    estado_final: number;
   }
 
 export interface ImagenAnomaliaFront {

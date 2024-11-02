@@ -15,8 +15,16 @@ class EstadoAerogenerador(models.Model):
     uuid_aerogenerador = models.ForeignKey('aerogeneradores.Aerogenerador', on_delete=models.CASCADE)
     uuid_inspeccion = models.ForeignKey(Inspeccion, on_delete=models.CASCADE)
 
-    estado_final_clasificacion = models.CharField(max_length=255, null=True, blank=True)
-    progreso = models.CharField(max_length=255)
+    SEVERIDAD_CHOICES = [
+        (1, 'Sin daño'),
+        (2, 'Menor'),
+        (3, 'Significativo'),
+        (4, 'Mayor'),
+        (5, 'Crítico'),
+    ]
+
+    estado_final_clasificacion = models.IntegerField(choices=SEVERIDAD_CHOICES, null=True, blank=True)
+
 
     def __str__(self):
         return f"Estado {self.estado_final_clasificacion} del Aerogenerador {self.uuid_aerogenerador}"

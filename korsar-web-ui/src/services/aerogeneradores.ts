@@ -57,3 +57,50 @@ export const obtenerNumeroAerogenerador = async (uuid_aerogenerador: string): Pr
     throw error;
   }
 };
+
+
+export const obtenerEstadoFinalAerogenerador = async (uuid_aerogenerador: string, uuid_inspeccion: string): Promise<number> => {
+  const token = localStorage.getItem('token');
+
+  try {
+
+    const response = await api.get(`/aerogeneradores/items/estado-final/`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: {
+        uuid_aerogenerador,
+        uuid_inspeccion,
+      },
+    });
+
+    return response.data.estado_final;
+
+  } catch (error) {
+    console.error('Error al obtener el estado final del aerogenerador:', error);
+    throw error;
+  }
+};
+
+
+export const cambiarEstadoFinalAerogenerador = async (uuid_aerogenerador: string, uuid_inspeccion: string, estado_final: number): Promise<void> => {
+  const token = localStorage.getItem('token');
+
+  try {
+      await api.put(
+      `/aerogeneradores/items/cambiar-estado-final/`,
+      { uuid_aerogenerador, uuid_inspeccion, estado_final }, // Todos los datos en el cuerpo
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        }
+      }
+    );
+
+  } catch (error) {
+    console.error('Error al cambiar el estado final del aerogenerador:', error);
+    throw error;
+  }
+};
+
+

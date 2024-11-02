@@ -45,7 +45,6 @@ class AerogeneradorViewSet(viewsets.ModelViewSet):
                     'uuid_aerogenerador': aerogenerador.uuid_aerogenerador,
                     'numero_aerogenerador': aerogenerador.numero_aerogenerador,
                     'estado_final': estado_final.estado_final_clasificacion,
-                    'progreso': estado_final.progreso
                 })
 
         return Response(aerogeneradores_con_estado, status=status.HTTP_200_OK)
@@ -63,3 +62,36 @@ class AerogeneradorViewSet(viewsets.ModelViewSet):
             return Response({'numero_aerogenerador': aerogenerador.numero_aerogenerador}, status=status.HTTP_200_OK)
         except Aerogenerador.DoesNotExist:
             return Response({'error': 'Aerogenerador no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+
+    # Obtener el estado final de clasificacion de un aerogenerador por inspeccion y aerogenerador
+    @action(detail=False, methods=['get'], url_path='estado-final')
+    def obtener_estado_final_aerogenerador(self, request):
+        uuid_aerogenerador = request.query_params.get('uuid_aerogenerador')
+        uuid_inspeccion = request.query_params.get('uuid_inspeccion')
+
+        if not uuid_aerogenerador or not uuid_inspeccion:
+            return Response({'error': 'Los parámetros uuid_aerogenerador y uuid_inspeccion son requeridos'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            estado_final = EstadoAerogenerador.objects.get(uuid_aerogenerador=uuid_aerogenerador, uuid_inspeccion=uuid_inspeccion)
+            return Response({'estado_final': estado_final.estado_final_clasificacion}, status=status.HTTP_200_OK)
+        except EstadoAerogenerador.DoesNotExist:
+            return Response({'error': 'Estado final no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+
+    # Cambiar el estado final de clasificacion de un aerogeneador por inspeccion y aerogenerador
+    @action(detail=False, methods=['put'], url_path='cambiar-estado-final')
+    def cambiar_estado_final_aerogenerador(self,request):
+        uuid_aerogenerador = request.data.get('uuid_aerogenerador')
+        uuid_inspeccion = request.data.get('uuid_inspeccion')
+        estado_final = request.data.get('estado_final')
+
+        if not uuid_aerogenerador or not uuid_inspeccion or not estado_final:
+            return Response({'error': 'Los parámetros uuid_aerogenerador, uuid_inspeccion y estado_final son requeridos'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            estado_aerogenerador = EstadoAerogenerador.objects.get(uuid_aerogenerador=uuid_aerogenerador, uuid_inspeccion=uuid_inspeccion)
+            estado_aerogenerador.estado_final_clasificacion = estado_final
+            estado_aerogenerador.save()
+            return Response({'mensaje': 'Estado final actualizado'}, status=status.HTTP_200_OK)
+        except EstadoAerogenerador.DoesNotExist:
+            return Response({'error': 'Estado final no encontrado'}, status=status.HTTP_404_NOT_FOUND)

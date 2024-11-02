@@ -12,6 +12,7 @@ interface DragZoneProps {
   uuid_aerogenerador: string;
   uuid_componente: string;
   uuid_parque: string;
+  onCreateAnomalia: boolean;
   onDragStart: (imagen: Imagen) => void;
 }
 
@@ -20,6 +21,7 @@ export const DragZone: React.FC<DragZoneProps> = ({
   uuid_componente,
   uuid_parque,
   onDragStart,
+  onCreateAnomalia,
 }) => {
   const [imagenes, setImagenes] = useState<Imagen[]>([]);
   const [selectedImage, setSelectedImage] = useState<Imagen | null>(null);
@@ -36,7 +38,8 @@ export const DragZone: React.FC<DragZoneProps> = ({
   }, [uuid_aerogenerador, uuid_componente, uuid_parque]);
 
   const handleImageClick = (imagen: Imagen) => {
-    setSelectedImage(imagen);
+      setSelectedImage(imagen);
+
   };
 
   const handleNext = () => {
@@ -51,6 +54,7 @@ export const DragZone: React.FC<DragZoneProps> = ({
     }
   };
 
+  // Configura la funcionalidad de arrastre para la imagen seleccionada
   const { attributes, listeners, setNodeRef } = useDraggable({
     id: selectedImage?.uuid_imagen || '',
   });
@@ -60,16 +64,16 @@ export const DragZone: React.FC<DragZoneProps> = ({
       {/* Imagen Principal */}
       {selectedImage && (
         <div
-          ref={setNodeRef}
-          {...listeners}
-          {...attributes}
-          className="w-full flex justify-center"
-          onMouseDown={() => onDragStart(selectedImage)}
+          ref={onCreateAnomalia ? setNodeRef : undefined} // Aplica la referencia solo si onCreateAnomalia es true
+          {...(onCreateAnomalia ? listeners : {})} // Aplica los listeners solo si onCreateAnomalia es true
+          {...(onCreateAnomalia ? attributes : {})} // Aplica los attributes solo si onCreateAnomalia es true
+          className={`w-full flex justify-center ${onCreateAnomalia ? 'cursor-move' : ''}`} // Solo muestra el cursor de mover si onCreateAnomalia es true
+          onMouseDown={() => onCreateAnomalia && onDragStart(selectedImage)} // Llama a onDragStart solo si onCreateAnomalia es true
         >
           <img
             src={selectedImage.ruta_imagen}
             alt={`Imagen seleccionada ${selectedImage.uuid_imagen}`}
-            className="w-96 h-96 object-cover cursor-move rounded-lg"
+            className="w-96 h-96 object-cover rounded-lg"
           />
         </div>
       )}

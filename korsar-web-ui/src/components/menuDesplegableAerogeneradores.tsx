@@ -16,6 +16,7 @@ interface MenuDesplegableAerogeneradoresProps {
   setUuidTurbina: React.Dispatch<React.SetStateAction<string | null>>;
   setUuidComponente: React.Dispatch<React.SetStateAction<string | null>>;
   onBuscar: () => void;
+  onCreateAnomalia: boolean;
   onDragStart: (imagen: Imagen) => void; // Notificar cuando se arrastra una imagen
 }
 
@@ -26,6 +27,7 @@ export function MenuDesplegableAerogeneradores({
   setUuidComponente,
   onBuscar,
   onDragStart,
+  onCreateAnomalia,
 }: MenuDesplegableAerogeneradoresProps) {
   const [aerogeneradores, setAerogeneradores] = useState<Aerogenerador[]>([]);
   const [componentes, setComponentes] = useState<ComponenteAerogenerador[]>([]);
@@ -118,6 +120,7 @@ export function MenuDesplegableAerogeneradores({
             uuid_componente={selectedComponente.uuid_componente}
             uuid_parque={uuid_parque_eolico}
             onDragStart={onDragStart} // Notificar al padre que una imagen fue arrastrada
+            onCreateAnomalia={onCreateAnomalia}
           />
         </div>
       )}

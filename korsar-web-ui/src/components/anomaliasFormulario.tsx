@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { TextInput, Textarea, Button } from "flowbite-react";
-import SelectorCategoria from "./selectorCategoria";
 import { DropZone } from "./dropZone";
+import SelectorCategoria  from "./selectorCategoria";
 import { obtenerSiguienteNumeroDano, crearAnomalia } from '../services/anomalias';
 import { obtenerAbreviaturaParque } from '../services/parqueEolico';
 import { obtenerNumeroAerogenerador } from '../services/aerogeneradores';
@@ -12,6 +12,10 @@ import { ConfirmacionModal } from './modalConfirmacion';
 import { crearImagenAnomalia } from '../services/imagenesAnomalia';
 import { ImagenAnomaliaFront } from '../utils/interfaces';
 import { ErrorAlert } from './alertForm';
+import { obtenerEstadoFinalAerogenerador } from '../services/aerogeneradores';
+import { cambiarEstadoFinalAerogenerador } from '../services/aerogeneradores';
+
+
 interface FormularioAnomaliasProps {
   droppedImages: ImagenAnomaliaFront[];
   onRemoveImage: (imageId: string) => void;
@@ -19,10 +23,12 @@ interface FormularioAnomaliasProps {
   uuid_componente: string;
   uuid_inspeccion: string;
   uuid_parque: string;
+  actualizarEstadoFinalAero: (cambioEstadoFinalAero: boolean) => void;
+  cambioEstadoFinalAero: boolean;
   resetDroppedImages: () => void;
 }
 
-export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogenerador, uuid_componente, uuid_inspeccion, uuid_parque, resetDroppedImages }: FormularioAnomaliasProps) {
+export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogenerador, uuid_componente, uuid_inspeccion, uuid_parque, resetDroppedImages, actualizarEstadoFinalAero, cambioEstadoFinalAero}: FormularioAnomaliasProps) {
   const [siguienteNumeroDano, setSiguienteNumeroDano] = useState<string>('');
   const [abreviaturaParque, setAbreviaturaParque] = useState<string>('');
   const [numeroAerogenerador, setNumeroAerogenerador] = useState<number>(0);
@@ -259,7 +265,7 @@ export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogen
 
       console.log("Anomalía creada:", response);
 
-      // Subir las imágenes asociadas a la anomalía
+      /*------------Subir las imágenes asociadas a la anomalía------------*/
       for (const imagen of droppedImages) {
         console.log('Subiendo imagen:', imagen);
         await crearImagenAnomalia({
@@ -267,6 +273,17 @@ export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogen
           uuid_anomalia: response.uuid_anomalia,
         });
       }
+
+      /** ----------cambiar estado final del aerogenerador si corresponde------- **/
+      console.log('Antes de llamar a obtenerEstadoFinalAerogenerador');
+      const response_estado_final = await obtenerEstadoFinalAerogenerador(uuid_aerogenerador, uuid_inspeccion);
+      if (response_estado_final !== null && response_estado_final < categoriaDaño) {
+        await cambiarEstadoFinalAerogenerador(uuid_aerogenerador, uuid_inspeccion, categoriaDaño);
+        actualizarEstadoFinalAero(!cambioEstadoFinalAero);
+      }
+
+
+      console.log('Después de llamar a obtenerEstadoFinalAerogenerador');
 
       setOpenModal(false);  // Cierra el modal después de confirmar el envío
       resetForm();  // Restablece el formulario después de enviar los datos
