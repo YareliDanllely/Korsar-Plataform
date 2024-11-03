@@ -4,7 +4,7 @@ from .views import ParqueEolicoViewSet
 
 
 router = DefaultRouter()
-router.register(r'items-eolicos', ParqueEolicoViewSet)
+router.register(r'items', ParqueEolicoViewSet)
 
 # Definir las URLs de la app
 urlpatterns = [

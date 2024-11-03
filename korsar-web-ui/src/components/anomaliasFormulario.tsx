@@ -4,7 +4,7 @@ import { TextInput, Textarea, Button } from "flowbite-react";
 import { DropZone } from "./dropZone";
 import SelectorCategoria  from "./selectorCategoria";
 import { obtenerSiguienteNumeroDano, crearAnomalia } from '../services/anomalias';
-import { obtenerAbreviaturaParque } from '../services/parqueEolico';
+import { obtenerAbreviaturaParque } from '../services/parquesEolicos';
 import { obtenerNumeroAerogenerador } from '../services/aerogeneradores';
 import { validarFormularioAnomalia } from '../utils/validacionesAnomalia';
 import { ValidacionErrores } from "../utils/interfaces";

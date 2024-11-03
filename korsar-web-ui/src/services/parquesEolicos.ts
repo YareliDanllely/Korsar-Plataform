@@ -1,4 +1,6 @@
 import axios from 'axios';  // Importa axios para realizar las solicitudes HTTP
+import { ParqueEolico } from '../utils/interfaces';  // Importa la interfaz ParqueEolico desde el archivo de interfaces
+
 
 // Define la URL base de la API
 const BASE_URL = 'http://localhost:8000/api';
@@ -30,3 +32,31 @@ export const obtenerAbreviaturaParque = async (uuid_parque_eolico: string) => {
       throw error;
     }
   };
+
+
+
+// obtener todos los parques asociados a una empresa
+// Obtener todos los parques asociados a una empresa
+export const obtenerParquesEmpresa = async (uuid_empresa: string): Promise<ParqueEolico[]> => {
+  const token = localStorage.getItem('token');
+
+  if (!token) {
+    throw new Error('Token de autenticación no encontrado en localStorage.');
+  }
+
+  try {
+      const response = await api.get('/parques-eolicos/items/parques-eolicos-por-empresa/', {
+          headers: {
+              Authorization: `Bearer ${token}`,
+          },
+          params: {
+              uuid_empresa: uuid_empresa,  // Asegúrate de pasar uuid_empresa como está en la vista
+          },
+      });
+
+      return response.data;
+  } catch (error) {
+      console.error('Error al obtener los parques eólicos:', error);
+      throw error;
+  }
+};

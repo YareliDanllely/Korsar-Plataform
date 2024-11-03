@@ -93,3 +93,17 @@ export interface ImagenAnomaliaPost {
     observacionAnomalia?: string;
     imagenesAnomalia?: string;
   }
+
+
+  export interface ParqueEolico {
+    uuid_parque_eolico: string;
+    nombre_parque: string;
+    abreviatura_parque: string;
+    ubicacion_comuna: string;
+    ubicacion_region: string;
+    potencia_instalada: number;
+    coordenada_longitud: number;
+    coordenada_latitud: number;
+    uuid_empresa: string;
+
+  }
