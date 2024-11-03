@@ -8,6 +8,7 @@ from .serializers import UsuarioSerializer
 from .permissions import IsTechnician  # Importar el permiso correcto
 
 
+
 class CustomTokenObtainPairView(TokenObtainPairView):
     def post(self, request, *args, **kwargs):
         # Llama al método post del padre para obtener la respuesta estándar de JWT
@@ -17,14 +18,13 @@ class CustomTokenObtainPairView(TokenObtainPairView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        # Obtenemos el usuario desde el serializer
-        user = serializer.user
+        # Obtenemos el usuario desde los datos validados del serializer
+        user = serializer.user  # Si esto no funciona, prueba con serializer.validated_data['user']
 
         # Agregar el user_id (o uuid_usuario si es personalizado) a la respuesta
         response.data['user_id'] = str(user.uuid_usuario)  # Usa 'id' o 'uuid_usuario', según tu modelo
-        response.data['empresa_id'] = str(user.uuid_empresa.id_empresa) if user.uuid_empresa else None
+        response.data['empresa_id'] = str(user.uuid_empresa.uuid_empresa) if user.uuid_empresa else None
         response.data['username'] = user.username  # Incluye el nombre de usuario
-
 
         return response
 

@@ -22,11 +22,17 @@ function Login() {
 
             const token = response.data.access;
             const userId = response.data.user_id;  // Capturar el ID del usuario desde la respuesta
+            const empresaId = response.data.empresa_id; // Capturar el ID de la empresa
+            const usernameResponse = response.data.username; // Capturar el nombre de usuario
+
+
             console.log(`Token: ${token}, User ID: ${userId}`);
 
             // Almacena el token y el ID del usuario en localStorage
             localStorage.setItem('token', token);
-            localStorage.setItem('userId', userId); // Almacena el ID del usuario
+            localStorage.setItem('userId', userId);
+            localStorage.setItem('empresa_id', empresaId);
+            localStorage.setItem('username', usernameResponse);
 
             // Navega al dashboard
             navigate('/dashboard');
