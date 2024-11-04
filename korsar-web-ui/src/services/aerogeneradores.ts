@@ -103,4 +103,3 @@ export const cambiarEstadoFinalAerogenerador = async (uuid_aerogenerador: string
   }
 };
 
-

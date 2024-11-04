@@ -1,4 +1,5 @@
 import axios from 'axios';  // Importa axios para realizar las solicitudes HTTP
+import { Inspeccion } from '../utils/interfaces';  // Importa la interfaz Inspeccion desde el archivo interfaces.ts
 
 // Define la URL base de la API
 const BASE_URL = 'http://localhost:8000/api';
@@ -36,4 +37,33 @@ export const obtenerInspecciones = async () => {
 };
 
 
-// aveces tira error al obtener inspecciones, si lo recargo mucho rapidamente pasa
+interface InspeccionResponse {
+  ultimas_inspecciones: Inspeccion[];
+}
+
+
+export const ultimaInspeccionParqueEmpresa= async (uuid_empresa: string): Promise<InspeccionResponse> => {
+
+  const token = localStorage.getItem('token');
+
+  try {
+    const response = await  api.get(`/inspecciones/items/ultima-inspeccion-por-empresa`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: {
+        uuid_empresa,
+      },
+    });
+
+    return response.data;
+
+  } catch (error) {
+    console.error('Error al obtener las ultimas inspecciones:', error);
+    throw error;
+  }
+
+};
+
+
+

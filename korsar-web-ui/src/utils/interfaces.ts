@@ -24,7 +24,7 @@ export interface Anomalia {
     uuid_parque_eolico: string;
     nombre_parque: string;
     fecha_inspeccion: string;
-    fecha_siguente_inspeccion: string;
+    fecha_siguiente_inspeccion: string;
     progreso: string;
   }
 
@@ -103,6 +103,7 @@ export interface ImagenAnomaliaPost {
     ubicacion_region: string;
     potencia_instalada: number;
     coordenada_longitud: number;
+    cantidad_turbinas: number;
     coordenada_latitud: number;
     uuid_empresa: string;
 

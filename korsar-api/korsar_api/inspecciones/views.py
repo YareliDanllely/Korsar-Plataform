@@ -2,6 +2,7 @@ from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from .models import Inspeccion
 from .serializers import InspeccionSerializer
+from .models import ParquesEolicos
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
@@ -60,3 +61,32 @@ class InspeccionViewSet(viewsets.ModelViewSet):
             'proxima_inspeccion': self.get_serializer(proxima_inspeccion).data if proxima_inspeccion else None
         }
         return Response(data, status=status.HTTP_200_OK)
+
+    # Obtener última inspección por parques eólicos para una empresa específica
+    # Obtener última inspección por parques eólicos para una empresa específica
+    @action(detail=False, methods=['get'], url_path='ultima-inspeccion-por-empresa')
+    def ultima_inspeccion_por_empresa(self, request):
+        """
+        Obtener la última inspección para cada parque eólico de una empresa específica.
+        """
+        uuid_empresa = request.query_params.get('uuid_empresa')
+
+        if not uuid_empresa:
+            return Response({'error': 'uuid_empresa es requerido'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Filtrar parques eólicos por la empresa
+        parques = ParquesEolicos.objects.filter(uuid_empresa=uuid_empresa)
+        inspecciones = []
+
+        for parque in parques:
+            try:
+                # Obtener la última inspección para cada parque eólico
+                ultima_inspeccion = Inspeccion.objects.filter(uuid_parque_eolico=parque.uuid_parque_eolico).latest('fecha_inspeccion')
+                inspecciones.append(ultima_inspeccion)
+            except Inspeccion.DoesNotExist:
+                # Si no hay inspección, omitir este parque
+                continue
+
+        # Serializar y devolver las últimas inspecciones de cada parque de la empresa
+        serializer = self.get_serializer(inspecciones, many=True)
+        return Response({'ultimas_inspecciones': serializer.data}, status=status.HTTP_200_OK)

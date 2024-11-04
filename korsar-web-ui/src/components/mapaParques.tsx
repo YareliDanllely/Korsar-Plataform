@@ -1,54 +1,57 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import jsVectorMap from 'jsvectormap';
-import 'jsvectormap/dist/jsvectormap.min.css';  // Importar el archivo CSS para estilos y botones de zoom
-import 'jsvectormap/dist/maps/world-merc';      // Importar el mapa mundial en proyección Mercator
-import 'jsvectormap/dist/jsvectormap.cjs';   // Importar el archivo de traducción al inglés
-import 'jsvectormap/dist/jsvectormap.js';
-import 'jsvectormap/dist/jsvectormap.esm.js';
-
-
+import 'jsvectormap/dist/jsvectormap.css';
+import 'jsvectormap/dist/maps/world-merc.js';
 
 interface Marker {
     name: string;
     coords: [number, number];
 }
 
-function SimpleMap() {
-    useEffect(() => {
-        // Crear el mapa en el elemento con id 'map'
-        const map = new jsVectorMap({
-            selector: '#map',
-            map: 'world_merc',
-            regionStyle: {
-                initial: { fill: "#d1d5db" }
-            },
-            markers: [
-                { name: "Russia", coords: [61, 105] },
-                { name: "Greenland", coords: [72, -42] },
-                { name: "Canada", coords: [56.1304, -106.3468] },
-                { name: "Palestine", coords: [31.5, 34.8] },
-                { name: "Brazil", coords: [-14.235, -51.9253] }
-            ],
-            markerStyle: {
-                initial: { fill: "red" }
-            },
-            labels: {
-                markers: {
-                    render: (marker: Marker) => marker.name
-                }
-            }
-        });
+interface SimpleMapProps {
+    markers: Marker[];
+}
 
-        // return () => {
-        //     map.destroy();
-        // };
-    }, []);
+function SimpleMap({ markers }: SimpleMapProps) {
+    useEffect(() => {
+        const initMap = () => {
+            const map = new jsVectorMap({
+                selector: '#map',
+                map: 'world_merc',
+                regionStyle: {
+                    initial: { fill: "#d1d5db" }
+                },
+                markers: markers, // Utiliza los markers pasados como prop
+                markerStyle: {
+                    initial: { fill: "#53AF0C" }, // Verde claro
+                    hover: { fill: "#2e7d32" },   // Verde oscuro al pasar el cursor
+                    selected: { fill: "green" },
+                    selectedHover: { fill: "yellow" }
+                },
+                zoomButtons: true,
+                labels: {
+                    markers: {
+                        render: (marker: Marker) => marker.name
+                    }
+                }
+            });
+
+            // Limpiar el mapa cuando el componente se desmonte
+            return () => map.destroy();
+        };
+
+        // Inicializar el mapa solo si hay markers
+        if (markers && markers.length > 0) {
+            const animationFrameId = requestAnimationFrame(initMap);
+            return () => cancelAnimationFrame(animationFrameId);
+        }
+    }, [markers]); // Ejecutar el efecto cuando markers cambien
 
     return (
-        <div>
+        <div className="w-full h-full flex justify-center items-center">
             <div
                 id="map"
-                style={{ width: '100%', height: '500px', maxWidth: '600px', margin: 'auto' }}
+                style={{ width: '100%', height: '100%' }}
             ></div>
         </div>
     );
