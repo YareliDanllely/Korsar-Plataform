@@ -67,3 +67,26 @@ export const ultimaInspeccionParqueEmpresa= async (uuid_empresa: string): Promis
 
 
 
+
+export const ultimaInspeccionPorPaquete = async (uuid_parque_eolico: string): Promise<Inspeccion> => {
+
+  const token = localStorage.getItem('token');
+
+  try {
+    const response = await  api.get(`/inspecciones/items/informacion-ultima-inspeccion`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: {
+        uuid_parque_eolico,
+      },
+    });
+
+    return response.data;
+
+  } catch (error) {
+    console.error('Error al obtener las ultimas inspecciones:', error);
+    throw error;
+  }
+
+}

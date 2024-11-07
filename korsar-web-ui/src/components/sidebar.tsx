@@ -27,6 +27,12 @@ function SidebarComponent({ isOpen }: SidebarComponentProps) {
                   </Link>
                 </Sidebar.Item>
                 <Sidebar.Item as="div">
+                  <Link to="/aerogeneradores" className="flex items-center">
+                    <HiDatabase className="mr-2" />
+                    Aerogeneradores
+                  </Link>
+                </Sidebar.Item>
+                <Sidebar.Item as="div">
                   <Link to="/inspecciones" className="flex items-center">
                     <HiDocumentReport className="mr-2" />
                     Inspecciones

@@ -5,6 +5,7 @@ import Login from "./routes/login";
 import Layout from "./components/layout";
 import ParquesEolicos from "./routes/parquesEolicos";
 import Inspecciones from "./routes/inspecciones";
+import Aerogeneradores from "./routes/aerogeneradores";
 import RevisarInspeccion from "./routes/revisarInspeccion";
 
 const router = (
@@ -27,6 +28,16 @@ const router = (
           </Layout>
         </PrivateRoute>
         } />
+
+        <Route path="/aerogeneradores" element={
+          <PrivateRoute>
+          <Layout>
+            <Aerogeneradores />
+          </Layout>
+        </PrivateRoute>
+        } />
+
+
         <Route path="/inspecciones" element={
           <PrivateRoute>
           <Layout>

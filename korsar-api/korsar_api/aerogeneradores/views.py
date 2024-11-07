@@ -95,3 +95,20 @@ class AerogeneradorViewSet(viewsets.ModelViewSet):
             return Response({'mensaje': 'Estado final actualizado'}, status=status.HTTP_200_OK)
         except EstadoAerogenerador.DoesNotExist:
             return Response({'error': 'Estado final no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+
+    # Obtener la información de un aerogenerador por su UUID
+    @action(detail=False, methods=['get'], url_path='informacion-aerogenerador')
+    def obtener_info_aerogenerador(self, request):
+        uuid_aerogenerador = request.query_params.get('uuid_aerogenerador')
+
+        if not uuid_aerogenerador:
+            return Response({'error': 'El parámetro uuid_aerogenerador es requerido'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            aerogenerador = Aerogenerador.objects.get(pk=uuid_aerogenerador)
+            serializer = AerogeneradorSerializer(aerogenerador)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Aerogenerador.DoesNotExist:
+            return Response({'error': 'Aerogenerador no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+
+

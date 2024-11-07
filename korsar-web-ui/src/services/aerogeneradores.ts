@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { AerogeneradorConEstado } from '../utils/interfaces';
+import { Aerogenerador } from '../utils/interfaces';
 
 const BASE_URL = 'http://localhost:8000/api';
 
@@ -103,3 +104,25 @@ export const cambiarEstadoFinalAerogenerador = async (uuid_aerogenerador: string
   }
 };
 
+
+export const informacionAerogenerador = async (uuid_aerogenerador: string): Promise<Aerogenerador> => {
+    const token = localStorage.getItem('token');
+
+    try {
+      const response = await api.get(`/aerogeneradores/items/informacion-aerogenerador/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        params: {
+          uuid_aerogenerador,
+        },
+      });
+
+      console.log('Información del aerogenerador:', response.data);
+      return response.data;
+
+    } catch (error) {
+      console.error('Error al obtener la información del aerogenerador:', error);
+      throw error;
+    }
+  }

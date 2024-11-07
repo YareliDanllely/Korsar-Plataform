@@ -90,3 +90,22 @@ class InspeccionViewSet(viewsets.ModelViewSet):
         # Serializar y devolver las últimas inspecciones de cada parque de la empresa
         serializer = self.get_serializer(inspecciones, many=True)
         return Response({'ultimas_inspecciones': serializer.data}, status=status.HTTP_200_OK)
+
+    #Obtener informacion de la ultima inspeccion por parque eolico
+    @action(detail=False, methods=['get'], url_path='informacion-ultima-inspeccion')
+    def informacion_ultima_inspeccion(self, request):
+        """
+        Obtener la información de la última inspección por parque eólico
+        """
+        uuid_parque_eolico = request.query_params.get('uuid_parque_eolico')
+
+        if not uuid_parque_eolico:
+            return Response({'error': 'uuid_parque_eolico es requerido'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            # Filtrar la última inspección por parque eólico
+            ultima_inspeccion = Inspeccion.objects.filter(uuid_parque_eolico=uuid_parque_eolico).latest('fecha_inspeccion')
+            serializer = self.get_serializer(ultima_inspeccion)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Inspeccion.DoesNotExist:
+            return Response({'error': 'No se encontró inspección'}, status=status.HTTP_404_NOT_FOUND)

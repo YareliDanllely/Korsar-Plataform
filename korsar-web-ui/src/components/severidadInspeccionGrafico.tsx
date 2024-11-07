@@ -67,30 +67,31 @@ const DonutChart: React.FC<DonutChartProps> = ({ uuidParque, uuidInspeccion }) =
     }, [uuidParque, uuidInspeccion]);
 
     return (
-        <div className="w-full flex items-center justify-center p-4"> {/* Limita el ancho máximo */}
-            <Doughnut
-                data={data}
-                options={{
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'right',
-                            labels: {
-                                boxWidth: 12, // Tamaño del punteo
-                                padding: 8, // Espacio entre cada etiqueta
-                                font: {
-                                    size: 10, // Tamaño de la fuente de las leyendas
-                                },
-                                usePointStyle: true,
-                                pointStyle: 'circle',
+        <div className="w-full flex items-center justify-center p-10" style={{ maxWidth: '100%', overflow: 'hidden' }}>
+        <Doughnut
+            data={data}
+            options={{
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: {
+                            boxWidth: 12,
+                            padding: 8,
+                            font: {
+                                size: 10,
                             },
+                            usePointStyle: true,
+                            pointStyle: 'circle',
                         },
                     },
-                    cutout: '50%',
-                }}
-                style={{ width: '80%', height: '80%' }}
-            />
-        </div>
+                },
+                cutout: '50%',
+            }}
+            style={{ width: '80%', height: '80%', maxWidth: '100%', maxHeight: '100%' }} // Ajusta el tamaño
+        />
+    </div>
+
     );
 };
 
