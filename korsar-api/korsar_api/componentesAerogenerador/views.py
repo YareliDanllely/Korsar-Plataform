@@ -53,3 +53,22 @@ class ComponenteAerogeneradorViewSet(viewsets.ModelViewSet):
 
 
 
+    # Obtener el tipo de un componente por su uuid unico
+    @action(detail=False, methods=['get'], url_path='tipo-componente')
+    def tipo_componente(self,request):
+        """
+        Obtiene el tipo del componente en base a su identificador unico
+        """
+
+        uuid_componente_url = request.query_params.get('uuid_componente')
+
+        if not uuid_componente_url:
+            return Response({'error': 'Parámetro uuid_componente es requerido'}, status=status.HTTP_400_BAD_REQUEST)
+
+        componente = ComponenteAerogenerador.objects.filter(uuid_componente=uuid_componente_url).first()
+
+        if componente:
+            return Response({'tipo_componente': componente.tipo_componente}, status=status.HTTP_200_OK)
+        else:
+            return Response({'error': 'No se encontró componente'}, status=status.HTTP_404_NOT_FOUND)
+

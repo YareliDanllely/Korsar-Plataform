@@ -6,7 +6,7 @@ import { ImagenAnomaliaFront } from "../utils/interfaces";
     dimensionAnomalia: string,
     orientacionAnomalia: string,
     descripcionAnomalia: string,
-    observacionAnomalia: string | null,
+    ubicacionAnomalia: string,
     imagenes: ImagenAnomaliaFront[]
 
   ): ValidacionErrores => {
@@ -36,10 +36,11 @@ import { ImagenAnomaliaFront } from "../utils/interfaces";
       errores.descripcionAnomalia = "La descripción de la anomalía es obligatoria.";
     }
 
-    // Validación para la observación (opcional)
-    if (observacionAnomalia && observacionAnomalia.length > 1000) {
-      errores.observacionAnomalia = "Las observaciones no pueden exceder los 1000 caracteres.";
+    // Validación para la ubicación de la anomalía
+    if (!ubicacionAnomalia.trim()) {
+      errores.ubicacionAnomalia = "La ubicación de la anomalía es obligatoria.";
     }
+
 
     // Validación para las imágenes
     if (imagenes.length === 0) {

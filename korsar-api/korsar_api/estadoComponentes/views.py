@@ -11,3 +11,5 @@ class EstadoComponenteViewSet(viewsets.ModelViewSet):
     queryset = EstadoComponente.objects.all()
     serializer_class = EstadoComponenteSerializer
     permission_classes = [IsAuthenticated]
+
+

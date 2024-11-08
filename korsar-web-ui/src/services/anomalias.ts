@@ -44,7 +44,7 @@ interface AnomaliaData {
   dimension_anomalia: string;
   orientacion_anomalia: string;
   descripcion_anomalia: string;
-  observacion_anomalia?: string;
+  ubicacion_componente?: string;
 }
 
 export const  crearAnomalia = async (data: AnomaliaData): Promise<Anomalia> => {

@@ -44,3 +44,5 @@ const Inspecciones = () => {
 };
 
 export default Inspecciones;
+
+

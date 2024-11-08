@@ -12,11 +12,10 @@ class ComponenteAerogeneradorAdmin(admin.ModelAdmin):
         'uuid_componente',
         'get_numero_aerogenerador',  # Mostrar el número del aerogenerador relacionado
         'tipo_componente',
-        'ruta_imagen_visualizacion_componente'
     )
 
     # Permitir la búsqueda por tipo de componente y ruta de imagen
-    search_fields = ('tipo_componente', 'ruta_imagen_visualizacion_componente')
+    search_fields = ('tipo_componente',)
 
     # Método para mostrar el número del aerogenerador relacionado
     def get_numero_aerogenerador(self, obj):

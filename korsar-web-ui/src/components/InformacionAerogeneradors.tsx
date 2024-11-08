@@ -23,7 +23,7 @@ export const InformacionAerogenerador = ({ uuid_aerogenerador }: { uuid_aerogene
     }, [uuid_aerogenerador]);
 
     return (
-        <div className="flex flex-col h-full w-full justify-center items-center">
+        <div className="flex flex-col  justify-center items-center">
             <div className="grid grid-cols-2 gap-3 mt-5 w-full h-full p-5">
 
                 {/* Titulo */}

@@ -3,6 +3,8 @@ from rest_framework.permissions import IsAuthenticated
 from .models import Inspeccion
 from .serializers import InspeccionSerializer
 from .models import ParquesEolicos
+from anomalias.models import Anomalia
+from django.db.models import Count
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
@@ -109,3 +111,40 @@ class InspeccionViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Inspeccion.DoesNotExist:
             return Response({'error': 'No se encontró inspección'}, status=status.HTTP_404_NOT_FOUND)
+
+
+    @action(detail=False, methods=['get'], url_path='cantidad-severidades-por-componente')
+    def cantidad_severidades_por_componente(self, request):
+        """
+        Obtener la cantidad de severidades obtenidas en una inspección por tipo de componente
+        """
+        uuid_inspeccion = request.query_params.get('uuid_inspeccion')
+
+        if not uuid_inspeccion:
+            return Response({'error': 'uuid_inspeccion es requerido'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            # Filtrar las anomalías por el UUID de inspección y agrupar por ubicación de componente y severidad
+            severidades = (
+                Anomalia.objects
+                .filter(uuid_inspeccion=uuid_inspeccion)
+                .values('ubicacion_componente', 'severidad_anomalia')
+                .annotate(total_severidades=Count('severidad_anomalia'))
+                .order_by('ubicacion_componente', 'severidad_anomalia')
+            )
+
+            # Reestructurar los datos en un formato de respuesta más claro
+            respuesta = {}
+            for item in severidades:
+                ubicacion = dict(Anomalia.UBICACION_COMPONENTE_CHOICES).get(item['ubicacion_componente'], 'Desconocido')
+                severidad = dict(Anomalia.SEVERIDAD_CHOICES).get(item['severidad_anomalia'], 'Desconocido')
+
+                if ubicacion not in respuesta:
+                    respuesta[ubicacion] = {}
+
+                respuesta[ubicacion][severidad] = item['total_severidades']
+
+            return Response(respuesta, status=status.HTTP_200_OK)
+
+        except Anomalia.DoesNotExist:
+            return Response({'error': 'No se encontraron anomalías para esta inspección'}, status=status.HTTP_404_NOT_FOUND)

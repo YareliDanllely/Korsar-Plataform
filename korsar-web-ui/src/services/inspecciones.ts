@@ -1,5 +1,6 @@
 import axios from 'axios';  // Importa axios para realizar las solicitudes HTTP
 import { Inspeccion } from '../utils/interfaces';  // Importa la interfaz Inspeccion desde el archivo interfaces.ts
+import { CantidadSeveridadesPorComponente } from '../utils/interfaces';
 
 // Define la URL base de la API
 const BASE_URL = 'http://localhost:8000/api';
@@ -68,7 +69,7 @@ export const ultimaInspeccionParqueEmpresa= async (uuid_empresa: string): Promis
 
 
 
-export const ultimaInspeccionPorPaquete = async (uuid_parque_eolico: string): Promise<Inspeccion> => {
+export const ultimaInspeccionPorParque = async (uuid_parque_eolico: string): Promise<Inspeccion> => {
 
   const token = localStorage.getItem('token');
 
@@ -90,3 +91,28 @@ export const ultimaInspeccionPorPaquete = async (uuid_parque_eolico: string): Pr
   }
 
 }
+
+
+export const cantidadSeveridadesPorComponentes = async (uuid_inspeccion: string): Promise<CantidadSeveridadesPorComponente> => {
+
+  const token = localStorage.getItem('token');
+
+  try {
+    const response = await  api.get(`/inspecciones/items/cantidad-severidades-por-componente`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: {
+        uuid_inspeccion,
+      },
+    });
+
+    return response.data;
+
+  } catch (error) {
+    console.error('Error al obtener las severidades', error);
+    throw error;
+  }
+
+}
+

@@ -29,8 +29,25 @@ export const obtenerComponentesAerogenerador = async (uuid_aerogenerador: string
         throw error;
     }
 
+}
 
+export const obtenerTipoComponente = async (uuid_componente: string): Promise<string> => {
+    const token = localStorage.getItem('token');
 
+    try {
+        const response = await api.get(`/componentes-aerogenerador/items/tipo-componente/`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+            params: {
+                uuid_componente,
+            },
+        });
 
+        return response.data.tipo_componente;
+    } catch (error) {
+        console.error('Error al obtener el tipo del componente:', error);
+        throw error;
+    }
 }
 

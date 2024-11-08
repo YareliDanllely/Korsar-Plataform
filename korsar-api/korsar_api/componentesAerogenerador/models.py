@@ -13,13 +13,23 @@ class ComponenteAerogenerador(models.Model):
     # LLave primaria UUID
     uuid_componente = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
-    # Relación con Aerogenerador y EstadoAerogenerador usando UUID
+    # Relación con Aerogenerador usando UUID
     uuid_aerogenerador = models.ForeignKey(Aerogenerador, on_delete=models.CASCADE)
 
-    # Campos
-    tipo_componente = models.CharField(max_length=255)
-    ruta_imagen_visualizacion_componente = models.CharField(max_length=255)
+    # Opciones de tipo de componente
+    TIPO_COMPONENTE_CHOICES = [
+        ('helice_a', 'Hélice A'),
+        ('helice_b', 'Hélice B'),
+        ('helice_c', 'Hélice C'),
+        ('torre', 'Torre'),
+        ('nacelle', 'Nacelle/Hub'),
+    ]
 
+    # Campos
+    tipo_componente = models.CharField(
+        max_length=50,
+        choices=TIPO_COMPONENTE_CHOICES,
+    )
 
     def __str__(self):
-        return f"Componente {self.tipo_componente} del Aerogenerador {self.uuid_aerogenerador}"
+        return f"Componente {self.get_tipo_componente_display()} del Aerogenerador {self.uuid_aerogenerador}"

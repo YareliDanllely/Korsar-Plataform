@@ -14,47 +14,49 @@ const router = (
 
       <Route path="/" element={<Navigate to="/login" />} />
       <Route path="/login" element={<Login />} />
+
       <Route path="/dashboard" element={
         <PrivateRoute>
           <Layout>
             <Dashboard />
           </Layout>
         </PrivateRoute>
-        } />
-        <Route path="/parquesEolicos" element={
-          <PrivateRoute>
+      } />
+
+      <Route path="/parquesEolicos/:uuid_parque_eolico" element={
+        <PrivateRoute>
           <Layout>
             <ParquesEolicos />
           </Layout>
         </PrivateRoute>
-        } />
+      } />
 
-        <Route path="/aerogeneradores" element={
-          <PrivateRoute>
+      <Route path="/aerogeneradores" element={
+        <PrivateRoute>
           <Layout>
             <Aerogeneradores />
           </Layout>
         </PrivateRoute>
-        } />
+      } />
 
-
-        <Route path="/inspecciones" element={
-          <PrivateRoute>
+      <Route path="/inspecciones" element={
+        <PrivateRoute>
           <Layout>
             <Inspecciones />
           </Layout>
         </PrivateRoute>
-        } />
+      } />
 
-        <Route path="/revisar/:uuid_inspeccion/:uuid_parque" element={
-          <PrivateRoute>
+      <Route path="/revisar/:uuid_inspeccion/:uuid_parque" element={
+        <PrivateRoute>
           <Layout>
             <RevisarInspeccion />
           </Layout>
         </PrivateRoute>
-        } />
+      } />
 
     </Routes>
   </Router>
 );
+
 export default router;

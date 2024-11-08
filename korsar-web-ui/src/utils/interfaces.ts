@@ -12,9 +12,9 @@ export interface Anomalia {
     severidad_anomalia: number;      // IntegerField para choices, se mantiene como number en TypeScript
 
     dimension_anomalia: string;      // CharField mapeado a string
+    ubicacion_anomalia: string;      // CharField mapeado a string
     orientacion_anomalia: string;    // CharField mapeado a string
     descripcion_anomalia: string;   // TextField, opcional en TypeScript
-    observacion_anomalia?: string;   // TextField, opcional en TypeScript
 
   }
 
@@ -57,6 +57,7 @@ export interface ImagenAnomaliaPost {
   }
 
 
+
   export interface ComponenteAerogenerador {
     uuid_componente: string;              // UUID del componente
     uuid_aerogenerador: string;           // UUID del Aerogenerador al que pertenece
@@ -90,7 +91,7 @@ export interface ImagenAnomaliaPost {
     dimensionAnomalia?: string;
     orientacionAnomalia?: string;
     descripcionAnomalia?: string;
-    observacionAnomalia?: string;
+    ubicacionAnomalia?: string;
     imagenesAnomalia?: string;
   }
 
@@ -108,3 +109,19 @@ export interface ImagenAnomaliaPost {
     uuid_empresa: string;
 
   }
+
+  export interface Empresa {
+    uuid_empresa: string;
+    nombre_empresa: string;
+  }
+
+// Definir las posibles severidades
+type Severidad = 'Sin daño' | 'Menor' | 'Significativo' | 'Mayor' | 'Crítico';
+
+// Crear un tipo mapeado para contar las severidades, haciendo que las propiedades sean opcionales con `Partial`
+type SeveridadCount = Partial<Record<Severidad, number>>;
+
+// Usar SeveridadCount como antes
+export interface CantidadSeveridadesPorComponente {
+  [key: string]: SeveridadCount | undefined; // Cada clave representa un componente y tiene un SeveridadCount o es undefined
+}

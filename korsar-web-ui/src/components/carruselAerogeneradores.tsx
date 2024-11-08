@@ -56,6 +56,7 @@ export function AerogeneradorCarrusel({
     const fetchAerogeneradores = async () => {
       try {
         const data = await obtenerAerogeneradores(uuid_parque_eolico, uuid_inspeccion);
+        console.log("Aerogeneradoresssss:", data);
         setAerogeneradores(data);
       } catch (error) {
         setError("Error al obtener los aerogeneradores");
@@ -72,7 +73,7 @@ export function AerogeneradorCarrusel({
   }
 
   return (
-    <div className="w-full h-full rounded-lg shadow-md">
+    <div className="w-full h-full rounded-lg ">
       {loading ? (
         <div className="flex justify-center items-center h-full">Cargando...</div>
       ) : error ? (
@@ -84,8 +85,8 @@ export function AerogeneradorCarrusel({
               {group.map((turbine) => (
                 <div
                   key={turbine.uuid_aerogenerador}
-                  className="flex-none w-20 sm:w-15 md:w-15 h-48 flex flex-col items-center justify-center space-y-2 p-3 bg-white rounded-lg"
-                >
+                  className="flex-none w-20 sm:w-15 md:w-15 h-48 flex flex-col items-center justify-center space-y-2 p-3 bg-transparent rounded-lg"
+                  >
                   <span className="text-lg font-semibold">#{turbine.numero_aerogenerador}</span>
                   <Badge
                     className={`border ${getColorClass(turbine.estado_final)} text-xs px-1 py-0.5 rounded-full`}

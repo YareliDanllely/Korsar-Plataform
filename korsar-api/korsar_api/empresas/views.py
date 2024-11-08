@@ -35,6 +35,25 @@ class EmpresaViewSet(viewsets.ModelViewSet): # ModelViset es una clase de Django
         # Retornamos la lista de parques en el formato JSON
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    # Obtener informacion de una empresa por su uuid
+    @action(detail=False, methods=['get'], url_path='empresa_por_uuid')
+    def get_empresa_por_uuid(self, request):
+        """
+        Obtenemos toda la información de una empresa en particular, dado su uuid.
+        """
+        # Obtenemos el uuid de la empresa
+        uuid_empresa = request.query_params.get('uuid_empresa')
+
+        # Obtenemos la empresa correspondiente usando el uuid
+        empresa = Empresa.objects.get(uuid_empresa=uuid_empresa)
+
+        # Serializamos la empresa para devolverla como JSON
+        serializer = EmpresaSerializer(empresa)
+
+        # Retornamos la empresa en el formato JSON
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
 
 
 
