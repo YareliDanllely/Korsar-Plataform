@@ -4,19 +4,11 @@ from .models import Anomalia
 from django.db.models import Count
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from collections import defaultdict
 from rest_framework import status
 from rest_framework import generics
 from .serializers import AnomaliaSerializer
 import re
-
-# Vista para operaciones CRUD de Anomalias
-class AnomaliaViewSet(viewsets.ModelViewSet):
-    """
-    Definir la vista de AnomaliaViewSet para la API
-    """
-    queryset = Anomalia.objects.all()
-    serializer_class = AnomaliaSerializer
-    permission_classes = [IsAuthenticated]  # Solo usuarios autenticados pueden acceder
 
     # Definir consulta para obtener la cantidad de severidad de daños por una inspección
 class AnomaliaViewSet(viewsets.ModelViewSet):
@@ -74,6 +66,55 @@ class AnomaliaViewSet(viewsets.ModelViewSet):
         siguiente_numero_dano = (max(numero_damage) + 1) if numero_damage else 1
 
         return Response({'siguiente_numero_dano': f"{siguiente_numero_dano:04d}"}, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['get'], url_path='anomalias-por-aerogenerador')
+    def obtener_anomalias_por_aerogenerador(self, request):
+        """
+        Obtener todas las anomalías asociadas a un aerogenerador, por uuid aerogenerador y uuid inspección.
+        """
+
+        uuid_aerogenerador = request.query_params.get('uuid_aerogenerador')
+        uuid_inspeccion = request.query_params.get('uuid_inspeccion')
+
+        if not uuid_aerogenerador:
+            return Response({'error': 'uuid_aerogenerador es requerido'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not uuid_inspeccion:
+            return Response({'error': 'uuid_inspeccion es requerido'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Obtener anomalías filtradas
+        anomalias = Anomalia.objects.filter(uuid_aerogenerador=uuid_aerogenerador, uuid_inspeccion=uuid_inspeccion)
+
+       # Diccionario de mapeo para traducir los nombres de la base de datos a las claves esperadas
+        componente_map = {
+            'Hélice A': 'helice_a',
+            'Hélice B': 'helice_b',
+            'Hélice C': 'helice_c',
+            'Torre': 'torre',
+            'Nacelle/Hub': 'nacelle'
+        }
+
+        # Inicializar el diccionario con arrays vacíos para cada tipo esperado
+        tipos_componentes_esperados = ['helice_a', 'helice_b', 'helice_c', 'torre', 'nacelle']
+        anomalias_por_tipo = {tipo: [] for tipo in tipos_componentes_esperados}
+
+        # Agregar anomalías al tipo correspondiente
+        for anomalia in anomalias:
+            tipo_componente = componente_map.get(anomalia.uuid_componente.tipo_componente)
+            if tipo_componente:  # Verifica si el tipo de componente existe en el mapeo
+                anomalias_por_tipo[tipo_componente].append(anomalia)
+            else:
+                print(f"Tipo de componente no reconocido: {anomalia.uuid_componente.tipo_componente}")
+
+        # Serializar los datos de anomalías
+        data = {
+            tipo: AnomaliaSerializer(anomalias, many=True).data
+            for tipo, anomalias in anomalias_por_tipo.items()
+        }
+
+        return Response(data, status=status.HTTP_200_OK)
+
+
 
 # Vista para obtener anomalías definidas por aerogenerador, componente e inspección
 class AnomaliaListView(generics.ListAPIView):

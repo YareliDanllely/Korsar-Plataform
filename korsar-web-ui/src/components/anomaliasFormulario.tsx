@@ -53,6 +53,14 @@ export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogen
     ubicacionAnomalia: true,
   });
 
+  const UBICACION_COMPONENTE_CHOICES = [
+    { value: 'aspa_interna', label: 'Aspa Interna' },
+    { value: 'aspa_externa', label: 'Aspa Externa' },
+    { value: 'nacelle', label: 'Nacelle/Hub' },
+    { value: 'torre', label: 'Torre' },
+  ];
+
+
   /** ----------------------------------- Efectos -----------------------------------**/
 
 
@@ -82,28 +90,41 @@ export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogen
   useEffect(() => {
     const fetchTipoComponente = async () => {
       try {
-        const tipoComponente = await obtenerTipoComponente(uuid_componente);
-        setTipoComponente(tipoComponente); // Actualizar el estado después de obtenerlo
-        console.log("Tipo_componente:", tipoComponente);
+        const tipoComponenteValue = await obtenerTipoComponente(uuid_componente);
+        setTipoComponente(tipoComponenteValue);
+        console.log("Tipo_componente:", tipoComponenteValue);
 
-        // Establecer el estado según el tipo de componente
-        if (tipoComponente === "Nacelle/Hub" || tipoComponente === "Torre") {
-          setOpcionHelice(false);
-          setUbicacionAnomalia(tipoComponente); // Asignar directamente la ubicación si es Torre o Nacelle
+        // Buscar el objeto con el tipoComponente y obtener el label correspondiente
+        const componenteSeleccionado = UBICACION_COMPONENTE_CHOICES.find(
+          (element) => element.label === tipoComponenteValue
+        );
+
+        console.log("Componente seleccionado:", componenteSeleccionado);
+
+        if (componenteSeleccionado) {
+          if (componenteSeleccionado.value === "nacelle" || componenteSeleccionado.value === "torre") {
+            setOpcionHelice(false);
+            setUbicacionAnomalia(componenteSeleccionado.value); // Asignar el valor para Torre o Nacelle
+            console.log("Ubicación de la anomalía:", ubicacionAnomalia);
+          } else if (componenteSeleccionado.value === "aspa_interna" || componenteSeleccionado.value === "aspa_externa") {
+            setOpcionHelice(true); // Permitir seleccionar Aspa Interna/Externa
+            setUbicacionAnomalia(""); // Limpiar ubicación para permitir selección
+          }
         } else {
-          setOpcionHelice(true); // Permitir seleccionar Aspa Interna/Externa
-          setUbicacionAnomalia(""); // Limpiar ubicación para aspa interna/externa
+          console.error("Componente no encontrado en las opciones");
+          setUbicacionAnomalia(""); // Valor predeterminado en caso de no encontrar el componente
         }
       } catch (error) {
         console.error("Error al obtener el componente:", error);
       }
     };
 
+    // Solo ejecuta fetchTipoComponente si uuid_componente tiene valor
     if (uuid_componente) {
       fetchTipoComponente();
     }
+  }, []); // Vacío para que solo se ejecute al montar el componente
 
-  }, [uuid_componente, obtenerTipoComponente]);
 
 
   /**
@@ -136,6 +157,7 @@ export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogen
       try {
         const abreviatura = await obtenerAbreviaturaParque(uuid_parque);
         setAbreviaturaParque(abreviatura);
+        console.log('Abreviatura del parque:', abreviatura);
       } catch (error) {
         console.error('Error al obtener la abreviatura del parque:', error);
       }
@@ -144,7 +166,7 @@ export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogen
     if (uuid_parque) {
       fetchAbreviaturaParque();
     }
-  }, [uuid_parque]);
+  }, [uuid_componente, uuid_aerogenerador, categoriaDaño]);
 
   /**
    * Obtiene el número del aerogenerador cuando se selecciona uno
@@ -218,7 +240,7 @@ export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogen
       severidad_anomalia: categoriaDaño,
       dimension_anomalia: dimensionAnomalia,
       orientacion_anomalia: orientacionAnomalia,
-      ubicacion_componente: tipoComponente,
+      ubicacion_componente: ubicacionAnomalia,
       descripcion_anomalia: descripcionAnomalia,
     });
 
@@ -294,7 +316,7 @@ export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogen
         uuid_tecnico: userId,
         codigo_anomalia: codigoAnomalia,
         severidad_anomalia: categoriaDaño,
-        ubicacion_componente: tipoComponente,
+        ubicacion_componente: ubicacionAnomalia,
         dimension_anomalia: dimensionAnomalia,
         orientacion_anomalia: orientacionAnomalia,
         descripcion_anomalia: descripcionAnomalia,
@@ -419,7 +441,6 @@ export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogen
 
 
       {/* Mostrar la opción de Aspa Interna o Externa solo si opcionHelice es true */}
-      {/* Mostrar la opción de Aspa Interna o Externa solo si opcionHelice es true */}
       {opcionHelice && (
         <>
           <hr className="my-4 border-gray-300" />
@@ -443,7 +464,7 @@ export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogen
       )}
 
 
-      {errores.ubicacionAnomalia && errorVisibility.ubicacionAnomalia && (
+      {opcionHelice &&  errores.ubicacionAnomalia && errorVisibility.ubicacionAnomalia && (
         <ErrorAlert message={errores.ubicacionAnomalia} onClose={() => handleCloseErrorAlert('ubicacionAnomalia')} />
       )}
 

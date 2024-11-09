@@ -1,17 +1,69 @@
 import { useState, useEffect } from 'react';
 import { ultimaInspeccionPorParque } from '../services/inspecciones';
 import { AerogeneradorCarrusel } from '../components/carruselAerogeneradores';
+import { obtenerAnomaliasPorAerogenerador } from '../services/anomalias';
+import AnomaliasComponente from '../components/anomaliasComponentes';
+import { Anomalia } from '../utils/interfaces';
+// Definición del tipo de datos Anomalia
+interface AspasAnomalias {
+    [key: string]: Anomalia[];
+}
+
+interface EstructuraAnomalias {
+    torre: Anomalia[];
+    nacelle: Anomalia[];
+}
 
 function Aerogeneradores() {
     const [uuid_parque_eolico, setUuidParqueEolico] = useState<string>('37fa3335-9087-4bad-a764-1dbec97a312a');
     const [ultimaInspeccion, setUltimaInspeccion] = useState<string | null>(null);
+    const [aerogeneradoSeleccionado, setAerogeneradoSeleccionado] = useState<string>('268c2500-55df-418e-976b-604e92fd607b');
+
+    // Estados tipados para anomalías en hélices y en torre/nacelle
+    const [aspasAnomalias, setAspasAnomalias] = useState<AspasAnomalias>({
+        helice_a: [],
+        helice_b: [],
+        helice_c: []
+    });
+
+    const [estructuraAnomalias, setEstructuraAnomalias] = useState<EstructuraAnomalias>({
+        torre: [],
+        nacelle: []
+    });
+
+    useEffect(() => {
+        const obtenerAnomaliasAerogenerador = async () => {
+            try {
+                if (ultimaInspeccion && aerogeneradoSeleccionado) {
+                    const response = await obtenerAnomaliasPorAerogenerador(aerogeneradoSeleccionado, ultimaInspeccion);
+
+                    // Actualizar estados de anomalías de aspas y estructura
+                    setAspasAnomalias({
+                        helice_a: response.helice_a || [],
+                        helice_b: response.helice_b || [],
+                        helice_c: response.helice_c || []
+                    });
+
+                    setEstructuraAnomalias({
+                        torre: response.torre || [],
+                        nacelle: response.nacelle || []
+                    });
+                }
+            } catch (error) {
+                console.error("Error al obtener las anomalías:", error);
+            }
+        };
+
+        if (aerogeneradoSeleccionado && ultimaInspeccion) {
+            obtenerAnomaliasAerogenerador();
+        }
+    }, [ultimaInspeccion, aerogeneradoSeleccionado]);
 
     useEffect(() => {
         const obtenerUltimaInspeccion = async () => {
             try {
                 const response = await ultimaInspeccionPorParque(uuid_parque_eolico);
                 setUltimaInspeccion(response.uuid_inspeccion);
-                console.log("Última inspección:", response);
             } catch (error) {
                 console.error("Error al obtener la última inspección:", error);
             }
@@ -21,51 +73,47 @@ function Aerogeneradores() {
             obtenerUltimaInspeccion();
         }
     }, [uuid_parque_eolico]);
-
     return (
-        <div className="w-full flex flex-col items-center justify-center min-h-screen">
-            {/* Título principal */}
-            <h1 className="text-2xl font-bold mb-6">Título de los Aerogeneradores</h1>
 
+        <div className="w-full px-8">
             <div
-                className="w-full max-w-7xl h-screen overflow-y-auto grid grid-cols-2 gap-4"
-                style={{
-                    gridTemplateRows: "1fr 1fr 2fr 2fr 1fr 1fr",
-                    gridTemplateColumns: "1fr 1fr"
-                }}
+            className="w-full grid gap-2 p-10"
+            style={{
+                height: "120vh",
+                display: "grid",
+                gridTemplateColumns: "repeat(8, 1fr)", // Cinco columnas iguales
+                gridTemplateRows: "repeat(6, 1fr)", // Alturas específicas para cada fila
+            }}
             >
-                {/* Elemento 1 */}
-                <div className="bg-white shadow-md rounded-lg row-span-2 flex flex-col items-center justify-center p-4">
-                    <h2 className="text-lg font-semibold">Título 1</h2>
-                    {ultimaInspeccion && (
-                        <AerogeneradorCarrusel
-                            uuid_inspeccion={ultimaInspeccion}
-                            uuid_parque_eolico={uuid_parque_eolico}
-                            cambioEstadoFinalAero={false}
-                        />
-                    )}
-                </div>
 
-                {/* Elemento 3 */}
-                <div className="bg-blue-200 shadow-md rounded-lg row-span-3 flex flex-col items-center justify-center p-4">
-                    <h2 className="text-lg font-semibold">Título 3</h2>
-                    <p>3</p>
-                </div>
+            <div className="bg-blue-200 shadow-md rounded-lg p-4 col-span-4 row-span-2">
+                {ultimaInspeccion && <AerogeneradorCarrusel
+                    uuid_inspeccion={ultimaInspeccion}
+                    uuid_parque_eolico={uuid_parque_eolico}
+                    cambioEstadoFinalAero={false}
+                />}
+            </div>
 
-                {/* Elemento 4 */}
-                <div className="bg-blue-200 shadow-md rounded-lg row-span-4 row-start-3 flex flex-col items-center justify-center p-4">
-                    <h2 className="text-lg font-semibold">Título 4</h2>
-                    <p>4</p>
-                </div>
+            <div className="bg-white shadow-md rounded-lg p-4 col-span-4 row-span-3">
+            <AnomaliasComponente cantidad={3} data={aspasAnomalias} />
+            </div>
 
-                {/* Elemento 6 */}
-                <div className="bg-blue-200 shadow-md rounded-lg row-span-3 col-start-2 row-start-4 flex flex-col items-center justify-center p-4">
-                    <h2 className="text-lg font-semibold">Título 6</h2>
-                    <p>6</p>
-                </div>
+            <div className="bg-blue-200 shadow-md rounded-lg p-4 col-span-4 row-span-6">
+                3
+            </div>
+
+            <div className="bg-white shadow-md rounded-lg p-4 col-span-2 row-span-5">
+            <AnomaliasComponente cantidad={1} data={{ torre: estructuraAnomalias.torre }} />
+            </div>
+
+            <div className="bg-white shadow-md rounded-lg p-4 col-span-2 row-span-5">
+             <AnomaliasComponente cantidad={1} data={{ nacelle: estructuraAnomalias.nacelle }} />
+            </div>
+
+
             </div>
         </div>
-    );
-}
+      );
+    }
 
 export default Aerogeneradores;

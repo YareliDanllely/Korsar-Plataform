@@ -16,7 +16,7 @@ export const obtenerAbreviaturaParque = async (uuid_parque_eolico: string) => {
     const token = localStorage.getItem('token');
 
     try {
-      const response = await api.get(`/parques-eolicos/items-eolicos/abreviatura-por-id/`, {
+      const response = await api.get(`/parques-eolicos/items/abreviatura-por-id/`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

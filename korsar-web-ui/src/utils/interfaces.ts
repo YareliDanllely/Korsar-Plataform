@@ -110,6 +110,16 @@ export interface ImagenAnomaliaPost {
 
   }
 
+  export interface AnomaliasAerogeneradores{
+
+    helice_a: Anomalia[];          // Lista de anomalías en la Hélice A
+    helice_b: Anomalia[];          // Lista de anomalías en la Hélice B
+    helice_c: Anomalia[];          // Lista de anomalías en la Hélice C
+    torre: Anomalia[];             // Lista de anomalías en la Torre
+    nacelle: Anomalia[];           // Lista de anomalías en el Nacelle/Hub
+
+  }
+
   export interface Empresa {
     uuid_empresa: string;
     nombre_empresa: string;

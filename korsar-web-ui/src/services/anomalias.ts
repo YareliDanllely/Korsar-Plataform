@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { Anomalia } from '../utils/interfaces';
+import { AnomaliasAerogeneradores } from '../utils/interfaces';
 
 const BASE_URL = 'http://localhost:8000/api';
 
@@ -77,4 +78,34 @@ export const obtenerSiguienteNumeroDano = async (uuid_componente: string): Promi
     console.error('Error al obtener el siguiente número de daño:', error);
     throw error;
   }
+};
+
+
+
+//Funcion para obtener las anomalias por aerogenerador
+export const obtenerAnomaliasPorAerogenerador = async (uuid_aerogenerador: string, uuid_inspeccion: string): Promise<AnomaliasAerogeneradores> => {
+  const token = localStorage.getItem('token');
+
+  try {
+    const response = await api.get('/anomalias/items/anomalias-por-aerogenerador', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: {
+        uuid_aerogenerador: uuid_aerogenerador,
+        uuid_inspeccion: uuid_inspeccion,
+      },
+    }
+
+    );
+
+    console.log('Anomalias por aerogenerador:', response.data);
+
+
+    return response.data;
+  } catch (error) {
+    console.error('Error al obtener las anomalías por aerogenerador:', error);
+    throw error;
+  }
+
 };
