@@ -4,6 +4,7 @@ import { AerogeneradorCarrusel } from '../components/inspecciones/carruselAeroge
 import { MenuDesplegableAerogeneradores } from '../components/inspecciones/menuDesplegableAerogeneradores';
 import { PanelAnomalias } from '../components/inspecciones/anomaliasPanel';
 import { DndContext } from '@dnd-kit/core';
+import { obtenerImagenesAnomalia } from '../services/imagenesAnomalia';
 
 interface Imagen {
   uuid_imagen: string;
@@ -28,6 +29,16 @@ const RevisarInspeccion: React.FC = () => {
   const actualizarEstadoCrearAnomalia = (crearAnomalia: boolean) => {
     setOnCreateAnomalia(crearAnomalia);
   }
+
+  const cargarImagenesDesdeBackend = async (uuid_anomalia: string) => {
+    try {
+      const imagenesDesdeBackend = await obtenerImagenesAnomalia(uuid_anomalia); // Llama a la función que obtendrá las imágenes
+      setDroppedImages((prev) => [...imagenesDesdeBackend, ...prev]); // Añade imágenes al estado existente
+    } catch (error) {
+      console.error("Error al cargar imágenes desde el backend:", error);
+    }
+  };
+
 
   const actualizarCambioEstadoFinalAero = (cambioEstadoFinalAero: boolean) => {
     setCambioEstadoFinalAero(cambioEstadoFinalAero);
@@ -93,6 +104,7 @@ const RevisarInspeccion: React.FC = () => {
                 cambioEstadoFinalAero={cambioEstadoFinalAero}
                 actualizarEstadoFinalAero={actualizarCambioEstadoFinalAero}
                 actualizarCrearAnomalia={actualizarEstadoCrearAnomalia}
+                cargarImagenesAnomaliaCreada = {cargarImagenesDesdeBackend}
               />
             ) : (
               <p>Seleccione un aerogenerador y un componente para ver las anomalías.</p>

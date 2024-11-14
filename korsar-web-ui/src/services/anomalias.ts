@@ -109,3 +109,22 @@ export const obtenerAnomaliasPorAerogenerador = async (uuid_aerogenerador: strin
   }
 
 };
+
+
+// Función para actualizar una anomalía usando el método PATCH
+export const patchAnomalia = async (uuid_anomalia: string, data: Partial<AnomaliaData>): Promise<Anomalia> => {
+  const token = localStorage.getItem('token');
+
+  try {
+    const response = await api.patch<Anomalia>(`/anomalias/items/${uuid_anomalia}/`, data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error al actualizar la anomalía:', error);
+    throw error;
+  }
+};

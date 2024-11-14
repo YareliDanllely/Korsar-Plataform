@@ -16,22 +16,24 @@ class ImagenAnomaliaViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]  # Asegura que solo usuarios autenticados puedan acceder
 
 
-    # Obtener todas las imagenes asociadas a una anomalia
-    @action(detail=True, methods=['get'], url_path='filtrar-anomalias')
-    def listar_imagenes_por_anomalia(self, request, pk=None):
-            """
-            Obtener todas las imagenes asociadas a una anomalia
-            """
-            # Filtramos las imágenes por anomalía
-            imagenes_anomalias = ImagenAnomalia.objects.filter(uuid_anomalia=pk)
+   # Obtener todas las imágenes asociadas a una anomalía
+    @action(detail=False, methods=['get'], url_path='filtrar-anomalias')
+    def listar_imagenes_por_anomalia(self, request):
+        """
+        Obtener todas las imágenes asociadas a una anomalía
+        """
+        uuid_anomalia = request.query_params.get('uuid_anomalia')
 
-            # Obtenemos las imágenes asociadas y construimos el objeto de respuesta
-            imagenes_data = [
-                {
-                    'uuid_imagen': ia.uuid_imagen.uuid_imagen,
-                    'ruta_imagen': ia.uuid_imagen.ruta_imagen,
-                }
-                for ia in imagenes_anomalias
-            ]
+        # Filtramos las imágenes por anomalía
+        imagenes_anomalias = ImagenAnomalia.objects.filter(uuid_anomalia=uuid_anomalia)
 
-            return Response(imagenes_data, status=status.HTTP_200_OK)
+        # Construimos el objeto de respuesta
+        imagenes_data = [
+            {
+                'uuid_imagen': ia.uuid_imagen.uuid_imagen,
+                'ruta_imagen': ia.uuid_imagen.ruta_imagen,
+            }
+            for ia in imagenes_anomalias
+        ]
+
+        return Response(imagenes_data, status=status.HTTP_200_OK)

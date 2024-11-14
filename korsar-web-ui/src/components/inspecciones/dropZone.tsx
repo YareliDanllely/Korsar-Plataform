@@ -33,11 +33,15 @@ export const DropZone: React.FC<DropZoneProps> = ({ droppedImages, onRemoveImage
                 className="w-16 h-16 object-cover rounded"
               />
               <button
-                onClick={() => onRemoveImage(img.uuid_imagen)}
+                onClick={(e) => {
+                  e.preventDefault();  // Evita el submit
+                  onRemoveImage(img.uuid_imagen);
+                }}
                 className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center"
               >
                 x
               </button>
+
             </div>
           ))}
         </div>

@@ -18,7 +18,8 @@ import { obtenerTipoComponente } from '../../services/componentesAerogeneradores
 import {ModalError} from "../inspecciones/modalErrorConfirmacion";
 import {ConfirmacionModalRecepcion} from "../inspecciones/modalConfirmacionRecepcion";
 import { Label, Select } from "flowbite-react";
-import { obtenerImagenesAnomalia } from '../../services/imagenesAnomalia';
+import { patchAnomalia } from '../../services/anomalias';
+
 
 interface FormularioAnomaliasProps {
   droppedImages: ImagenAnomaliaFront[];
@@ -28,7 +29,7 @@ interface FormularioAnomaliasProps {
   uuid_inspeccion: string;
   uuid_parque: string;
   actualizarEstadoFinalAero: (cambioEstadoFinalAero: boolean) => void;
-  actualizarAnomaliasDisplay: () => void;
+  actualizarAnomaliasDisplay: () => void; // Actualiza la visualización de las anomalías
   cambioEstadoFinalAero: boolean;
   resetDroppedImages: () => void;
   modoEditar?: boolean;
@@ -39,8 +40,6 @@ export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogen
   const [siguienteNumeroDano, setSiguienteNumeroDano] = useState<string>('');
   const [abreviaturaParque, setAbreviaturaParque] = useState<string>('');
   const [numeroAerogenerador, setNumeroAerogenerador] = useState<number>(0);
-  const [codigoAnomalia, setCodigoAnomalia] = useState<string>('');
-  const [categoriaDaño, setCategoriaDaño] = useState<number>(0);
 
   const [opcionHelice, setOpcionHelice] = useState<boolean>(false);
   const [errores, setErrores] = useState<ValidacionErrores>({});
@@ -51,12 +50,15 @@ export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogen
 
   {/*CAMPOS FORMULARIO*/}
   const [orientacionAnomalia, setOrientacionAnomalia] = useState<string>(informacionIncialAnomalia?.orientacion_anomalia || '');
+  const [codigoAnomalia, setCodigoAnomalia] = useState<string>(informacionIncialAnomalia?.codigo_anomalia || '');
+  const [categoriaDaño, setCategoriaDaño] = useState<number>(informacionIncialAnomalia?.severidad_anomalia || 0);
   const [tipoComponente, setTipoComponente] = useState<string>(informacionIncialAnomalia?.ubicacion_anomalia || '');
   const [ubicacionAnomalia, setUbicacionAnomalia] = useState<string>(informacionIncialAnomalia?.ubicacion_anomalia || '');
   const [dimensionAnomalia, setDimensionAnomalia] = useState<string>(informacionIncialAnomalia?.dimension_anomalia || '');
   const [descripcionAnomalia, setDescripcionAnomalia] = useState<string>(informacionIncialAnomalia?.descripcion_anomalia || '');
-  const [imagenesAnomalia, setImagenesAnomalia] = useState<ImagenAnomaliaFront[]>(droppedImages || []);
   const [userId, setUserId] = useState<string | null>(null);
+  const dataEdit: Partial<Anomalia> = {};
+
 
 
   const [errorVisibility, setErrorVisibility] = useState({
@@ -79,26 +81,11 @@ export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogen
   /** ----------------------------------- Efectos -----------------------------------**/
 
 
-  useEffect(() => {
-    if (modoEditar && informacionIncialAnomalia) {
-      const fetchImagenes = async () => {
-        try {
-          const imagenes = await obtenerImagenesAnomalia(informacionIncialAnomalia.uuid_anomalia);
-          setImagenesAnomalia(imagenes);
-        } catch (error) {
-          console.error("Error al obtener imágenes de la anomalía:", error);
-        }
-      };
-      fetchImagenes();
-    }
-  }, [modoEditar, informacionIncialAnomalia]);
-
-
   /**
    * Genera el código de la anomalía cuando se selecciona una categoría
    */
   useEffect(() => {
-    if (categoriaDaño !== 0) {
+    if (categoriaDaño !== 0 && !modoEditar) {
       generarCodigoAnomalia();
     }
   }, [categoriaDaño,siguienteNumeroDano]);
@@ -111,6 +98,13 @@ export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogen
     const storedUserId = localStorage.getItem('userId');
     setUserId(storedUserId);
   }, []);
+
+  useEffect(() => {
+    if (modoEditar && informacionIncialAnomalia) {
+    editarCodigoAnomalia();
+    }
+  } , [categoriaDaño]);
+
 
 
   /**
@@ -161,23 +155,21 @@ export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogen
    * Obtiene el siguiente número de daño cuando se selecciona un componente
    */
   useEffect(() => {
-    const fetchSiguienteNumeroDano = async () => {
-      try {
-        const numero = await obtenerSiguienteNumeroDano(uuid_componente);
-        console.log('Siguiente número de daño:', numero);
-        setSiguienteNumeroDano(numero);
-      } catch (error) {
-        console.error('Error al obtener el siguiente número de daño:', error);
-      }
-    };
+    if (!modoEditar && uuid_componente) {
+      const fetchSiguienteNumeroDano = async () => {
+        try {
+          const numero = await obtenerSiguienteNumeroDano(uuid_componente);
+          console.log('Siguiente número de daño:', numero);
+          setSiguienteNumeroDano(numero);
+        } catch (error) {
+          console.error('Error al obtener el siguiente número de daño:', error);
+        }
+      };
 
-    if (uuid_componente) {
       fetchSiguienteNumeroDano();
     }
+  }, [uuid_componente, uuid_aerogenerador, categoriaDaño, modoEditar]);
 
-
-
-  }, [uuid_componente, uuid_aerogenerador, categoriaDaño]);
 
   /**
    * Obtiene la abreviatura del parque eólico cuando se selecciona un parque
@@ -250,6 +242,21 @@ export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogen
     setCodigoAnomalia(codigo);
   };
 
+  const editarCodigoAnomalia = () => {
+    if (modoEditar && informacionIncialAnomalia) {
+      // Dividir el código de anomalía existente en sus partes
+      const partesCodigo = informacionIncialAnomalia.codigo_anomalia.split("-");
+
+      // Reemplazar la última parte con el valor actual de `categoriaDaño` (nueva severidad)
+      partesCodigo[partesCodigo.length - 1] = categoriaDaño.toString();
+
+      // Unir las partes para crear el nuevo código de anomalía
+      const codigoActualizado = partesCodigo.join("-");
+      setCodigoAnomalia(codigoActualizado);
+    }
+  };
+
+
   /** -------------------Validacion de Formulario----------------------------------**/
 
 
@@ -262,42 +269,106 @@ export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogen
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
 
-    console.log('Datos que se enviarán:', {
-      uuid_aerogenerador,
-      uuid_componente_aerogenerador: uuid_componente, // Asegúrate de usar el nombre correcto
-      uuid_inspeccion,
-      uuid_tecnico: userId,
-      codigo_anomalia: codigoAnomalia,
-      severidad_anomalia: categoriaDaño,
-      dimension_anomalia: dimensionAnomalia,
-      orientacion_anomalia: orientacionAnomalia,
-      ubicacion_componente: ubicacionAnomalia,
-      descripcion_anomalia: descripcionAnomalia,
-    });
+
+    if (modoEditar && informacionIncialAnomalia) {
+
+       // Comparar cada campo con su valor inicial y, si ha cambiado, agrégalo a `data`
+       const validarInformacion: Partial<Anomalia> = {};
+
+      // Comparar y agregar campos modificados a `dataEdit` y `validarInformacion`
+      if (categoriaDaño !== informacionIncialAnomalia.severidad_anomalia) {
+          dataEdit.severidad_anomalia = categoriaDaño;
+          validarInformacion.severidad_anomalia = categoriaDaño;
+      }
+
+      if (dimensionAnomalia !== informacionIncialAnomalia.dimension_anomalia) {
+          dataEdit.dimension_anomalia = dimensionAnomalia;
+          validarInformacion.dimension_anomalia = dimensionAnomalia;
+      }
+
+      if (orientacionAnomalia !== informacionIncialAnomalia.orientacion_anomalia) {
+          dataEdit.orientacion_anomalia = orientacionAnomalia;
+          validarInformacion.orientacion_anomalia = orientacionAnomalia;
+      }
+
+      if (ubicacionAnomalia !== informacionIncialAnomalia.ubicacion_anomalia) {
+          dataEdit.ubicacion_anomalia = ubicacionAnomalia;
+          validarInformacion.ubicacion_anomalia = ubicacionAnomalia;
+      }
+
+      if (descripcionAnomalia !== informacionIncialAnomalia.descripcion_anomalia) {
+          dataEdit.descripcion_anomalia = descripcionAnomalia;
+          validarInformacion.descripcion_anomalia = descripcionAnomalia;
+      }
+
+      if (userId !== informacionIncialAnomalia.uuid_tecnico) {
+          dataEdit.uuid_tecnico = userId;
+          validarInformacion.uuid_tecnico = userId;
+      }
 
 
-    console.log('validando entradas');
-    const validacionErrores = validarFormularioAnomalia(
-      categoriaDaño,
-      dimensionAnomalia,
-      orientacionAnomalia,
-      descripcionAnomalia,
-      ubicacionAnomalia,
-      droppedImages
+      const validacionErrores = validarFormularioAnomalia(
+        validarInformacion.severidad_anomalia ?? undefined,
+        validarInformacion.dimension_anomalia ?? undefined,
+        validarInformacion.orientacion_anomalia ?? undefined,
+        validarInformacion.descripcion_anomalia ?? undefined,
+        validarInformacion.ubicacion_anomalia ?? undefined,
+        droppedImages
     );
 
-    if (Object.keys(validacionErrores).length > 0) {
-      setErrores(validacionErrores);
-      setErrorVisibility({
-        severidadAnomalia: true,
-        orientacionAnomalia: true,
-        dimensionAnomalia: true,
-        descripcionAnomalia: true,
-        imagenesAnomalia: true,
-        ubicacionAnomalia: true,
-      });
-      return;
+
+        console.log('Datos que se enviarán:', dataEdit);
+
+        if (Object.keys(validacionErrores).length > 0) {
+          setErrores(validacionErrores);
+          setErrorVisibility({
+            severidadAnomalia: true,
+            orientacionAnomalia: true,
+            dimensionAnomalia: true,
+            descripcionAnomalia: true,
+            imagenesAnomalia: true,
+            ubicacionAnomalia: true,
+          });
+          return;
+        }
     }
+    else {
+        console.log('Datos que se enviarán:', {
+          uuid_aerogenerador,
+          uuid_componente_aerogenerador: uuid_componente, // Asegúrate de usar el nombre correcto
+          uuid_inspeccion,
+          uuid_tecnico: userId,
+          codigo_anomalia: codigoAnomalia,
+          severidad_anomalia: categoriaDaño,
+          dimension_anomalia: dimensionAnomalia,
+          orientacion_anomalia: orientacionAnomalia,
+          ubicacion_componente: ubicacionAnomalia,
+          descripcion_anomalia: descripcionAnomalia,
+        });
+
+
+        console.log('validando entradas');
+        const validacionErrores = validarFormularioAnomalia(
+          categoriaDaño,
+          dimensionAnomalia,
+          orientacionAnomalia,
+          descripcionAnomalia,
+          ubicacionAnomalia,
+          droppedImages
+        );
+
+        if (Object.keys(validacionErrores).length > 0) {
+          setErrores(validacionErrores);
+          setErrorVisibility({
+            severidadAnomalia: true,
+            orientacionAnomalia: true,
+            dimensionAnomalia: true,
+            descripcionAnomalia: true,
+            imagenesAnomalia: true,
+            ubicacionAnomalia: true,
+          });
+          return;
+    }}
 
     console.log('enviando formulario');
 
@@ -343,7 +414,21 @@ export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogen
       if (modoEditar && informacionIncialAnomalia ) {
         console.log('Modo editar');
 
+
+
+      if (Object.keys(dataEdit).length > 0) {
+        // Llama a tu función para hacer PATCH (debes implementarla en `services/anomalias`)
+        await patchAnomalia(informacionIncialAnomalia.uuid_anomalia, dataEdit);
+        console.log("Anomalía actualizada con éxito");
       } else {
+            console.log("No hay cambios para actualizar.");
+      }
+
+      actualizarAnomaliasDisplay();  // Actualiza la visualización después de la edición
+      setOpenModalConfirmacionCreacion(true);  // Abre el modal de confirmación
+
+
+    } else {
 
         console.log('Antes de llamar a crearAnomalia');
         const response = await crearAnomalia({
@@ -498,7 +583,7 @@ export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogen
             <Select
               id="ubicacionAspa"
               required
-              value={ubicacionAnomalia} // Controlar el valor del Select con el estado
+              value={informacionIncialAnomalia?.ubicacion_anomalia} // Controlar el valor del Select con el estado
               onChange={(e) => setUbicacionAnomalia(e.target.value)} // Actualizar el valor en el estado
             >
               <option value="">Seleccione una opción</option>
@@ -524,8 +609,7 @@ export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogen
         <ErrorAlert message={errores.imagenesAnomalia} onClose={() => handleCloseErrorAlert('imagenesAnomalia')} />
       )}
 
-      /
-      <DropZone droppedImages={imagenesAnomalia} onRemoveImage={onRemoveImage} />
+      <DropZone droppedImages={droppedImages} onRemoveImage={onRemoveImage} />
 
       <Button type="submit">Crear Anomalía</Button>
 
