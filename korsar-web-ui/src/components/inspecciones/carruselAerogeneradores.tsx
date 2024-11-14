@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { Carousel, Badge } from "flowbite-react";
-import { obtenerAerogeneradores } from "../services/aerogeneradores";
-import { AerogeneradorConEstado } from "../utils/interfaces";
+import { obtenerAerogeneradores } from "../../services/aerogeneradores";
+import { AerogeneradorConEstado } from "../../utils/interfaces";
+import IconAerogenerador from "../iconos/iconAerogenerador";
 
-// Función para obtener el color de la clase basado en el estado numérico
+// Function to get the color class based on numeric state
 const getColorClass = (estado: number): string => {
   switch (estado) {
     case 1:
@@ -17,11 +18,11 @@ const getColorClass = (estado: number): string => {
     case 5:
       return "border-korsar-naranja-sol text-korsar-naranja-sol";
     default:
-      return "border-gray-500 text-gray-500"; // Color de fallback
+      return "border-gray-500 text-gray-500"; // Fallback color
   }
 };
 
-// Función para obtener el texto descriptivo basado en el estado numérico
+// Function to get descriptive text based on numeric state
 const getSeverityText = (estado: number): string => {
   switch (estado) {
     case 1:
@@ -35,7 +36,7 @@ const getSeverityText = (estado: number): string => {
     case 5:
       return "Crítico";
     default:
-      return "Desconocido"; // Texto de fallback
+      return "Desconocido"; // Fallback text
   }
 };
 
@@ -56,7 +57,7 @@ export function AerogeneradorCarrusel({
     const fetchAerogeneradores = async () => {
       try {
         const data = await obtenerAerogeneradores(uuid_parque_eolico, uuid_inspeccion);
-        console.log("Aerogeneradoresssss:", data);
+        console.log("Aerogeneradores:", data);
         setAerogeneradores(data);
       } catch (error) {
         setError("Error al obtener los aerogeneradores");
@@ -73,7 +74,7 @@ export function AerogeneradorCarrusel({
   }
 
   return (
-    <div className="w-full h-full rounded-lg ">
+    <div className="w-full h-full rounded-lg">
       {loading ? (
         <div className="flex justify-center items-center h-full">Cargando...</div>
       ) : error ? (
@@ -86,15 +87,20 @@ export function AerogeneradorCarrusel({
                 <div
                   key={turbine.uuid_aerogenerador}
                   className="flex-none w-20 sm:w-15 md:w-15 h-48 flex flex-col items-center justify-center space-y-2 p-3 bg-transparent rounded-lg"
-                  >
+                >
+                  {/* Icon above the turbine number */}
+                  <IconAerogenerador width={"60px"} height={"60px"}  />
+
+                  {/* Turbine number */}
                   <span className="text-lg font-semibold">#{turbine.numero_aerogenerador}</span>
+
+                  {/* Severity Badge */}
                   <Badge
                     className={`border ${getColorClass(turbine.estado_final)} text-xs px-1 py-0.5 rounded-full`}
-                    style={{ backgroundColor: "transparent", fontSize: "0.7rem" }} // Ajuste de tamaño de fuente
+                    style={{ backgroundColor: "transparent", fontSize: "0.7rem" }}
                   >
                     {getSeverityText(turbine.estado_final)}
                   </Badge>
-
                 </div>
               ))}
             </div>

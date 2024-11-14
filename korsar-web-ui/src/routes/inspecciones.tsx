@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';  // Importa React y los hooks useEffect y useState
-import TablaInspecciones from '../components/tablaInspecciones';  // Importa el componente de tabla de inspecciones
+import TablaInspecciones from '../components/inspecciones/tablaInspecciones';  // Importa el componente de tabla de inspecciones
 import { obtenerInspecciones } from '../services/inspecciones';  // Importa la función para obtener inspecciones
 
 const Inspecciones = () => {

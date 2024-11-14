@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import Dashboard from './routes/dashboard';
 import PrivateRoute from './routes/privateRoute';
 import Login from "./routes/login";
-import Layout from "./components/layout";
+import Layout from "./layout/layout";
 import ParquesEolicos from "./routes/parquesEolicos";
 import Inspecciones from "./routes/inspecciones";
 import Aerogeneradores from "./routes/aerogeneradores";

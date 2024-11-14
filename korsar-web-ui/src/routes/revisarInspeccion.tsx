@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { AerogeneradorCarrusel } from '../components/carruselAerogeneradores';
-import { MenuDesplegableAerogeneradores } from '../components/menuDesplegableAerogeneradores';
-import { PanelAnomalias } from '../components/anomaliasPanel';
+import { AerogeneradorCarrusel } from '../components/inspecciones/carruselAerogeneradores';
+import { MenuDesplegableAerogeneradores } from '../components/inspecciones/menuDesplegableAerogeneradores';
+import { PanelAnomalias } from '../components/inspecciones/anomaliasPanel';
 import { DndContext } from '@dnd-kit/core';
 
 interface Imagen {

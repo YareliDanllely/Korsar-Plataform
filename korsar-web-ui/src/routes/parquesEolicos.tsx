@@ -1,9 +1,9 @@
-import { InformacionAerogenerador } from "../components/InformacionAerogeneradors";
-import { InformacionInspecciones } from "../components/informacionInspecciones";
+import { InformacionAerogenerador } from "../components/parquesEolicos/InformacionAerogeneradors";
+import { InformacionInspecciones } from "../components/parquesEolicos/informacionInspecciones";
 import { CantidadSeveridadesPorComponente, Inspeccion } from "../utils/interfaces";
 import { ultimaInspeccionPorParque, cantidadSeveridadesPorComponentes } from "../services/inspecciones";
 import { useEffect, useState } from "react";
-import DonutChartComponets from "../components/severidadComponentesGrafico";
+import DonutChartComponets from "../components/parquesEolicos/severidadComponentesGrafico";
 import { useParams, Navigate } from "react-router-dom";
 
 const ParquesEolicos: React.FC = () => {
@@ -69,6 +69,7 @@ const ParquesEolicos: React.FC = () => {
                 {/* Elemento 4 - Gráfico de severidades */}
                 <div className="col-span-3 row-span-2 col-start-3 row-start-1 bg-white shadow-md rounded-lg">
                     {/* Gráfico principal si es necesario */}
+
                 </div>
 
                 {/* Elementos 5, 6, 7, y 8 - Gráficos por componente */}

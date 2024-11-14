@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { ImagenAnomaliaPost } from '../utils/interfaces';
+import { ImagenAnomaliaFront, ImagenAnomaliaPost } from '../utils/interfaces';
 
 const BASE_URL = 'http://localhost:8000/api';
 
@@ -25,3 +25,24 @@ export const crearImagenAnomalia = async (data: ImagenAnomaliaPost): Promise<voi
       throw error;
     }
   };
+
+
+  export const obtenerImagenesAnomalia = async (uuid_anomalia: string): Promise<ImagenAnomaliaFront[]> => {
+    const token = localStorage.getItem('token');
+
+    try {
+      const response = await api.get(`/imagenes-anomalias/items/filtrar-anomalias/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        params: {
+          uuid_anomalia,
+        },
+      });
+
+      return response.data;
+    } catch (error) {
+      console.error('Error al obtener las imágenes de la anomalía:', error);
+      throw error;
+    }
+  }

@@ -1,6 +1,6 @@
 import { ReactNode, useState } from 'react';
-import NavbarComponent from "./navbar";
-import SidebarComponent from './sidebar';
+import NavbarComponent from "../layout/navbar";
+import SidebarComponent from '../layout/sidebar';
 
 function Layout({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);

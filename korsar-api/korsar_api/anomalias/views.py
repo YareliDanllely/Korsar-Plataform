@@ -57,8 +57,8 @@ class AnomaliaViewSet(viewsets.ModelViewSet):
         numero_damage = []
 
         for anomalia in anomalias:
-            # Expresión regular para capturar el número de daño correcto
-            match = re.search(r'^\w+-\d{7}-\d-(\d{4})-\d$', anomalia.codigo_anomalia)
+            # Expresión regular ajustada para permitir días de uno o dos dígitos
+            match = re.search(r'^\w+-\d{6,8}-\d-(\d{4})-\d$', anomalia.codigo_anomalia)
             if match:
                 numero_damage.append(int(match.group(1)))  # Agregar el número de daño a la lista
 

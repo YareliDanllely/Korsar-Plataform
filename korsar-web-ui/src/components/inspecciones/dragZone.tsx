@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDraggable } from '@dnd-kit/core';
-import { obtenerImagenesFiltradas } from '../services/imagenes';
+import { obtenerImagenesFiltradas } from '../../services/imagenes';
 import { HiArrowCircleRight, HiArrowCircleLeft } from "react-icons/hi";
 
 interface Imagen {

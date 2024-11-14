@@ -1,0 +1,16 @@
+.map-wrap {
+    position: relative;
+    width: 100%; /* Ocupa el ancho completo del contenedor */
+    height: 80%;
+    display: flex;
+    justify-content: center; /* Centra horizontalmente */
+    align-items: center; /* Centra verticalmente */
+    padding: 16px; /* Ajusta el padding según sea necesario */
+    box-sizing: border-box; /* Asegura que el padding no expanda el tamaño del contenedor */
+  }
+
+  .map {
+    width: 100%; /* Haz que el mapa ocupe el ancho del contenedor map-wrap */
+    height: 100%; /* Haz que el mapa ocupe el alto del contenedor map-wrap */
+    border-radius: 8px; /* Añade esquinas redondeadas si es necesario */
+  }

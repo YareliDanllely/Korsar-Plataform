@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Inspeccion } from '../utils/interfaces';
-import { ultimaInspeccionPorParque } from '../services/inspecciones';
+import { Inspeccion } from '../../utils/interfaces';
+import { ultimaInspeccionPorParque } from '../../services/inspecciones';
 import { Badge } from "flowbite-react";
 import { HiOutlineCalendar } from "react-icons/hi";
 

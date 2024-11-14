@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Doughnut } from 'react-chartjs-2';
-import { AerogeneradorConEstado } from '../utils/interfaces';
+import { AerogeneradorConEstado } from '../../utils/interfaces';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
-import { obtenerAerogeneradores } from '../services/aerogeneradores';
+import { obtenerAerogeneradores } from '../../services/aerogeneradores';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 

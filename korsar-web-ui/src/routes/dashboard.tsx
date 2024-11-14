@@ -1,10 +1,10 @@
 import { obtenerParquesEmpresa } from '../services/parquesEolicos';
 import { Inspeccion, ParqueEolico } from '../utils/interfaces';
-import SimpleMap from '../components/mapaParques';
+import SimpleMap from '../components/dashboard/mapaParques';
 import { ultimaInspeccionParqueEmpresa } from '../services/inspecciones';
 import { Badge } from "flowbite-react";
 import { HiOutlineCalendar } from "react-icons/hi";
-import DonutChart from '../components/severidadInspeccionGrafico';
+import DonutChart from '../components/dashboard/severidadInspeccionGrafico';
 import { useEffect, useState } from 'react';
 
 function Dashboard() {

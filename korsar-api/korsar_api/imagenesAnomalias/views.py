@@ -19,15 +19,19 @@ class ImagenAnomaliaViewSet(viewsets.ModelViewSet):
     # Obtener todas las imagenes asociadas a una anomalia
     @action(detail=True, methods=['get'], url_path='filtrar-anomalias')
     def listar_imagenes_por_anomalia(self, request, pk=None):
-        """
-        Obtener todas las imagenes asociadas a una anomalia
-        """
-        # Filtramos las imagenes por anomalia
-        imagenes_anomalias = ImagenAnomalia.objects.filter(uuid_anomalia=pk)
+            """
+            Obtener todas las imagenes asociadas a una anomalia
+            """
+            # Filtramos las imágenes por anomalía
+            imagenes_anomalias = ImagenAnomalia.objects.filter(uuid_anomalia=pk)
 
-        # Obtenemos las imagenes asociadas a las anomalias
-        imagenes = Imagen.objects.filter(uuid_imagen__in=[ia.uuid_imagen.uuid_imagen for ia in imagenes_anomalias])
+            # Obtenemos las imágenes asociadas y construimos el objeto de respuesta
+            imagenes_data = [
+                {
+                    'uuid_imagen': ia.uuid_imagen.uuid_imagen,
+                    'ruta_imagen': ia.uuid_imagen.ruta_imagen,
+                }
+                for ia in imagenes_anomalias
+            ]
 
-        # Serializamos las imagenes
-        serializer = ImagenSerializer(imagenes, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(imagenes_data, status=status.HTTP_200_OK)

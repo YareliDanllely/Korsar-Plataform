@@ -1,7 +1,7 @@
 import { Table } from "flowbite-react";
 import { useEffect, useState } from "react";
-import { Aerogenerador } from "../utils/interfaces";
-import { informacionAerogenerador } from "../services/aerogeneradores";
+import { Aerogenerador } from "../../utils/interfaces";
+import { informacionAerogenerador } from "../../services/aerogeneradores";
 
 export const InformacionAerogenerador = ({ uuid_aerogenerador }: { uuid_aerogenerador: string }) => {
     const [aerogenerador, setAerogenerador] = useState<Aerogenerador | null>(null);

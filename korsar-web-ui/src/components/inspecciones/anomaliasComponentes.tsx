@@ -1,6 +1,5 @@
-import React from "react";
 import { Accordion } from "flowbite-react";
-import { Anomalia } from "../utils/interfaces";
+import { Anomalia } from "../../utils/interfaces";
 
 interface AnomaliasComponenteProps {
   cantidad: number;
@@ -19,7 +18,7 @@ function AnomaliasComponente({ cantidad, data }: AnomaliasComponenteProps) {
             <h3 className="text-sm font-semibold capitalize">{parte.replace("_", " ")}</h3>
             <div className="mt-2 h-full overflow-auto"> {/* Contenedor con desplazamiento */}
               <Accordion collapseAll>
-                <Accordion.Panel>
+                <Accordion.Panel  className="my-4">
                   <Accordion.Title className="text-xs font-semibold">
                     <p className={`${data[parte].length ? "text-red-600" : "text-green-600"} font-semibold`}>
                       {data[parte].length ? "Dañada" : "Sin Daños"}
