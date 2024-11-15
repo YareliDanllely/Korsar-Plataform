@@ -10,38 +10,36 @@ export const validarFormularioAnomalia = (
 ): ValidacionErrores => {
   const errores: ValidacionErrores = {};
 
-  // Validación para la severidad
-  if (!severidadAnomalia || ![1, 2, 3, 4, 5].includes(severidadAnomalia)) {
-    errores.severidadAnomalia = "Debe seleccionar una severidad válida.";
+  if (severidadAnomalia !== undefined && ![1, 2, 3, 4, 5].includes(severidadAnomalia)) {
+      errores.severidadAnomalia = "Debe seleccionar una severidad válida.";
   }
 
-  // Validación para la dimensión de la anomalía
-  if (!dimensionAnomalia || !dimensionAnomalia.trim()) {
-    errores.dimensionAnomalia = "La dimensión de la anomalía es obligatoria.";
-  } else if (dimensionAnomalia.length > 255) {
-    errores.dimensionAnomalia = "La dimensión no puede tener más de 255 caracteres.";
+  if (dimensionAnomalia !== undefined) {
+      if (!dimensionAnomalia.trim()) {
+          errores.dimensionAnomalia = "La dimensión de la anomalía es obligatoria.";
+      } else if (dimensionAnomalia.length > 255) {
+          errores.dimensionAnomalia = "La dimensión no puede tener más de 255 caracteres.";
+      }
   }
 
-  // Validación para la orientación de la anomalía
-  if (!orientacionAnomalia || !orientacionAnomalia.trim()) {
-    errores.orientacionAnomalia = "La orientación es obligatoria.";
-  } else if (orientacionAnomalia.length > 255) {
-    errores.orientacionAnomalia = "La orientación no puede tener más de 255 caracteres.";
+  if (orientacionAnomalia !== undefined) {
+      if (!orientacionAnomalia.trim()) {
+          errores.orientacionAnomalia = "La orientación es obligatoria.";
+      } else if (orientacionAnomalia.length > 255) {
+          errores.orientacionAnomalia = "La orientación no puede tener más de 255 caracteres.";
+      }
   }
 
-  // Validación para la descripción (obligatoria)
-  if (!descripcionAnomalia || !descripcionAnomalia.trim()) {
-    errores.descripcionAnomalia = "La descripción de la anomalía es obligatoria.";
+  if (descripcionAnomalia !== undefined && !descripcionAnomalia.trim()) {
+      errores.descripcionAnomalia = "La descripción de la anomalía es obligatoria.";
   }
 
-  // Validación para la ubicación de la anomalía
-  if (!ubicacionAnomalia || !ubicacionAnomalia.trim()) {
-    errores.ubicacionAnomalia = "La ubicación de la anomalía es obligatoria.";
+  if (ubicacionAnomalia !== undefined && !ubicacionAnomalia.trim()) {
+      errores.ubicacionAnomalia = "La ubicación de la anomalía es obligatoria.";
   }
 
-  // Validación para las imágenes
-  if (!imagenes || imagenes.length === 0) {
-    errores.imagenesAnomalia = "Debe asociar al menos una imagen.";
+  if (imagenes && imagenes.length === 0) {
+      errores.imagenesAnomalia = "Debe asociar al menos una imagen.";
   }
 
   return errores;

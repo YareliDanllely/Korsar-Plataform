@@ -3,11 +3,12 @@ import { useDroppable } from '@dnd-kit/core';
 interface Imagen {
   uuid_imagen: string;
   ruta_imagen: string;
+  uuid_imagen_anomalia?: string;
 }
 
 interface DropZoneProps {
   droppedImages: Imagen[];
-  onRemoveImage: (imageId: string) => void;
+  onRemoveImage: (imageId: Imagen) => void;
 }
 
 export const DropZone: React.FC<DropZoneProps> = ({ droppedImages, onRemoveImage }) => {
@@ -35,7 +36,7 @@ export const DropZone: React.FC<DropZoneProps> = ({ droppedImages, onRemoveImage
               <button
                 onClick={(e) => {
                   e.preventDefault();  // Evita el submit
-                  onRemoveImage(img.uuid_imagen);
+                  onRemoveImage(img);
                 }}
                 className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center"
               >

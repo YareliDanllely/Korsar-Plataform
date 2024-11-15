@@ -30,6 +30,7 @@ class ImagenAnomaliaViewSet(viewsets.ModelViewSet):
         # Construimos el objeto de respuesta
         imagenes_data = [
             {
+                'uuid_imagen_anomalia': ia.uuid_imagen_anomalia,
                 'uuid_imagen': ia.uuid_imagen.uuid_imagen,
                 'ruta_imagen': ia.uuid_imagen.ruta_imagen,
             }
@@ -37,3 +38,17 @@ class ImagenAnomaliaViewSet(viewsets.ModelViewSet):
         ]
 
         return Response(imagenes_data, status=status.HTTP_200_OK)
+
+    # Eliminar una imagen específica asociada a una anomalía
+    @action(detail=True, methods=['delete'], url_path='eliminar-imagen')
+    def eliminar_imagen(self, request, pk=None):
+        """
+        Eliminar una imagen específica asociada a una anomalía.
+        """
+        try:
+            # Obtener la instancia de la imagen-anomalía
+            imagen_anomalia = self.get_object()
+            imagen_anomalia.delete()
+            return Response({'detail': 'Imagen eliminada correctamente.'}, status=status.HTTP_204_NO_CONTENT)
+        except ImagenAnomalia.DoesNotExist:
+            return Response({'detail': 'Imagen no encontrada.'}, status=status.HTTP_404_NOT_FOUND)

@@ -21,9 +21,15 @@ import { Label, Select } from "flowbite-react";
 import { patchAnomalia } from '../../services/anomalias';
 
 
+interface Imagen {
+  uuid_imagen: string;
+  ruta_imagen: string;
+  uuid_imagen_anomalia?: string;
+}
+
 interface FormularioAnomaliasProps {
   droppedImages: ImagenAnomaliaFront[];
-  onRemoveImage: (imageId: string) => void;
+  onRemoveImage: (imageId: Imagen) => void;
   uuid_aerogenerador: string;
   uuid_componente: string;
   uuid_inspeccion: string;
@@ -57,7 +63,7 @@ export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogen
   const [dimensionAnomalia, setDimensionAnomalia] = useState<string>(informacionIncialAnomalia?.dimension_anomalia || '');
   const [descripcionAnomalia, setDescripcionAnomalia] = useState<string>(informacionIncialAnomalia?.descripcion_anomalia || '');
   const [userId, setUserId] = useState<string | null>(null);
-  const dataEdit: Partial<Anomalia> = {};
+  const [dataEdit, setDataEdit] = useState<Partial<Anomalia>>({});
 
 
 
@@ -104,7 +110,6 @@ export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogen
     editarCodigoAnomalia();
     }
   } , [categoriaDaño]);
-
 
 
   /**
@@ -270,67 +275,71 @@ export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogen
     event.preventDefault();
 
 
-    if (modoEditar && informacionIncialAnomalia) {
+      if (modoEditar && informacionIncialAnomalia) {
 
-       // Comparar cada campo con su valor inicial y, si ha cambiado, agrégalo a `data`
-       const validarInformacion: Partial<Anomalia> = {};
+        // Comparar cada campo con su valor inicial y, si ha cambiado, agrégalo a `data`
+        const validarInformacion: Partial<Anomalia> = {};
 
-      // Comparar y agregar campos modificados a `dataEdit` y `validarInformacion`
-      if (categoriaDaño !== informacionIncialAnomalia.severidad_anomalia) {
-          dataEdit.severidad_anomalia = categoriaDaño;
-          validarInformacion.severidad_anomalia = categoriaDaño;
-      }
+        // Comparar y agregar campos modificados a `dataEdit` y `validarInformacion`
+        if (categoriaDaño !== informacionIncialAnomalia.severidad_anomalia) {
+            dataEdit.severidad_anomalia = categoriaDaño;
+            validarInformacion.severidad_anomalia = categoriaDaño;
+        }
 
-      if (dimensionAnomalia !== informacionIncialAnomalia.dimension_anomalia) {
-          dataEdit.dimension_anomalia = dimensionAnomalia;
-          validarInformacion.dimension_anomalia = dimensionAnomalia;
-      }
+        if (dimensionAnomalia !== informacionIncialAnomalia.dimension_anomalia) {
+            dataEdit.dimension_anomalia = dimensionAnomalia;
+            validarInformacion.dimension_anomalia = dimensionAnomalia;
+        }
 
-      if (orientacionAnomalia !== informacionIncialAnomalia.orientacion_anomalia) {
-          dataEdit.orientacion_anomalia = orientacionAnomalia;
-          validarInformacion.orientacion_anomalia = orientacionAnomalia;
-      }
+        if (orientacionAnomalia !== informacionIncialAnomalia.orientacion_anomalia) {
+            dataEdit.orientacion_anomalia = orientacionAnomalia;
+            validarInformacion.orientacion_anomalia = orientacionAnomalia;
+        }
 
-      if (ubicacionAnomalia !== informacionIncialAnomalia.ubicacion_anomalia) {
-          dataEdit.ubicacion_anomalia = ubicacionAnomalia;
-          validarInformacion.ubicacion_anomalia = ubicacionAnomalia;
-      }
+        if (ubicacionAnomalia !== informacionIncialAnomalia.ubicacion_anomalia) {
+            dataEdit.ubicacion_anomalia = ubicacionAnomalia;
+            validarInformacion.ubicacion_anomalia = ubicacionAnomalia;
+        }
 
-      if (descripcionAnomalia !== informacionIncialAnomalia.descripcion_anomalia) {
-          dataEdit.descripcion_anomalia = descripcionAnomalia;
-          validarInformacion.descripcion_anomalia = descripcionAnomalia;
-      }
+        if (descripcionAnomalia !== informacionIncialAnomalia.descripcion_anomalia) {
+          console.log('Descripción de la anomalía cabmio:', descripcionAnomalia);
+            dataEdit.descripcion_anomalia = descripcionAnomalia;
+            validarInformacion.descripcion_anomalia = descripcionAnomalia;
+        }
 
-      if (userId !== informacionIncialAnomalia.uuid_tecnico) {
-          dataEdit.uuid_tecnico = userId;
-          validarInformacion.uuid_tecnico = userId;
-      }
+        if (userId !== informacionIncialAnomalia.uuid_tecnico) {
+            dataEdit.uuid_tecnico = userId;
+            validarInformacion.uuid_tecnico = userId;
+        }
+
+        setDataEdit((prevData) => ({ ...prevData, ...validarInformacion }));
 
 
-      const validacionErrores = validarFormularioAnomalia(
-        validarInformacion.severidad_anomalia ?? undefined,
-        validarInformacion.dimension_anomalia ?? undefined,
-        validarInformacion.orientacion_anomalia ?? undefined,
-        validarInformacion.descripcion_anomalia ?? undefined,
-        validarInformacion.ubicacion_anomalia ?? undefined,
-        droppedImages
-    );
+        const validacionErrores = validarFormularioAnomalia(
+          validarInformacion.severidad_anomalia,
+          validarInformacion.dimension_anomalia,
+          validarInformacion.orientacion_anomalia,
+          validarInformacion.descripcion_anomalia,
+          validarInformacion.ubicacion_anomalia,
+          droppedImages
+      );
 
 
         console.log('Datos que se enviarán:', dataEdit);
 
-        if (Object.keys(validacionErrores).length > 0) {
-          setErrores(validacionErrores);
-          setErrorVisibility({
-            severidadAnomalia: true,
-            orientacionAnomalia: true,
-            dimensionAnomalia: true,
-            descripcionAnomalia: true,
-            imagenesAnomalia: true,
-            ubicacionAnomalia: true,
-          });
-          return;
-        }
+      if (Object.keys(validacionErrores).length > 0) {
+        setErrores(validacionErrores);
+        setErrorVisibility({
+          severidadAnomalia: true,
+          orientacionAnomalia: true,
+          dimensionAnomalia: true,
+          descripcionAnomalia: true,
+          imagenesAnomalia: true,
+          ubicacionAnomalia: true,
+        });
+        return;
+      }
+
     }
     else {
         console.log('Datos que se enviarán:', {
@@ -415,17 +424,18 @@ export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogen
         console.log('Modo editar');
 
 
+        console.log('DataEdit:', dataEdit);
+        if (Object.keys(dataEdit).length > 0) {
+          // Llama a tu función para hacer PATCH (debes implementarla en `services/anomalias`)
+          await patchAnomalia(informacionIncialAnomalia.uuid_anomalia, dataEdit);
+          console.log("Anomalía actualizada con éxito");
+        } else {
+              console.log("No hay cambios para actualizar.");
+        }
 
-      if (Object.keys(dataEdit).length > 0) {
-        // Llama a tu función para hacer PATCH (debes implementarla en `services/anomalias`)
-        await patchAnomalia(informacionIncialAnomalia.uuid_anomalia, dataEdit);
-        console.log("Anomalía actualizada con éxito");
-      } else {
-            console.log("No hay cambios para actualizar.");
-      }
-
-      actualizarAnomaliasDisplay();  // Actualiza la visualización después de la edición
-      setOpenModalConfirmacionCreacion(true);  // Abre el modal de confirmación
+        actualizarAnomaliasDisplay();  // Actualiza la visualización después de la edición
+        setOpenModal(false);
+        setOpenModalConfirmacionCreacion(true);  // Abre el modal de confirmación
 
 
     } else {

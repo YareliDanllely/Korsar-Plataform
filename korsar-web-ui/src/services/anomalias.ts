@@ -112,7 +112,7 @@ export const obtenerAnomaliasPorAerogenerador = async (uuid_aerogenerador: strin
 
 
 // Función para actualizar una anomalía usando el método PATCH
-export const patchAnomalia = async (uuid_anomalia: string, data: Partial<AnomaliaData>): Promise<Anomalia> => {
+export const patchAnomalia = async (uuid_anomalia: string, data: Partial<Anomalia>): Promise<Anomalia> => {
   const token = localStorage.getItem('token');
 
   try {

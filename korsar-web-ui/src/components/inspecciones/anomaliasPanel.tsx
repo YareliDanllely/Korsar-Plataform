@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { obtenerAnomaliasFiltradas } from "../../services/anomalias";
 import { Anomalia } from "../../utils/interfaces";
 import { FormularioAnomalias } from "./anomaliasFormulario";
+import SuccessToast from "./avisoOperacionExitosa";
 
 interface Imagen {
   uuid_imagen: string;
@@ -19,7 +20,7 @@ interface PanelAnomaliasProps {
   actualizarCrearAnomalia: (crearAnomalia: boolean) => void;
   droppedImages: Imagen[];
   actualizarEstadoFinalAero: (cambioEstadoFinalAero: boolean) => void;
-  onRemoveImage: (imageId: string) => void;
+  onRemoveImage: (imageId: Imagen) => void;
   resetDroppedImages: () => void;
   cargarImagenesAnomaliaCreada: (uuid_anomalia: string) => void;
 }
@@ -43,18 +44,22 @@ export const PanelAnomalias: React.FC<PanelAnomaliasProps> = ({
   const [actualizarAnomalias, setActualizarAnomalias] = useState<boolean>(false);
   const [anomaliaSeleccionada, setAnomaliaSeleccionada] = useState<Anomalia | null>(null);
   const [mostrarPrevisualizar, setMostrarPrevisualizar] = useState(false);
+  const [showToast, setShowToast] = useState<boolean>(false);
+  const [toastMessage, setToastMessage] = useState<string>('');
+
 
   const actualizarAnomaliasCreadas = () => {
     setActualizarAnomalias(!actualizarAnomalias);
   };
 
   const handleTabChange = (tabIndex: number) => {
-    console.log("Tab index", tabIndex);
-    console.log("Mostrar previsualizar", droppedImages);
+
+
     if (tabIndex === 0) {
+      resetDroppedImages();
       actualizarCrearAnomalia(false);
       setMostrarPrevisualizar(false);
-    } else if (tabIndex === 1 ||  tabIndex === 2) {
+    } else if (tabIndex === 1 || tabIndex === 2) {
       actualizarCrearAnomalia(true);
       setMostrarPrevisualizar(false);
     }
@@ -68,7 +73,16 @@ export const PanelAnomalias: React.FC<PanelAnomaliasProps> = ({
   };
 
   const handleVolverClick = () => {
+    if (droppedImages.length === 0) {
+
+      setToastMessage('Necesitas subir al menos una imagen para continuar');
+      setShowToast(true);
+      // setTimeout(() => setShowToast(false), 3000); // Oculta el Toast después de 3 segundos
+      return;
+    }
+
     setMostrarPrevisualizar(false);
+    resetDroppedImages(); // Limpia las imágenes al volver
     setAnomaliaSeleccionada(null); // Limpia la selección de anomalía
   };
 
@@ -187,7 +201,23 @@ export const PanelAnomalias: React.FC<PanelAnomaliasProps> = ({
           )}
         </Tabs>
       </div>
+
+      {showToast && (
+      <div className="fixed inset-0 flex items-center justify-center z-50">
+        <div className="w-1/3">
+          <SuccessToast message={toastMessage} />
+        </div>
+      </div>
+    )}
+
     </div>
+
+
+
+
+
+
+
   );
 };
 
