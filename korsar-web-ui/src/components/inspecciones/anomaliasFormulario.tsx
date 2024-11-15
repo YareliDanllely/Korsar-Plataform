@@ -19,7 +19,7 @@ import {ModalError} from "../inspecciones/modalErrorConfirmacion";
 import {ConfirmacionModalRecepcion} from "../inspecciones/modalConfirmacionRecepcion";
 import { Label, Select } from "flowbite-react";
 import { patchAnomalia } from '../../services/anomalias';
-
+import { eliminarImagenesAnomalias } from '../../services/imagenesAnomalia';
 
 interface Imagen {
   uuid_imagen: string;
@@ -33,6 +33,7 @@ interface FormularioAnomaliasProps {
   uuid_aerogenerador: string;
   uuid_componente: string;
   uuid_inspeccion: string;
+  imagenesParaEliminar: string[];
   uuid_parque: string;
   actualizarEstadoFinalAero: (cambioEstadoFinalAero: boolean) => void;
   actualizarAnomaliasDisplay: () => void; // Actualiza la visualización de las anomalías
@@ -42,7 +43,7 @@ interface FormularioAnomaliasProps {
   informacionIncialAnomalia?: Anomalia;
 }
 
-export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogenerador, uuid_componente, uuid_inspeccion, uuid_parque, resetDroppedImages, actualizarEstadoFinalAero, actualizarAnomaliasDisplay, cambioEstadoFinalAero,  modoEditar = false, informacionIncialAnomalia }: FormularioAnomaliasProps) {
+export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogenerador, uuid_componente, uuid_inspeccion, uuid_parque, resetDroppedImages, actualizarEstadoFinalAero, actualizarAnomaliasDisplay, cambioEstadoFinalAero,  modoEditar = false, informacionIncialAnomalia, imagenesParaEliminar }: FormularioAnomaliasProps) {
   const [siguienteNumeroDano, setSiguienteNumeroDano] = useState<string>('');
   const [abreviaturaParque, setAbreviaturaParque] = useState<string>('');
   const [numeroAerogenerador, setNumeroAerogenerador] = useState<number>(0);
@@ -432,6 +433,43 @@ export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogen
         } else {
               console.log("No hay cambios para actualizar.");
         }
+
+        // Eliminar imagenes de la anomalía
+        try {
+          if (imagenesParaEliminar.length > 0) {
+            console.log('Eliminando imágenes:', imagenesParaEliminar);
+
+            // Llamada al servicio para eliminar imágenes en lote
+            await eliminarImagenesAnomalias(imagenesParaEliminar);
+
+            console.log('Imágenes eliminadas correctamente');
+          } else {
+            console.log('No hay imágenes para eliminar');
+          }
+        } catch (error) {
+          console.error('Error al eliminar las imágenes:', error);
+        }
+
+
+        // subir nuevas imagenes de anomalia
+        /*------------Subir las imágenes asociadas a la anomalía------------*/
+        for (const imagen of droppedImages) {
+          console.log('Subiendo imagen:', imagen);
+          await crearImagenAnomalia({
+            uuid_imagen: imagen.uuid_imagen,
+            uuid_anomalia: informacionIncialAnomalia.uuid_anomalia,
+          });
+        }
+
+        /** ----------cambiar estado final del aerogenerador si corresponde------- **/
+        console.log('Antes de llamar a obtenerEstadoFinalAerogenerador');
+        const response_estado_final = await obtenerEstadoFinalAerogenerador(uuid_aerogenerador, uuid_inspeccion);
+        if (response_estado_final !== null && response_estado_final < categoriaDaño) {
+          await cambiarEstadoFinalAerogenerador(uuid_aerogenerador, uuid_inspeccion, categoriaDaño);
+          actualizarEstadoFinalAero(!cambioEstadoFinalAero);
+        }
+
+
 
         actualizarAnomaliasDisplay();  // Actualiza la visualización después de la edición
         setOpenModal(false);

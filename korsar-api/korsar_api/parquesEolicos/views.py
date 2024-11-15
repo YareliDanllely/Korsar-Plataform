@@ -44,3 +44,18 @@ class ParqueEolicoViewSet(viewsets.ModelViewSet):
         except ParquesEolicos.DoesNotExist:
             return Response({'error': 'Parques eólicos no encontrados'}, status=status.HTTP_404_NOT_FOUND)
 
+
+    # Obtener informacion de un parque eolico por su uuid
+    @action(detail=False, methods=['get'], url_path='informacion-por-uuid')
+    def obtener_informacion_por_uuid(self, request):
+        uuid_parque_eolico = request.query_params.get('uuid_parque_eolico')
+
+        if not uuid_parque_eolico:
+            return Response({'error': 'El parámetro uuid_parque_eolico es requerido'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            parque = ParquesEolicos.objects.get(uuid_parque_eolico=uuid_parque_eolico)
+            serializer = self.get_serializer(parque)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except ParquesEolicos.DoesNotExist:
+            return Response({'error': 'Parque eólico no encontrado'}, status=status.HTTP_404_NOT_FOUND)

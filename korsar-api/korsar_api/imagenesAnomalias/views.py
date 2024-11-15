@@ -40,15 +40,18 @@ class ImagenAnomaliaViewSet(viewsets.ModelViewSet):
         return Response(imagenes_data, status=status.HTTP_200_OK)
 
     # Eliminar una imagen específica asociada a una anomalía
-    @action(detail=True, methods=['delete'], url_path='eliminar-imagen')
-    def eliminar_imagen(self, request, pk=None):
+    @action(detail=False, methods=['post'], url_path='eliminar-imagenes')
+    def eliminar_imagenes(self, request):
         """
-        Eliminar una imagen específica asociada a una anomalía.
+        Eliminar múltiples imágenes asociadas a anomalías.
         """
+        imagenes_ids = request.data.get('imagenes_ids', [])
+        if not imagenes_ids:
+            return Response({'detail': 'No se proporcionaron imágenes para eliminar.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Filtrar y eliminar las imágenes por los IDs proporcionados.
         try:
-            # Obtener la instancia de la imagen-anomalía
-            imagen_anomalia = self.get_object()
-            imagen_anomalia.delete()
-            return Response({'detail': 'Imagen eliminada correctamente.'}, status=status.HTTP_204_NO_CONTENT)
-        except ImagenAnomalia.DoesNotExist:
-            return Response({'detail': 'Imagen no encontrada.'}, status=status.HTTP_404_NOT_FOUND)
+            ImagenAnomalia.objects.filter(uuid_imagen_anomalia__in=imagenes_ids).delete()
+            return Response({'detail': 'Imágenes eliminadas correctamente.'}, status=status.HTTP_204_NO_CONTENT)
+        except Exception as e:
+            return Response({'detail': f'Error al eliminar imágenes: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

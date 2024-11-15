@@ -48,18 +48,23 @@ export const crearImagenAnomalia = async (data: ImagenAnomaliaPost): Promise<voi
   }
 
 
-// Eliminar una imagen específica asociada a una anomalía
-export const eliminarImagenAnomalia = async (uuid_imagen_anomalia: string): Promise<void> => {
+
+// Eliminar múltiples imágenes asociadas a una anomalía
+export const eliminarImagenesAnomalias = async (imagenesIds: string[]): Promise<void> => {
   const token = localStorage.getItem('token');
 
   try {
-    await api.delete(`/imagenes-anomalias/items/${uuid_imagen_anomalia}/eliminar-imagen/`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    await api.post(
+      `/imagenes-anomalias/eliminar-imagenes/`,
+      { imagenes_ids: imagenesIds }, // Enviar la lista de IDs en el cuerpo
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
   } catch (error) {
-    console.error('Error al eliminar la imagen asociada:', error);
+    console.error('Error al eliminar las imágenes asociadas:', error);
     throw error;
   }
 };

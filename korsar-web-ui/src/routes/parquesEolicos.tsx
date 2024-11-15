@@ -5,11 +5,16 @@ import { ultimaInspeccionPorParque, cantidadSeveridadesPorComponentes } from "..
 import { useEffect, useState } from "react";
 import DonutChartComponets from "../components/parquesEolicos/severidadComponentesGrafico";
 import { useParams, Navigate } from "react-router-dom";
+import { obtenerInformacionParque } from "../services/parquesEolicos";
+import { ParqueEolico } from "../utils/interfaces";
+import MapaParqueEolico from "../components/parquesEolicos/mapaAerogeneradores";
+
 
 const ParquesEolicos: React.FC = () => {
     const { uuid_parque_eolico } = useParams<{ uuid_parque_eolico: string }>();
     const [ultimaInspeccion, setUltimaInspeccion] = useState<Inspeccion | null>(null);
     const [severidadesData, setSeveridadesData] = useState<CantidadSeveridadesPorComponente | null>(null);
+    const [informacionParqueEolico, setInformacionParqueEolico] = useState<ParqueEolico | null>(null);
 
     // Verifica si `uuid_parque_eolico` existe; si no, redirige o muestra un error.
     if (!uuid_parque_eolico) {
@@ -29,6 +34,24 @@ const ParquesEolicos: React.FC = () => {
 
         obtenerUltimaInspeccion();
     }, [uuid_parque_eolico]);
+
+
+    useEffect(() => {
+        const obtenerInformacionParqueEolico = async () => {
+            try {
+                const response = await obtenerInformacionParque(uuid_parque_eolico);
+                console.log("Información del parque eólico:", response);
+                setInformacionParqueEolico(response);
+            } catch (error) {
+                console.error("Error al obtener el parque eolico:", error);
+            }
+        };
+
+        obtenerInformacionParqueEolico();
+    }, [uuid_parque_eolico]);
+
+
+
 
     useEffect(() => {
         const obtenerSeveridades = async () => {
@@ -67,10 +90,17 @@ const ParquesEolicos: React.FC = () => {
                 </div>
 
                 {/* Elemento 4 - Gráfico de severidades */}
-                <div className="col-span-3 row-span-2 col-start-3 row-start-1 bg-white shadow-md rounded-lg">
-                    {/* Gráfico principal si es necesario */}
+                <div className="col-span-3 row-span-2 col-start-3 row-start-1 bg-white shadow-md rounded-lg p-4">
+                    <div className="h-[600px] w-full">
+                        {/* <MapaParqueEolico
+                            latitud_parque_eolico={informacionParqueEolico?.coordenada_latitud || 0}
+                            longitud_parque_eolico={informacionParqueEolico?.coordenada_longitud || 0}
+                        /> */}
+                    </div>
+                    </div>
 
-                </div>
+
+
 
                 {/* Elementos 5, 6, 7, y 8 - Gráficos por componente */}
                 <div className="col-span-5 row-start-3 grid grid-cols-4 gap-4">

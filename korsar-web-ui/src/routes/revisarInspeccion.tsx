@@ -6,7 +6,6 @@ import { PanelAnomalias } from '../components/inspecciones/anomaliasPanel';
 import { DndContext } from '@dnd-kit/core';
 import { obtenerImagenesAnomalia } from '../services/imagenesAnomalia';
 import ConfirmDeleteModal from '../components/inspecciones/modalEliminarImagen';
-import { eliminarImagenAnomalia } from '../services/imagenesAnomalia';
 import  SuccessToast from '../components/inspecciones/avisoOperacionExitosa';
 
 interface Imagen {
@@ -28,6 +27,7 @@ const RevisarInspeccion: React.FC = () => {
   const [imageToDelete, setImageToDelete] = useState<Imagen | null>(null);
   const [showToast, setShowToast] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string>('');
+  const [imagenesParaEliminar, setImagenesParaEliminar] = useState<string[]>([]);
 
 
 
@@ -78,7 +78,6 @@ const RevisarInspeccion: React.FC = () => {
 
   const handleRemoveImage = (image: Imagen) => {
     if (image.uuid_imagen_anomalia) {
-      setImageToDelete(image);
       setShowDeleteModal(true); // Abre el modal solo si es del backend
     } else {
       setDroppedImages((prev) => prev.filter((img) => img.uuid_imagen !== image.uuid_imagen));
@@ -90,19 +89,16 @@ const RevisarInspeccion: React.FC = () => {
     setDroppedImages([]);
   };
 
-  const onConfirmDelete = async () => {
+  const onConfirmDelete = (image: Imagen) => {
     if (imageToDelete?.uuid_imagen_anomalia) {
-      try {
-        await eliminarImagenAnomalia(imageToDelete.uuid_imagen_anomalia); // Llama al backend para eliminar la imagen
-        setDroppedImages((prev) =>
-          prev.filter((img) => img.uuid_imagen !== imageToDelete.uuid_imagen)
-        );
-        setToastMessage('Imagen eliminada correctamente.');
-        setShowToast(true);
-        setTimeout(() => setShowToast(false), 3000); // Oculta el Toast después de 3 segundos
-      } catch (error) {
-        console.error('Error al eliminar la imagen:', error);
+      const id = imageToDelete.uuid_imagen_anomalia;
+      if (id) {
+        setImagenesParaEliminar((prev) => [...prev, id]);
       }
+
+      setDroppedImages((prev) =>
+        prev.filter((img) => img.uuid_imagen !== image.uuid_imagen)
+      );
     }
 
     setShowDeleteModal(false);
@@ -140,6 +136,7 @@ const RevisarInspeccion: React.FC = () => {
                 uuid_parque={uuid_parque || ''}
                 busquedaActivada={busquedaActivada}
                 droppedImages={droppedImages}
+                imagenesParaEliminar={imagenesParaEliminar}
                 onRemoveImage={handleRemoveImage}
                 resetDroppedImages={resetDroppedImages}
                 cambioEstadoFinalAero={cambioEstadoFinalAero}

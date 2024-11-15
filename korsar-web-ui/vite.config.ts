@@ -4,7 +4,15 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   server: {
-    port: 3000,  // Cambia el puerto de 5173 a 3000
-    host: '0.0.0.0',  // Asegúrate de que se exponga correctamente
+    port: 3000,
+    host: '0.0.0.0',
   },
-})
+  optimizeDeps: {
+    include: ['mapbox-gl'], // Asegúrate de incluir Mapbox en los módulos optimizados
+  },
+  build: {
+    commonjsOptions: {
+      transformMixedEsModules: true, // Maneja módulos ES/JS mixtos
+    },
+  },
+});

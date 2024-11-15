@@ -19,6 +19,7 @@ interface PanelAnomaliasProps {
   cambioEstadoFinalAero: boolean;
   actualizarCrearAnomalia: (crearAnomalia: boolean) => void;
   droppedImages: Imagen[];
+  imagenesParaEliminar: string[];
   actualizarEstadoFinalAero: (cambioEstadoFinalAero: boolean) => void;
   onRemoveImage: (imageId: Imagen) => void;
   resetDroppedImages: () => void;
@@ -37,6 +38,7 @@ export const PanelAnomalias: React.FC<PanelAnomaliasProps> = ({
   actualizarCrearAnomalia,
   cambioEstadoFinalAero,
   cargarImagenesAnomaliaCreada,
+  imagenesParaEliminar
 }) => {
   const [anomalies, setAnomalies] = useState<Anomalia[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -161,6 +163,7 @@ export const PanelAnomalias: React.FC<PanelAnomaliasProps> = ({
                   uuid_inspeccion={uuid_inspeccion}
                   uuid_componente={uuid_componente}
                   uuid_parque={uuid_parque}
+                  imagenesParaEliminar={[]}
                   resetDroppedImages={resetDroppedImages}
                   cambioEstadoFinalAero={cambioEstadoFinalAero}
                   actualizarAnomaliasDisplay={actualizarAnomaliasCreadas}
@@ -181,6 +184,7 @@ export const PanelAnomalias: React.FC<PanelAnomaliasProps> = ({
                                   droppedImages={droppedImages}
                                   onRemoveImage={onRemoveImage}
                                   uuid_aerogenerador={uuid_turbina}
+                                  imagenesParaEliminar={imagenesParaEliminar}
                                   uuid_inspeccion={uuid_inspeccion}
                                   uuid_componente={uuid_componente}
                                   uuid_parque={uuid_parque}

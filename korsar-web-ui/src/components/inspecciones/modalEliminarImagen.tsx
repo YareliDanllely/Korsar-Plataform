@@ -10,7 +10,7 @@ interface Imagen {
 interface ConfirmDeleteModalProps {
   open: boolean;
   onClose: () => void;
-  onConfirm: () => void;
+  onConfirm: (imagen: Imagen) => void;
   image: Imagen | null;
 }
 
@@ -19,11 +19,15 @@ const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({ open, onClose, 
     <Modal.Header>Confirmar eliminación</Modal.Header>
     <Modal.Body>
       <p>¿Estás seguro de que deseas eliminar esta imagen?</p>
-      {image && <img src={image.ruta_imagen} alt="Imagen a eliminar" className="mt-4"/>}
+      {image && <img src={image.ruta_imagen} alt="Imagen a eliminar" className="mt-4" />}
     </Modal.Body>
     <Modal.Footer>
-      <Button color="failure" onClick={onConfirm}>Sí, eliminar</Button>
-      <Button color="gray" onClick={onClose}>Cancelar</Button>
+      <Button color="failure" onClick={() => image && onConfirm(image)}>
+        Sí, eliminar
+      </Button>
+      <Button color="gray" onClick={onClose}>
+        Cancelar
+      </Button>
     </Modal.Footer>
   </Modal>
 );

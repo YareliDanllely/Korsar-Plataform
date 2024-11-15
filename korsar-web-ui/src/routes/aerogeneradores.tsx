@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { ultimaInspeccionPorParque } from '../services/inspecciones';
 import { AerogeneradorCarrusel } from '../components/inspecciones/carruselAerogeneradores';
 import { obtenerAnomaliasPorAerogenerador } from '../services/anomalias';
-import AnomaliasComponente from '../components/inspecciones/anomaliasComponentes';
+import AnomaliasComponente from '../components/aerogeneradores/anomaliasComponentes';
 import { Anomalia } from '../utils/interfaces';
 import TurbineComponent from '../components/aerogeneradores/estadoAerogeneradores';
 import IconAerogeneradorDos from '../components/iconos/iconAerogenerador2';

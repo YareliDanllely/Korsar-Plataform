@@ -60,3 +60,28 @@ export const obtenerParquesEmpresa = async (uuid_empresa: string): Promise<Parqu
       throw error;
   }
 };
+
+
+// Obtener informacion parque eolico por uuid
+// Obtener información completa de un parque eólico por UUID
+export const obtenerInformacionParque = async (uuid_parque_eolico: string): Promise<ParqueEolico> => {
+  const token = localStorage.getItem('token');
+
+  if (!token) {
+    throw new Error('Token de autenticación no encontrado en localStorage.');
+  }
+
+  try {
+    const response = await api.get(`/parques-eolicos/${uuid_parque_eolico}/`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    console.log('Información del Parque Eólico:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error al obtener la información del parque eólico:', error);
+    throw error;
+  }
+};
