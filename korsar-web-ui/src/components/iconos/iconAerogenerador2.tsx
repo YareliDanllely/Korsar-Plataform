@@ -22,7 +22,7 @@ interface Props {
   height: string;
 }
 
-const IconAerogeneradorDos: React.FC<Props> = ({ colors, width, height }) => {
+const IconAerogenerador: React.FC<Props> = ({ colors, width, height }) => {
   const [tooltip, setTooltip] = useState({ visible: false, text: '', x: 0, y: 0 });
 
   const isDamage = (color: string) => color !== "#6ABF4B" && color !== "#5DAF3E";
@@ -191,4 +191,4 @@ const IconAerogeneradorDos: React.FC<Props> = ({ colors, width, height }) => {
   );
 };
 
-export default IconAerogeneradorDos;
+export default IconAerogenerador;

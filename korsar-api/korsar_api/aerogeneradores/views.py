@@ -45,6 +45,8 @@ class AerogeneradorViewSet(viewsets.ModelViewSet):
                     'uuid_aerogenerador': aerogenerador.uuid_aerogenerador,
                     'numero_aerogenerador': aerogenerador.numero_aerogenerador,
                     'estado_final': estado_final.estado_final_clasificacion,
+                    'coordenada_latitud': aerogenerador.coordenada_latitud,
+                    'coordenada_longitud': aerogenerador.coordenada_longitud
                 })
 
         return Response(aerogeneradores_con_estado, status=status.HTTP_200_OK)

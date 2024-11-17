@@ -72,10 +72,13 @@ export const obtenerInformacionParque = async (uuid_parque_eolico: string): Prom
   }
 
   try {
-    const response = await api.get(`/parques-eolicos/${uuid_parque_eolico}/`, {
+    const response = await api.get(`/parques-eolicos/items/informacion-por-uuid/`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
+      params: {
+        uuid_parque_eolico: uuid_parque_eolico,
+      }
     });
 
     console.log('Información del Parque Eólico:', response.data);

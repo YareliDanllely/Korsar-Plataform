@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 // Define la estructura para el objeto de colores personalizados
-interface TurbineColors {
+interface TurbineColorss {
   torre1: string;
   torre2: string;
   base1: string;
@@ -17,12 +17,12 @@ interface TurbineColors {
 }
 
 interface TurbineComponentProps {
-  colors: TurbineColors;
+  colors: TurbineColorss;
   width: string;
   height: string;
 }
 
-const TurbineComponent: React.FC<TurbineComponentProps> = ({ colors, width, height }) => {
+const TurbineComponentDos: React.FC<TurbineComponentProps> = ({ colors, width, height }) => {
   const [tooltip, setTooltip] = useState({ visible: false, text: '', x: 0, y: 0 });
 
   const isDamage = (color: string) => color !== "#6ABF4B" && color !== "#5DAF3E";
@@ -143,4 +143,4 @@ const TurbineComponent: React.FC<TurbineComponentProps> = ({ colors, width, heig
   );
 };
 
-export default TurbineComponent;
+export default TurbineComponentDos;

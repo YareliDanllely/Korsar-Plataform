@@ -4,8 +4,8 @@ import { AerogeneradorCarrusel } from '../components/inspecciones/carruselAeroge
 import { obtenerAnomaliasPorAerogenerador } from '../services/anomalias';
 import AnomaliasComponente from '../components/aerogeneradores/anomaliasComponentes';
 import { Anomalia } from '../utils/interfaces';
-import TurbineComponent from '../components/aerogeneradores/estadoAerogeneradores';
-import IconAerogeneradorDos from '../components/iconos/iconAerogenerador2';
+// import TurbineComponent from '../components/aerogeneradores/estadoAerogeneradores';
+import TurbineComponentDos from '../components/aerogeneradores/estadoAerogeneradoresDos';
 
 interface AspasAnomalias {
   [key: string]: Anomalia[];
@@ -22,25 +22,22 @@ const getHighestSeverity = (anomalies: Anomalia[]): number => {
   return Math.max(...anomalies.map(anomalia => anomalia.severidad_anomalia)); // Devuelve el mayor estado presente
 };
 
-const getColorClass = (estado: number): { primary: string; secondary: string } => {
+const getColorClass = (estado: number): string => {
   switch (estado) {
     case 1:
-      return { primary: "#A8D4A4", secondary: "#82BC85" }; // Verde claro más definido
+      return "#F1F1F1"; // Verde claro más definido
     case 2:
-      return { primary: "#99CCFF", secondary: "#66B2FF" }; // Azul suave más saturado
+      return "#66B2FF"; // Azul suave más saturado
     case 3:
-      return { primary: "#FFEB99", secondary: "#FFD966" }; // Amarillo más vibrante y dorado claro
+      return "#FFD966"; // Amarillo más vibrante
     case 4:
-      return { primary: "#FFC780", secondary: "#FFA94D" }; // Naranja pastel con más saturación
+      return "#FFA94D"; // Naranja pastel con más saturación
     case 5:
-      return { primary: "#FF9996", secondary: "#FF6663" }; // Rojo claro pero más intenso
+      return "#FF6663"; // Rojo claro pero más intenso
     default:
-      return { primary: "#E0E0E0", secondary: "#C8C8C8" }; // Gris base con un poco más de contraste
+      return "#E0E0E0"; // Gris base
   }
 };
-
-
-
 
 function Aerogeneradores() {
   const [uuid_parque_eolico, setUuidParqueEolico] = useState<string>('37fa3335-9087-4bad-a764-1dbec97a312a');
@@ -102,18 +99,11 @@ function Aerogeneradores() {
 
   // Calcular los colores de cada componente basado en el mayor nivel de daño
   const damageColors = {
-    torre1: getColorClass(getHighestSeverity(estructuraAnomalias.torre)).primary,
-    torre2: getColorClass(getHighestSeverity(estructuraAnomalias.torre)).secondary,
-    base1: "#E0E0E0",
-    base2: "#C0C0C0",
-    heliceA1: getColorClass(getHighestSeverity(aspasAnomalias.helice_a)).primary,
-    heliceA2: getColorClass(getHighestSeverity(aspasAnomalias.helice_a)).secondary,
-    heliceB1: getColorClass(getHighestSeverity(aspasAnomalias.helice_b)).primary,
-    heliceB2: getColorClass(getHighestSeverity(aspasAnomalias.helice_b)).secondary,
-    heliceC1: getColorClass(getHighestSeverity(aspasAnomalias.helice_c)).primary,
-    heliceC2: getColorClass(getHighestSeverity(aspasAnomalias.helice_c)).secondary,
-    nacelle1: getColorClass(getHighestSeverity(estructuraAnomalias.nacelle)).primary,
-    nacelle2: getColorClass(getHighestSeverity(estructuraAnomalias.nacelle)).secondary,
+    torre: getColorClass(getHighestSeverity(estructuraAnomalias.torre)),
+    heliceA: getColorClass(getHighestSeverity(aspasAnomalias.helice_a)),
+    heliceB: getColorClass(getHighestSeverity(aspasAnomalias.helice_b)),
+    heliceC: getColorClass(getHighestSeverity(aspasAnomalias.helice_c)),
+    nacelle: getColorClass(getHighestSeverity(estructuraAnomalias.nacelle)),
   };
 
   return (
@@ -142,8 +132,8 @@ function Aerogeneradores() {
         </div>
 
         <div className="bg-white shadow-md rounded-lg p-4 col-span-4 row-span-6 flex items-center justify-center">
-          {/* <TurbineComponent colors={damageColors} width="400" height="400" /> Ajusta el tamaño según prefieras */}
-          <IconAerogeneradorDos  colors={damageColors} width={"512"} height={"524"} />
+          {/* <TurbineComponentDos colors={damageColors} width="400" height="400" /> */}
+          <TurbineComponentDos colors={damageColors} width="800" height="600" />
         </div>
 
         <div className="bg-white shadow-md rounded-lg p-4 col-span-2 row-span-5">
