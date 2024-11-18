@@ -38,6 +38,55 @@ export const obtenerInspecciones = async () => {
 };
 
 
+// Función para cambiar progreso de inspección
+
+
+export const cambiarProgresoInspeccion = async (uuid_inspeccion: string, progreso: string) => {
+  const token = localStorage.getItem('token');
+  try {
+    const response = await api.post(
+      '/inspecciones/items/cambiar-progreso/', // Asegúrate de que el endpoint sea correcto
+      {
+        uuid_inspeccion: uuid_inspeccion,
+        progreso: progreso,
+      }, // Los datos van aquí en el cuerpo de la solicitud
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // Incluye el token en los headers
+          'Content-Type': 'application/json', // Asegúrate de que los datos se envíen como JSON
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error al cambiar el progreso de la inspección:', error);
+    throw error;
+  }
+};
+
+
+
+
+  export const obteenerInspeccionPorUuid = async (uuid_inspeccion: string): Promise<Inspeccion> => {
+
+      const token = localStorage.getItem('token');
+
+      try {
+        const response = await api.get(`/inspecciones/items/${uuid_inspeccion}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        return response.data;
+
+      } catch (error) {
+        console.error('Error al obtener la inspección:', error);
+        throw error;
+      }
+
+    }
+
 interface InspeccionResponse {
   ultimas_inspecciones: Inspeccion[];
 }
@@ -52,9 +101,7 @@ export const ultimaInspeccionParqueEmpresa= async (uuid_empresa: string): Promis
       headers: {
         Authorization: `Bearer ${token}`,
       },
-      params: {
-        uuid_empresa,
-      },
+
     });
 
     return response.data;

@@ -8,6 +8,8 @@ import DonutChartComponets from "../components/parquesEolicos/severidadComponent
 import { InformacionAerogenerador } from "../components/parquesEolicos/InformacionAerogeneradors";
 import { InformacionInspecciones } from "../components/parquesEolicos/informacionInspecciones";
 import { Inspeccion, CantidadSeveridadesPorComponente, AerogeneradorConEstado, ParqueEolico } from "../utils/interfaces";
+import {claseColores} from "../utils/colores";
+
 
 const ParquesEolicos: React.FC = () => {
   const { uuid_parque_eolico } = useParams<{ uuid_parque_eolico: string }>();
@@ -17,13 +19,17 @@ const ParquesEolicos: React.FC = () => {
   const [estadoAerogeneradores, setEstadoAerogeneradores] = useState<AerogeneradorConEstado[]>([]);
   const [aerogeneradorSeleccionado, setAerogeneradorSeleccionado] = useState<string | null>(null);
 
+
+  const obtenerColor = (number: number) => claseColores[number] || "";
+
+
   if (!uuid_parque_eolico) {
     return <Navigate to="/404" />;
   }
 
-    const aerogeneradorEscogido = (uuid_aerogenerador: string) => {
-        setAerogeneradorSeleccionado(uuid_aerogenerador);
-    };
+  const aerogeneradorEscogido = (uuid_aerogenerador: string) => {
+      setAerogeneradorSeleccionado(uuid_aerogenerador);
+  };
 
   useEffect(() => {
     const obtenerUltimaInspeccion = async () => {
@@ -83,25 +89,15 @@ const ParquesEolicos: React.FC = () => {
     obtenerAerogeneradoresConEstado();
   }, [uuid_parque_eolico, ultimaInspeccion]);
 
-  // Mapeo de estados a colores
-  const estadoAColor = (estado: number) => {
-    switch (estado) {
-      case 1: return "#82BC85"; // Verde
-      case 2: return "#66B2FF"; // Azul
-      case 3: return "#FFD966"; // Amarillo
-      case 4: return "#FFA94D"; // Naranja
-      case 5: return "#FF6663"; // Rojo
-      default: return "#C8C8C8"; // Gris
-    }
-  };
+
 
   const markers = estadoAerogeneradores.map((aero) => ({
     id: aero.uuid_aerogenerador,
     latitud: aero.coordenada_latitud,
     longitud: aero.coordenada_longitud,
-    color: estadoAColor(aero.estado_final),
+    color: obtenerColor(aero.estado_final),
     size: 30,
-    title: `Aerogenerador ${aero.numero_aerogenerador}`,
+    title: `A${aero.numero_aerogenerador}`,
     description: `Estado: ${aero.estado_final} `,
   }));
 
@@ -126,14 +122,14 @@ const ParquesEolicos: React.FC = () => {
 
         <div className="col-span-3 row-span-2 col-start-3 row-start-1 bg-white shadow-md rounded-lg p-4">
           <div className="h-[600px] w-full">
-            {informacionParqueEolico && (
+            {/* {informacionParqueEolico && (
               <MapaParqueEolico
                 latitud_parque_eolico={informacionParqueEolico.coordenada_latitud}
                 longitud_parque_eolico={informacionParqueEolico.coordenada_longitud}
                 markers={markers}
                 onMarkerClick={aerogeneradorEscogido}
               />
-            )}
+            )} */}
           </div>
         </div>
 

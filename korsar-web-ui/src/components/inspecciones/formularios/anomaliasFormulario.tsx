@@ -1,25 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { TextInput, Textarea, Button } from "flowbite-react";
-import { DropZone } from "../inspecciones/dropZone";
-import SelectorCategoria  from "../inspecciones/selectorCategoria";
-import { obtenerSiguienteNumeroDano, crearAnomalia } from '../../services/anomalias';
-import { obtenerAbreviaturaParque } from '../../services/parquesEolicos';
-import { obtenerNumeroAerogenerador } from '../../services/aerogeneradores';
-import { validarFormularioAnomalia } from '../../utils/validacionesAnomalia';
-import { Anomalia, ValidacionErrores } from "../../utils/interfaces";
-import { ConfirmacionModal } from '../inspecciones/modalConfirmacion';
-import { crearImagenAnomalia } from '../../services/imagenesAnomalia';
-import { ImagenAnomaliaFront } from '../../utils/interfaces';
-import { ErrorAlert } from '../inspecciones/alertForm';
-import { obtenerEstadoFinalAerogenerador } from '../../services/aerogeneradores';
-import { cambiarEstadoFinalAerogenerador } from '../../services/aerogeneradores';
-import { obtenerTipoComponente } from '../../services/componentesAerogeneradores';
-import {ModalError} from "../inspecciones/modalErrorConfirmacion";
-import {ConfirmacionModalRecepcion} from "../inspecciones/modalConfirmacionRecepcion";
+import { DropZone } from "../zonasDragDrop/dropZone";
+import SelectorCategoria  from "../selectorCategoria";
+import { obtenerSiguienteNumeroDano, crearAnomalia } from '../../../services/anomalias';
+import { obtenerAbreviaturaParque } from '../../../services/parquesEolicos';
+import { obtenerNumeroAerogenerador } from '../../../services/aerogeneradores';
+import { validarFormularioAnomalia } from '../../../utils/validacionesAnomalia';
+import { Anomalia, ValidacionErrores } from "../../../utils/interfaces";
+import { ConfirmacionModal } from '../modales/modalConfirmacion';
+import { crearImagenAnomalia } from '../../../services/imagenesAnomalia';
+import { ImagenAnomaliaFront } from '../../../utils/interfaces';
+import { ErrorAlert } from '../alertForm';
+import { obtenerEstadoFinalAerogenerador } from '../../../services/aerogeneradores';
+import { cambiarEstadoFinalAerogenerador } from '../../../services/aerogeneradores';
+import { obtenerTipoComponente } from '../../../services/componentesAerogeneradores';
+import {ModalError} from "../modales/modalErrorConfirmacion";
+import {ConfirmacionModalRecepcion} from "../modales/modalConfirmacionRecepcion";
 import { Label, Select } from "flowbite-react";
-import { patchAnomalia } from '../../services/anomalias';
-import { eliminarImagenesAnomalias } from '../../services/imagenesAnomalia';
+import { patchAnomalia } from '../../../services/anomalias';
+import { eliminarImagenesAnomalias } from '../../../services/imagenesAnomalia';
 
 interface Imagen {
   uuid_imagen: string;
@@ -666,6 +666,7 @@ export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogen
       <ConfirmacionModal
         openModal={openModal}
         onConfirm={confirmarEnvio}
+        message='¿Estas seguro que quieres crear la Anomalia?'
         onClose={() => setOpenModal(false)}
       />
 

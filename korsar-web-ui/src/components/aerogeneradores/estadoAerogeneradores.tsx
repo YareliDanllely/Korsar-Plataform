@@ -1,42 +1,67 @@
 import React, { useState } from 'react';
 
-// Define la estructura para el objeto de colores personalizados
-interface TurbineColorss {
-  torre1: string;
-  torre2: string;
-  base1: string;
-  base2: string;
-  heliceA1: string;
-  heliceA2: string;
-  heliceB1: string;
-  heliceB2: string;
-  heliceC1: string;
-  heliceC2: string;
-  nacelle1: string;
-  nacelle2: string;
+/**
+ * Propiedades para el componente `EstadoAerogeneradores`
+ * @interface TurbinaComponentesProps
+ * @property {ColoresTurbina} colors - Colores de los componentes de la turbina.
+ * @property {string} ancho - Ancho del componente.
+ * @property {string} alto - Alto del componente.
+ */
+
+interface TurbinaComponentesProps {
+  colores: ColoresTurbina;
+  ancho: string;
+  alto: string;
 }
 
-interface TurbineComponentProps {
-  colors: TurbineColorss;
-  width: string;
-  height: string;
+
+/**
+ * Colores de los componentes de la turbina.
+ * @interface ColoresTurbina
+ * @property {string} torre - Color de la torre.
+ * @property {string} heliceA - Color de la hélice A.
+ * @property {string} heliceB - Color de la hélice B.
+ * @property {string} heliceC - Color de la hélice C.
+ */
+interface ColoresTurbina {
+  torre: string;
+  heliceA: string;
+  heliceB: string;
+  heliceC: string;
+  nacelle: string;
 }
 
-const TurbineComponentDos: React.FC<TurbineComponentProps> = ({ colors, width, height }) => {
+
+/**
+ * Componente para visualizar el estado de los componentes de un aerogenerador.
+ * @param {TurbinaComponentesProps} props - Propiedades del componente.
+ * @returns {JSX.Element} Un componente con la representación visual de un aerogenerador y los estados de sus componentes.
+ */
+const EstadoAerogeneradores: React.FC<TurbinaComponentesProps> = ({ colores, ancho, alto }) => {
+  // Estado del tooltip
   const [tooltip, setTooltip] = useState({ visible: false, text: '', x: 0, y: 0 });
 
   const isDamage = (color: string) => color !== "#6ABF4B" && color !== "#5DAF3E";
 
-  const showTooltip = (component: string, color: string, event: React.MouseEvent<SVGElement, MouseEvent>) => {
+/**
+ *  Muestra informacion sobre el estado del componente seleccionado
+ * @param componente Componente seleccionado
+ * @param color Color del componente
+ * @param evento Evento del mouse
+ */
+  const showTooltip = (componente: string, color: string, evento: React.MouseEvent<SVGElement, MouseEvent>) => {
     const hasDamage = isDamage(color);
     setTooltip({
       visible: true,
-      text: `${component}: ${hasDamage ? "Con daños" : "Sin daños"}`,
-      x: event.clientX,
-      y: event.clientY,
+      text: `${componente}: ${hasDamage ? "Con daños" : "Sin daños"}`,
+      x: evento.clientX,
+      y: evento.clientY,
     });
   };
 
+  /**
+   * Oculta el tooltip
+   */
   const hideTooltip = () => {
     setTooltip({ visible: false, text: '', x: 0, y: 0 });
   };
@@ -65,82 +90,107 @@ const TurbineComponentDos: React.FC<TurbineComponentProps> = ({ colors, width, h
 
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        width={width}
-        height={height}
-        viewBox="0 0 512 512"
+        width={ancho}
+        height={alto}
+        viewBox="0 0 462 640"
         preserveAspectRatio="xMidYMid meet"
       >
-        {/* Torre */}
-        <g
-          id="torre"
-          onMouseEnter={(e) => showTooltip("Torre", colors.torre1, e)}
-          onMouseLeave={hideTooltip}
-          style={{ cursor: 'pointer' }}
-        >
-          <path fill={colors.torre1 || "#F0F0F0"} d="M258.631 282.341c15.265 10.152 30.674 10.152 45.938 0l2.981-1.983 14.546 193.031h-80.992l14.546-193.031 2.981 1.983Z" />
-          <path fill={colors.torre2 || "#E8E8E8"} d="M281.6 289.955c7.668 0 15.337-2.538 22.969-7.614l2.981-1.983 14.546 193.031H281.6V289.955Z" />
-        </g>
+        <g clipPath="url(#a)">
+          {/* Torre */}
+          <g
+            id="torre"
+            onMouseEnter={(e) => showTooltip("Torre", colores.torre, e)}
+            onMouseLeave={hideTooltip}
+            style={{ cursor: 'pointer' }}
+          >
+            <path
+              fill={colores.torre || "#F1F1F1"}
+              d="M268.359 242.857c-9.421 0-17.128 2.572-17.128 5.714l-17.128 354.286c0 6.286 15.415 11.429 34.256 11.429 18.84 0 34.256-5.143 34.256-11.429l-17.128-354.286c0-3.142-7.708-5.714-17.128-5.714Z"
+            />
+            <path
+              fill="#000"
+              d="M271.334 254.286c-10.239 0-18.616-2.572-18.616-5.715l-18.615 354.286c0 6.286 16.754 11.429 37.231 11.429s37.231-5.143 37.231-11.429l-18.616-354.286c0 3.143-8.377 5.715-18.615 5.715Z"
+              opacity=".05"
+            />
+          </g>
 
-        {/* Base (sin tooltip) */}
-        <g id="base">
-          <path fill={colors.base1 || "#E8E8E8"} d="M223.089 504.002H340.11a5.251 5.251 0 0 0 5.24-5.24v-16.465c0-6.053-4.952-11.004-11.004-11.004H228.853c-6.053 0-11.004 4.952-11.004 11.004v16.465a5.251 5.251 0 0 0 5.24 5.24Z" />
-          <path fill={colors.base2 || "#D9D9D9"} d="M281.6 504.002h58.511a5.251 5.251 0 0 0 5.24-5.24v-16.465c0-6.053-4.952-11.004-11.004-11.004H281.6v32.709Z" />
-        </g>
+          {/* Nacelle */}
+          <g
+            id="nacelle"
+            onMouseEnter={(e) => showTooltip("Nacelle", colores.nacelle, e)}
+            onMouseLeave={hideTooltip}
+            style={{ cursor: 'pointer' }}
+          >
+            <path
+              fill={colores.nacelle || "#E5E5E5"}
+              d="M263.404 271.429 237.737 260v-22.857l25.667 11.428v22.858Z"
+            />
+            <path
+              fill={colores.nacelle || "#E5E5E5"}
+              d="M309.233 204.34h-14.299l-57.197 26.835v26.836l28.599 13.418 71.496-33.545v-20.126l-28.599-13.418Z"
+            />
+            <path
+              fill={colores.nacelle || "#E5E5E5"}
+              d="m327.571 242.857-64.167 28.572v-22.858l64.167-22.857v17.143Z"
+            />
 
-        {/* Hélice A */}
-        <g
-          id="heliceA"
-          onMouseEnter={(e) => showTooltip("Hélice A", colors.heliceA1, e)}
-          onMouseLeave={hideTooltip}
-          style={{ cursor: 'pointer' }}
-        >
-          <path fill={colors.heliceA1 || "#6ABF4B"} d="M297.482 196.403c9.15 2.452 16.966 7.4 22.909 13.916 24.952-60.531 32.818-101.337 40.019-183.713.731-8.339-4.52-15.839-12.606-18.006s-16.384 1.703-19.92 9.291C292.932 92.83 279.341 132.103 270.684 197a47.565 47.565 0 0 1 26.798-.597Z" />
-          <path fill={colors.heliceA2 || "#5DAF3E"} d="M297.481 196.403c9.151 2.452 16.966 7.4 22.909 13.916 24.952-60.531 32.818-101.337 40.019-183.713.731-8.339-4.52-15.839-12.606-18.006l-50.322 187.803Z" />
-          <text x="230" y="120" fontSize="24" fill="#43454B" textAnchor="middle" dominantBaseline="middle">Aspa A</text>
+            <path fill="#000" d="m263.404 273.361-25.667-14.136v-28.272l25.667 14.136v28.272Z" opacity=".06"/>
+            <path fill="#000" d="m337.832 237.934-74.428 34.61v-27.688l59.542-27.688h14.886v20.766Z" opacity=".1"/>
+          </g>
 
-        </g>
+          {/* Hélice A */}
+          <g
+            id="heliceA"
+            onMouseEnter={(e) => showTooltip("Hélice A", colores.heliceA, e)}
+            onMouseLeave={hideTooltip}
+            style={{ cursor: 'pointer' }}
+          >
+            <path
+              fill={colores.heliceA || "#F1F1F1"}
+              d="M435.343 373.503c-23.891-4.502-145.813-54.387-152.701-58.364-6.889-3.977-38.174-18.806-43.428-25.073-5.254-6.268-2.402-11.632 1.378-21.984 2.058-5.637 5.802-16.37 5.802-16.37l204.452 118.04s8.387 8.253-15.503 3.751Z"
+            />
 
-
-        {/* Hélice B */}
-        <g
-          id="heliceB"
-          onMouseEnter={(e) => showTooltip("Hélice B", colors.heliceB1, e)}
-          onMouseLeave={hideTooltip}
-          style={{ cursor: 'pointer' }}
-        >
-          <path fill={colors.heliceB1 || "#6ABF4B"} d="M331.269 254.923c-4.776 17.822-19.02 30.578-35.872 34.303a663.722 663.722 0 0 0 11.847 14.959c34.787 42.597 66.322 68.903 127.242 111.554 6.856 4.802 15.978 4.005 21.897-1.914 5.919-5.919 6.716-15.04 1.914-21.896-47.426-67.742-74.643-99.148-126.518-139.096-.155.7-.325 1.397-.51 2.09Z" />
-          <path fill={colors.heliceB2 || "#5DAF3E"} d="M318.908 276.347a47.988 47.988 0 0 1-23.511 12.88 663.722 663.722 0 0 0 11.847 14.959c34.787 42.597 66.322 68.903 127.242 111.554 6.856 4.802 15.978 4.005 21.897-1.914L318.908 276.347Z" />
-          <text x="450" y="290" fontSize="24" fill="#43454B" textAnchor="middle" dominantBaseline="middle">Aspa B</text>
-
-        </g>
-
-        {/* Hélice C */}
-        <g
-          id="heliceC"
-          onMouseEnter={(e) => showTooltip("Hélice C", colors.heliceC1, e)}
-          onMouseLeave={hideTooltip}
-          style={{ cursor: 'pointer' }}
-        >
-          <path fill={colors.heliceC1 || "#6ABF4B"} d="M252.874 277.835c-12.73-11.653-18.688-29.823-13.913-47.645.186-.697.388-1.385.605-2.065-64.901 8.657-104.175 22.247-179.118 57.201-7.587 3.536-11.458 11.835-9.291 19.92 2.166 8.086 9.667 13.337 18.006 12.606 82.376-7.202 123.183-15.068 183.711-40.017Z" />
-          <path fill={colors.heliceC2 || "#5DAF3E"} d="M238.954 254.925a47.567 47.567 0 0 1 .612-26.801c-64.901 8.657-104.175 22.247-179.118 57.201-7.587 3.536-11.458 11.835-9.291 19.92l187.797-50.32Z" />
-          <text x="100" y="350" fontSize="24" fill="#43454B" textAnchor="middle" dominantBaseline="middle">Aspa C</text>
+            <path fill="#000" d="M429.193 379.107c-23.444-4.704-140.754-48.832-147.556-52.759-6.803-3.928-37.647-18.662-42.887-24.761-5.241-6.1-4.843-15.561-1.311-25.436 1.923-5.378 9.027-24.527 9.027-24.527l205.945 119.249s.226 12.938-23.218 8.234Z" opacity=".05"/>
 
 
-        </g>
+          </g>
 
-        {/* Nacelle */}
-        <g
-          id="nacelle"
-          onMouseEnter={(e) => showTooltip("Nacelle", colors.nacelle1, e)}
-          onMouseLeave={hideTooltip}
-          style={{ cursor: 'pointer' }}
-        >
-          <path fill={colors.nacelle1 || "#FFE469"} d="M285.115 292.442c27.551 0 49.886-22.335 49.886-49.886 0-27.551-22.335-49.886-49.886-49.886-27.551 0-49.886 22.335-49.886 49.886 0 27.551 22.335 49.886 49.886 49.886Z" />
-          <path fill={colors.nacelle2 || "#FFDA30"} d="M292.532 273.915c17.328-4.092 28.058-21.456 23.966-38.784-4.092-17.328-21.456-28.058-38.784-23.966-17.328 4.091-28.058 21.455-23.966 38.783 4.091 17.328 21.456 28.059 38.784 23.967Z" />
+          {/* Hélice B */}
+          <g
+            id="heliceB"
+            onMouseEnter={(e) => showTooltip("Hélice B", colores.heliceB, e)}
+            onMouseLeave={hideTooltip}
+            style={{ cursor: 'pointer' }}
+          >
+            <path
+              fill={colores.heliceB || "#F1F1F1"}
+              d="M46.25 354.803c15.843-18.439 120.006-99.084 126.894-103.061 6.889-3.977 35.373-23.657 43.428-25.073 8.055-1.417 11.274 3.735 18.349 12.185 3.853 4.601 11.277 13.209 11.277 13.209L41.746 370.104s-11.341 3.137 4.503-15.301Z"
+            />
+
+            <path fill="#000" d="M44.471 346.675c15.797-17.95 112.667-97.478 119.47-101.405 6.802-3.928 34.985-23.273 42.887-24.761 7.903-1.489 15.897 3.586 22.683 11.581 3.696 4.354 16.727 20.079 16.727 20.079L39.992 370.899s-11.317-6.273 4.48-24.224Z" opacity=".05"/>
+
+          </g>
+
+          {/* Hélice C */}
+          <g
+            id="heliceC"
+            onMouseEnter={(e) => showTooltip("Hélice C", colores.heliceC, e)}
+            onMouseLeave={hideTooltip}
+            style={{ cursor: 'pointer' }}
+          >
+            <path
+              fill={colores.heliceC || "#F1F1F1"}
+              d="M256.765 27.538c8.047 22.941 25.806 153.472 25.806 161.425 0 7.954 2.801 42.462 0 50.146-2.8 7.684-8.872 7.896-19.727 9.799-5.911 1.036-17.078 3.161-17.078 3.161V15.988s2.953-11.39 10.999 11.55Z"
+            />
+
+            <path fill="#000" d="M264.694 30.062c7.648 22.656 28.087 146.312 28.087 154.167 0 7.855 2.662 41.934 0 49.522-2.662 7.588-11.055 11.974-21.373 13.853-5.619 1.023-25.754 4.446-25.754 4.446l.3-237.978s11.092-6.665 18.74 15.99Z" opacity=".05"/>
+
+          </g>
         </g>
       </svg>
     </div>
   );
 };
 
-export default TurbineComponentDos;
+export default EstadoAerogeneradores;
+

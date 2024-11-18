@@ -20,19 +20,18 @@ function Login() {
                 password,
             });
 
-            const token = response.data.access;
-            const userId = response.data.user_id;
-            const empresaId = response.data.empresa_id;
-            const usernameResponse = response.data.username;
 
-            // Guarda en localStorage con nombres consistentes
-            localStorage.setItem('token', token);
-            localStorage.setItem('user_id', userId);  // Usa 'user_id'
-            localStorage.setItem('empresa_id', empresaId); // Usa 'empresa_id'
-            localStorage.setItem('username', usernameResponse); // Usa 'username'
+        const { access, refresh, user_id, empresa_id, username: usernameResponse } = response.data;
 
-            // Navega al dashboard
-            navigate('/dashboard');
+        // Guarda ambos tokens y datos del usuario en localStorage
+        localStorage.setItem('token', access);
+        localStorage.setItem('refresh_token', refresh);
+        localStorage.setItem('user_id', user_id);
+        localStorage.setItem('empresa_id', empresa_id);
+        localStorage.setItem('username', usernameResponse);
+
+        // Navega al dashboard
+        navigate('/dashboard');
 
         } catch (error) {
             setError('Error al iniciar sesión. Por favor, verifica tus credenciales.');

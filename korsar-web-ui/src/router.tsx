@@ -7,54 +7,33 @@ import ParquesEolicos from "./routes/parquesEolicos";
 import Inspecciones from "./routes/inspecciones";
 import Aerogeneradores from "./routes/aerogeneradores";
 import RevisarInspeccion from "./routes/revisarInspeccion";
+import AdministradorSesion from "./utils/administradorSesion"; // Importa el componente
 
 const router = (
   <Router>
     <Routes>
-
       <Route path="/" element={<Navigate to="/login" />} />
       <Route path="/login" element={<Login />} />
 
-      <Route path="/dashboard" element={
-        <PrivateRoute>
-          <Layout>
-            <Dashboard />
-          </Layout>
-        </PrivateRoute>
-      } />
-
-      <Route path="/parquesEolicos/:uuid_parque_eolico" element={
-        <PrivateRoute>
-          <Layout>
-            <ParquesEolicos />
-          </Layout>
-        </PrivateRoute>
-      } />
-
-      <Route path="/aerogeneradores" element={
-        <PrivateRoute>
-          <Layout>
-            <Aerogeneradores />
-          </Layout>
-        </PrivateRoute>
-      } />
-
-      <Route path="/inspecciones" element={
-        <PrivateRoute>
-          <Layout>
-            <Inspecciones />
-          </Layout>
-        </PrivateRoute>
-      } />
-
-      <Route path="/revisar/:uuid_inspeccion/:uuid_parque" element={
-        <PrivateRoute>
-          <Layout>
-            <RevisarInspeccion />
-          </Layout>
-        </PrivateRoute>
-      } />
-
+      {/* Agrupa todas las rutas protegidas dentro de AdministradorSesion */}
+      <Route
+        path="/*"
+        element={
+          <AdministradorSesion>
+            <PrivateRoute>
+              <Layout>
+                <Routes>
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/parquesEolicos/:uuid_parque_eolico" element={<ParquesEolicos />} />
+                  <Route path="/aerogeneradores" element={<Aerogeneradores />} />
+                  <Route path="/inspecciones" element={<Inspecciones />} />
+                  <Route path="/revisar/:uuid_inspeccion/:uuid_parque" element={<RevisarInspeccion />} />
+                </Routes>
+              </Layout>
+            </PrivateRoute>
+          </AdministradorSesion>
+        }
+      />
     </Routes>
   </Router>
 );

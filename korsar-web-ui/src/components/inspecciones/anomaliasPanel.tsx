@@ -2,7 +2,7 @@ import { Accordion, Tabs, Button } from "flowbite-react";
 import { useEffect, useState } from "react";
 import { obtenerAnomaliasFiltradas } from "../../services/anomalias";
 import { Anomalia } from "../../utils/interfaces";
-import { FormularioAnomalias } from "./anomaliasFormulario";
+import { FormularioAnomalias } from "./formularios/anomaliasFormulario";
 import SuccessToast from "./avisoOperacionExitosa";
 
 interface Imagen {

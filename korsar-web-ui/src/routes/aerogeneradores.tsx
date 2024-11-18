@@ -4,8 +4,8 @@ import { AerogeneradorCarrusel } from '../components/inspecciones/carruselAeroge
 import { obtenerAnomaliasPorAerogenerador } from '../services/anomalias';
 import AnomaliasComponente from '../components/aerogeneradores/anomaliasComponentes';
 import { Anomalia } from '../utils/interfaces';
-// import TurbineComponent from '../components/aerogeneradores/estadoAerogeneradores';
-import TurbineComponentDos from '../components/aerogeneradores/estadoAerogeneradoresDos';
+import EstadoAerogeneradores from '../components/aerogeneradores/estadoAerogeneradores';
+import {claseColores} from "../utils/colores";
 
 interface AspasAnomalias {
   [key: string]: Anomalia[];
@@ -22,22 +22,7 @@ const getHighestSeverity = (anomalies: Anomalia[]): number => {
   return Math.max(...anomalies.map(anomalia => anomalia.severidad_anomalia)); // Devuelve el mayor estado presente
 };
 
-const getColorClass = (estado: number): string => {
-  switch (estado) {
-    case 1:
-      return "#F1F1F1"; // Verde claro más definido
-    case 2:
-      return "#66B2FF"; // Azul suave más saturado
-    case 3:
-      return "#FFD966"; // Amarillo más vibrante
-    case 4:
-      return "#FFA94D"; // Naranja pastel con más saturación
-    case 5:
-      return "#FF6663"; // Rojo claro pero más intenso
-    default:
-      return "#E0E0E0"; // Gris base
-  }
-};
+
 
 function Aerogeneradores() {
   const [uuid_parque_eolico, setUuidParqueEolico] = useState<string>('37fa3335-9087-4bad-a764-1dbec97a312a');
@@ -54,6 +39,10 @@ function Aerogeneradores() {
     torre: [],
     nacelle: []
   });
+
+  const obtenerColor = (number: number) => claseColores[number] || "";
+
+
 
   useEffect(() => {
     const obtenerAnomaliasAerogenerador = async () => {
@@ -99,11 +88,11 @@ function Aerogeneradores() {
 
   // Calcular los colores de cada componente basado en el mayor nivel de daño
   const damageColors = {
-    torre: getColorClass(getHighestSeverity(estructuraAnomalias.torre)),
-    heliceA: getColorClass(getHighestSeverity(aspasAnomalias.helice_a)),
-    heliceB: getColorClass(getHighestSeverity(aspasAnomalias.helice_b)),
-    heliceC: getColorClass(getHighestSeverity(aspasAnomalias.helice_c)),
-    nacelle: getColorClass(getHighestSeverity(estructuraAnomalias.nacelle)),
+    torre: obtenerColor(getHighestSeverity(estructuraAnomalias.torre)),
+    heliceA: obtenerColor(getHighestSeverity(aspasAnomalias.helice_a)),
+    heliceB: obtenerColor(getHighestSeverity(aspasAnomalias.helice_b)),
+    heliceC: obtenerColor(getHighestSeverity(aspasAnomalias.helice_c)),
+    nacelle: obtenerColor(getHighestSeverity(estructuraAnomalias.nacelle)),
   };
 
   return (
@@ -133,7 +122,7 @@ function Aerogeneradores() {
 
         <div className="bg-white shadow-md rounded-lg p-4 col-span-4 row-span-6 flex items-center justify-center">
           {/* <TurbineComponentDos colors={damageColors} width="400" height="400" /> */}
-          <TurbineComponentDos colors={damageColors} width="800" height="600" />
+          <EstadoAerogeneradores colores={damageColors} ancho="800" alto="600" />
         </div>
 
         <div className="bg-white shadow-md rounded-lg p-4 col-span-2 row-span-5">

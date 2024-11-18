@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { createRoot } from 'react-dom/client';
@@ -21,34 +21,6 @@ interface MapaParqueEolicoProps {
   onMarkerClick: (id: string) => void;
 }
 
-const MarkerButton: React.FC<{ marker: Marker; onClick: (id: string) => void }> = ({
-  marker,
-  onClick,
-}) => {
-  return (
-    <button
-      style={{
-        width: `${marker.size}px`,
-        height: `${marker.size}px`,
-        border: 'none',
-        background: 'transparent',
-        cursor: 'pointer',
-        padding: '0',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-      onClick={(e) => {
-        e.preventDefault(); // Evita comportamiento predeterminado
-        e.stopPropagation(); // Evita propagación al mapa
-        onClick(marker.id);
-      }}
-    >
-      <MarcadorMapa color={marker.color} size={marker.size} />
-    </button>
-  );
-};
-
 const MapaParqueEolico: React.FC<MapaParqueEolicoProps> = ({
   latitud_parque_eolico,
   longitud_parque_eolico,
@@ -58,7 +30,9 @@ const MapaParqueEolico: React.FC<MapaParqueEolicoProps> = ({
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<Map<string, mapboxgl.Marker>>(new Map());
+  const [selectedMarkerId, setSelectedMarkerId] = useState<string | null>(null);
 
+  // Inicializar el mapa (solo una vez)
   useEffect(() => {
     if (!mapboxgl.accessToken) {
       mapboxgl.accessToken = 'pk.eyJ1IjoieWFyZXlhcmUiLCJhIjoiY20zYWpjNGVkMTJ5aDJrb2c5cDltMWwydSJ9.1GkzPeKihfzarJvzr4hQyw'; // Reemplaza con tu token real
@@ -73,7 +47,10 @@ const MapaParqueEolico: React.FC<MapaParqueEolicoProps> = ({
         zoom: 14,
       });
     }
+  }, [latitud_parque_eolico, longitud_parque_eolico]);
 
+  // Actualizar los marcadores cuando cambien
+  useEffect(() => {
     if (mapRef.current) {
       const currentMarkers = markersRef.current;
 
@@ -81,21 +58,33 @@ const MapaParqueEolico: React.FC<MapaParqueEolicoProps> = ({
       markers.forEach((marker) => {
         if (!currentMarkers.has(marker.id)) {
           const el = document.createElement('div');
+          el.style.width = `${marker.size}px`;
+          el.style.height = `${marker.size}px`;
+          el.style.cursor = 'pointer';
+          el.style.display = 'flex';
+          el.style.alignItems = 'center';
+          el.style.justifyContent = 'center';
 
-          // Renderizar el componente de marcador como un botón React
+          // Renderizar el marcador con React
           const root = createRoot(el);
           root.render(
-            <MarkerButton marker={marker} onClick={onMarkerClick} />
+            <MarcadorMapa
+              color={marker.color}
+              size={marker.size}
+              name={marker.title}
+              isSelected={marker.id == selectedMarkerId} // Verifica si el marcador está seleccionado
+            />
           );
 
           const mapboxMarker = new mapboxgl.Marker(el)
             .setLngLat([marker.longitud, marker.latitud])
-            .setPopup(
-              new mapboxgl.Popup({ offset: 25 }).setHTML(
-                `<h3>${marker.title}</h3><p>${marker.description}</p>`
-              )
-            )
             .addTo(mapRef.current!);
+
+          // Agregar evento de clic directamente al elemento
+          el.addEventListener('click', (e) => {
+            setSelectedMarkerId(marker.id); // Actualiza el marcador seleccionado
+            e.stopPropagation(); // Evita que el evento de clic afecte al mapa
+          });
 
           currentMarkers.set(marker.id, mapboxMarker);
         }
@@ -109,15 +98,14 @@ const MapaParqueEolico: React.FC<MapaParqueEolicoProps> = ({
         }
       });
     }
+  }, [markers, selectedMarkerId]); // Añade selectedMarkerId para actualizar el efecto
 
-    return () => {
-      if (mapRef.current) {
-        mapRef.current.remove();
-        markersRef.current.clear();
-        mapRef.current = null;
-      }
-    };
-  }, [latitud_parque_eolico, longitud_parque_eolico, markers, onMarkerClick]);
+  // Maneja los clics en los marcadores desde el estado
+  useEffect(() => {
+    if (selectedMarkerId) {
+      onMarkerClick(selectedMarkerId);
+    }
+  }, [selectedMarkerId, onMarkerClick]);
 
   return <div id="map-container" ref={mapContainerRef} className="h-full w-full"></div>;
 };

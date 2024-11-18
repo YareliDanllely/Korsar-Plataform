@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react";
+import {claseColores} from "../../utils/colores";
 
 interface SelectorCategoriaProps {
   onCategoriaSelected: (number: number) => void;
-  selectedCategoria?: number;
+  selectedCategoria?: number | null;
 }
 
 const SelectorCategoria: React.FC<SelectorCategoriaProps> = ({ onCategoriaSelected, selectedCategoria = null }) => {
   const [selected, setSelected] = useState<number | null>(selectedCategoria);
 
+  const obtenerColor = (number: number) => claseColores[number] || "";
   // Actualiza el estado `selected` cuando `selectedCategoria` cambie en el componente principal
   useEffect(() => {
     setSelected(selectedCategoria);
@@ -23,12 +25,14 @@ const SelectorCategoria: React.FC<SelectorCategoriaProps> = ({ onCategoriaSelect
       <div className="flex space-x-4">
         {[1, 2, 3, 4, 5].map((number) => (
           <div key={number} className="flex flex-col items-center">
-            <div
+            <button
+              type="button"
+              aria-selected={selected === number}
               onClick={() => handleSelection(number)}
-              className={`w-6 h-6 rounded-full cursor-pointer ${
+              className={`w-6 h-6 rounded-full cursor-pointer hover:scale-110 transition-transform ${
                 selected === number ? "ring-4 ring-opacity-30 ring-korsar-turquesa-viento" : ""
-              } ${getColorClass(number)}`}
-            ></div>
+              } ${obtenerColor(number)}`}
+            ></button>
             <span className="mt-1 text-gray-700">{number}</span>
           </div>
         ))}
@@ -40,21 +44,6 @@ const SelectorCategoria: React.FC<SelectorCategoriaProps> = ({ onCategoriaSelect
   );
 };
 
-const getColorClass = (number: number) => {
-  switch (number) {
-    case 1:
-      return "bg-korsar-verde-brillante";
-    case 2:
-      return "bg-korsar-turquesa-viento";
-    case 3:
-      return "bg-korsar-amarillo-dorado";
-    case 4:
-      return "bg-korsar-naranja-brillante";
-    case 5:
-      return "bg-korsar-naranja-sol";
-    default:
-      return "";
-  }
-};
+
 
 export default SelectorCategoria;

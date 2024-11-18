@@ -65,7 +65,6 @@ class InspeccionViewSet(viewsets.ModelViewSet):
         return Response(data, status=status.HTTP_200_OK)
 
     # Obtener última inspección por parques eólicos para una empresa específica
-    # Obtener última inspección por parques eólicos para una empresa específica
     @action(detail=False, methods=['get'], url_path='ultima-inspeccion-por-empresa')
     def ultima_inspeccion_por_empresa(self, request):
         """
@@ -111,6 +110,45 @@ class InspeccionViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Inspeccion.DoesNotExist:
             return Response({'error': 'No se encontró inspección'}, status=status.HTTP_404_NOT_FOUND)
+
+    #Obtener informacion de una inspeccion por su uuid
+    def retrieve(self, request, *args, **kwargs):
+        """
+        Obtener la información de una inspección por su UUID
+        """
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
+    #Cambiar progreso de inspeccion
+    @action(detail=False, methods=['post'], url_path='cambiar-progreso')
+    def cambiar_progreso(self, request):
+        """
+        Cambiar el progreso de una inspección
+        """
+
+        print(request.data)
+        uuid_inspeccion = request.data.get('uuid_inspeccion')
+        progreso = request.data.get('progreso')
+
+        if not uuid_inspeccion:
+            return Response({'error': 'uuid_inspeccion es requerido'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if progreso is None:
+            return Response({'error': 'progreso es requerido'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            # Actualizar el progreso de la inspección
+            inspeccion = Inspeccion.objects.get(uuid_inspeccion=uuid_inspeccion)
+            inspeccion.progreso = progreso
+            inspeccion.save()
+
+            return Response({'mensaje': 'Progreso actualizado correctamente'}, status=status.HTTP_200_OK)
+
+        except Inspeccion.DoesNotExist:
+            return Response({'error': 'Inspección no encontrada'}, status=status.HTTP_404_NOT_FOUND)
+
+
 
 
     @action(detail=False, methods=['get'], url_path='cantidad-severidades-por-componente')
