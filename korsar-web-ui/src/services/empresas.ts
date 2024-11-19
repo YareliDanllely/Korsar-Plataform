@@ -30,3 +30,21 @@ export const obtenerEmpresas = async (uuid_empresa: string): Promise<Empresa> =>
 
 }
 
+
+export const obtenerTodasLasEmpresas = async (): Promise<Empresa[]> => {
+    const token = localStorage.getItem('token');
+
+    try {
+        const response = await api.get('/empresas/items', {
+            headers: {
+            Authorization: `Bearer ${token}`,
+            },
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error('Error al obtener las empresas:', error);
+        throw error;
+    }
+
+}

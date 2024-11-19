@@ -2,7 +2,7 @@ import { Sidebar } from "flowbite-react";
 import { Link } from 'react-router-dom';
 import { HiChartPie, HiDatabase, HiDocumentReport, HiShoppingBag } from "react-icons/hi";
 import { useEffect, useState } from 'react';
-import { obtenerParquesEmpresa } from '../services/parquesEolicos';
+import { obtenerParquesPorEmpresa } from '../services/parquesEolicos';
 import { obtenerEmpresas } from '../services/empresas';
 import { Empresa, ParqueEolico } from '../utils/interfaces';
 
@@ -29,7 +29,7 @@ function SidebarComponent({ isOpen }: SidebarComponentProps) {
     const obtenerParquesEmpresaAsync = async () => {
       if (empresaId) {
         try {
-          const parques = await obtenerParquesEmpresa(empresaId);
+          const parques = await obtenerParquesPorEmpresa(empresaId);
           console.log("Parques obtenidos:", parques);
           setParques(parques);
         } catch (error) {

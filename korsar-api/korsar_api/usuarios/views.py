@@ -25,6 +25,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
         response.data['user_id'] = str(user.uuid_usuario)  # Usa 'id' o 'uuid_usuario', según tu modelo
         response.data['empresa_id'] = str(user.uuid_empresa.uuid_empresa) if user.uuid_empresa else None
         response.data['username'] = user.username  # Incluye el nombre de usuario
+        response.data['tipo_usuario'] = user.tipo_usuario  # Incluye el tipo de usuario
 
         return response
 
@@ -37,7 +38,8 @@ class UsuarioViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         # Si el usuario es cliente, solo puede ver su propio perfil
         if self.request.user.tipo_usuario == 2:  # Cliente
-            return Usuario.objects.filter(id=self.request.user.id)
+            return Usuario.objects.filter(uuid_usuario=self.request.user.uuid_usuario)
+
         # Técnicos pueden ver a todos los usuarios
         return Usuario.objects.all()
 

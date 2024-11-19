@@ -21,7 +21,7 @@ function Login() {
             });
 
 
-        const { access, refresh, user_id, empresa_id, username: usernameResponse } = response.data;
+        const { access, refresh, user_id, empresa_id, tipo_usuario, username: usernameResponse } = response.data;
 
         // Guarda ambos tokens y datos del usuario en localStorage
         localStorage.setItem('token', access);
@@ -29,6 +29,8 @@ function Login() {
         localStorage.setItem('user_id', user_id);
         localStorage.setItem('empresa_id', empresa_id);
         localStorage.setItem('username', usernameResponse);
+        localStorage.setItem('tipo_usuario', tipo_usuario);
+
 
         // Navega al dashboard
         navigate('/dashboard');

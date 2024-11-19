@@ -8,7 +8,7 @@ import { obtenerImagenesAnomalia } from '../services/imagenesAnomalia';
 import ConfirmDeleteModal from '../components/inspecciones/modales/modalEliminarImagen';
 import { Button } from 'flowbite-react';
 import SuccessToast from '../components/inspecciones/avisoOperacionExitosa';
-import { obteenerInspeccionPorUuid } from '../services/inspecciones';
+import { obtenerInspeccionPorUuid } from '../services/inspecciones';
 import { Inspeccion } from '../utils/interfaces';
 import { ConfirmacionModal } from '../components/inspecciones/modales/modalConfirmacion';
 import { cambiarProgresoInspeccion } from '../services/inspecciones';
@@ -41,7 +41,7 @@ const RevisarInspeccion: React.FC = () => {
     if (uuid_inspeccion) {
       const fetchInspeccion = async () => {
         try {
-          const inspeccionData = await obteenerInspeccionPorUuid(uuid_inspeccion);
+          const inspeccionData = await obtenerInspeccionPorUuid(uuid_inspeccion);
           setInspeccionInformacion(inspeccionData);
         } catch (error) {
           console.error("Error al obtener la inspección:", error);

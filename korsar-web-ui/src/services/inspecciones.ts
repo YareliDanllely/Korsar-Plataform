@@ -1,165 +1,123 @@
-import axios from 'axios';  // Importa axios para realizar las solicitudes HTTP
-import { Inspeccion } from '../utils/interfaces';  // Importa la interfaz Inspeccion desde el archivo interfaces.ts
-import { CantidadSeveridadesPorComponente } from '../utils/interfaces';
+import axios from 'axios';
+import { Inspeccion, CantidadSeveridadesPorComponente } from '../utils/interfaces';
+import { obtenerEncabezadosAutenticacion } from '../utils/apiUtils';
 
-// Define la URL base de la API
+
 const BASE_URL = 'http://localhost:8000/api';
 
-// Crea una instancia de axios con una configuración personalizada.
-// Esta instancia utilizará la URL base especificada para todas las solicitudes.
 const api = axios.create({
   baseURL: BASE_URL,
 });
 
-// Función para obtener todas las inspecciones desde el endpoint '/inspecciones/items'.
-export const obtenerInspecciones = async () => {
-  // Obtiene el token de autenticación del almacenamiento local.
-  // El token se utiliza para autenticar la solicitud a la API.
-  const token = localStorage.getItem('token');
 
+
+// Obtener todas las inspecciones
+export const obtenerInspecciones = async () => {
   try {
-    // Realiza una solicitud GET al endpoint '/inspecciones/items' utilizando la instancia de axios.
-    // Incluye el token de autenticación en los headers de la solicitud para autorizar el acceso.
     const response = await api.get('/inspecciones/items', {
-      headers: {
-        Authorization: `Bearer ${token}`,  // Agrega el token al header 'Authorization'
-      },
+      headers: obtenerEncabezadosAutenticacion(),
     });
 
-    // Si la solicitud es exitosa, retorna los datos obtenidos de la respuesta.
     return response.data;
   } catch (error) {
-    // En caso de que ocurra un error durante la solicitud, muestra un mensaje de error en la consola.
     console.error('Error al obtener las inspecciones:', error);
-
-    // Lanza el error para permitir que el componente que llama a esta función pueda manejar el error de manera personalizada.
-    throw error;
+    throw new Error('No se pudieron cargar las inspecciones.');
   }
 };
 
-
-// Función para cambiar progreso de inspección
-
-
+// Cambiar progreso de inspección
 export const cambiarProgresoInspeccion = async (uuid_inspeccion: string, progreso: string) => {
-  const token = localStorage.getItem('token');
+  if (!uuid_inspeccion || !progreso) {
+    throw new Error('Los parámetros "uuid_inspeccion" y "progreso" son requeridos.');
+  }
+
   try {
     const response = await api.post(
-      '/inspecciones/items/cambiar-progreso/', // Asegúrate de que el endpoint sea correcto
-      {
-        uuid_inspeccion: uuid_inspeccion,
-        progreso: progreso,
-      }, // Los datos van aquí en el cuerpo de la solicitud
+      '/inspecciones/items/cambiar-progreso/',
+      { uuid_inspeccion, progreso },
       {
         headers: {
-          Authorization: `Bearer ${token}`, // Incluye el token en los headers
-          'Content-Type': 'application/json', // Asegúrate de que los datos se envíen como JSON
+          ...obtenerEncabezadosAutenticacion(),
+          'Content-Type': 'application/json',
         },
       }
     );
     return response.data;
   } catch (error) {
     console.error('Error al cambiar el progreso de la inspección:', error);
-    throw error;
+    throw new Error('No se pudo cambiar el progreso de la inspección.');
   }
 };
 
-
-
-
-  export const obteenerInspeccionPorUuid = async (uuid_inspeccion: string): Promise<Inspeccion> => {
-
-      const token = localStorage.getItem('token');
-
-      try {
-        const response = await api.get(`/inspecciones/items/${uuid_inspeccion}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        return response.data;
-
-      } catch (error) {
-        console.error('Error al obtener la inspección:', error);
-        throw error;
-      }
-
-    }
-
-interface InspeccionResponse {
-  ultimas_inspecciones: Inspeccion[];
-}
-
-
-export const ultimaInspeccionParqueEmpresa= async (uuid_empresa: string): Promise<InspeccionResponse> => {
-
-  const token = localStorage.getItem('token');
+// Obtener inspección por UUID
+export const obtenerInspeccionPorUuid = async (uuid_inspeccion: string): Promise<Inspeccion> => {
+  if (!uuid_inspeccion) {
+    throw new Error('El parámetro "uuid_inspeccion" es requerido.');
+  }
 
   try {
-    const response = await  api.get(`/inspecciones/items/ultima-inspeccion-por-empresa`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-
+    const response = await api.get(`/inspecciones/items/${uuid_inspeccion}`, {
+      headers: obtenerEncabezadosAutenticacion(),
     });
-
     return response.data;
-
   } catch (error) {
-    console.error('Error al obtener las ultimas inspecciones:', error);
-    throw error;
+    console.error('Error al obtener la inspección:', error);
+    throw new Error('No se pudo obtener la inspección.');
   }
-
 };
 
+// Obtener última inspección por empresa
+export const ultimaInspeccionParqueEmpresa = async (uuid_empresa: string): Promise<Inspeccion[]> => {
+  if (!uuid_empresa) {
+    throw new Error('El parámetro "uuid_empresa" es requerido.');
+  }
 
+  try {
+    const response = await api.get('/inspecciones/items/ultima-inspeccion-por-empresa', {
+      headers: obtenerEncabezadosAutenticacion(),
+      params: { uuid_empresa },
+    });
+    return response.data.ultimas_inspecciones;
+  } catch (error) {
+    console.error('Error al obtener las últimas inspecciones por empresa:', error);
+    throw new Error('No se pudieron obtener las inspecciones.');
+  }
+};
 
-
+// Obtener última inspección por parque
 export const ultimaInspeccionPorParque = async (uuid_parque_eolico: string): Promise<Inspeccion> => {
-
-  const token = localStorage.getItem('token');
-
-  try {
-    const response = await  api.get(`/inspecciones/items/informacion-ultima-inspeccion`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      params: {
-        uuid_parque_eolico,
-      },
-    });
-
-    return response.data;
-
-  } catch (error) {
-    console.error('Error al obtener las ultimas inspecciones:', error);
-    throw error;
+  if (!uuid_parque_eolico) {
+    throw new Error('El parámetro "uuid_parque_eolico" es requerido.');
   }
 
-}
-
-
-export const cantidadSeveridadesPorComponentes = async (uuid_inspeccion: string): Promise<CantidadSeveridadesPorComponente> => {
-
-  const token = localStorage.getItem('token');
-
   try {
-    const response = await  api.get(`/inspecciones/items/cantidad-severidades-por-componente`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      params: {
-        uuid_inspeccion,
-      },
+    const response = await api.get('/inspecciones/items/informacion-ultima-inspeccion', {
+      headers: obtenerEncabezadosAutenticacion(),
+      params: { uuid_parque_eolico },
     });
-
     return response.data;
-
   } catch (error) {
-    console.error('Error al obtener las severidades', error);
-    throw error;
+    console.error('Error al obtener la última inspección del parque:', error);
+    throw new Error('No se pudo obtener la última inspección.');
+  }
+};
+
+// Obtener cantidad de severidades por componente
+export const cantidadSeveridadesPorComponentes = async (
+  uuid_inspeccion: string
+): Promise<CantidadSeveridadesPorComponente> => {
+  if (!uuid_inspeccion) {
+    throw new Error('El parámetro "uuid_inspeccion" es requerido.');
   }
 
-}
-
+  try {
+    const response = await api.get('/inspecciones/items/cantidad-severidades-por-componente', {
+      headers: obtenerEncabezadosAutenticacion(),
+      params: { uuid_inspeccion },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error al obtener las severidades:', error);
+    throw new Error('No se pudieron obtener las severidades por componente.');
+  }
+};
