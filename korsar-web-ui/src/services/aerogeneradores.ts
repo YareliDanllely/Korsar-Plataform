@@ -126,3 +126,29 @@ export const informacionAerogenerador = async (uuid_aerogenerador: string): Prom
       throw error;
     }
   }
+
+
+
+  export const obtenerAerogeneradoresPorParque = async (uuid_parque_eolico: string): Promise<Aerogenerador[]> => {
+    const token = localStorage.getItem('token');
+
+    try {
+      // Realiza una solicitud GET al endpoint para obtener aerogeneradores por parque
+      const response = await api.get(`/aerogeneradores/items/por-parque/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        params: {
+          uuid_parque_eolico, // Parámetro del parque
+        },
+      });
+
+      console.log('Aerogeneradores por parque:', response.data);
+      // Retorna los aerogeneradores del parque si la solicitud es exitosa
+      return response.data;
+
+    } catch (error) {
+      console.error('Error al obtener los aerogeneradores del parque:', error);
+      throw error;
+    }
+  };

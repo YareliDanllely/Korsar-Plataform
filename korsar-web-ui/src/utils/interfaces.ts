@@ -18,6 +18,13 @@ export interface Anomalia {
 
   }
 
+export interface InspeccionFront {
+  uuid_inspeccion: string;
+  uuid_parque_eolico: string; // UUID del parque
+  fecha_inspeccion: string | null; // Fecha en formato ISO
+  fecha_siguiente_inspeccion: string | null; // Fecha en formato ISO o null
+}
+
 
   export interface Inspeccion {
     uuid_inspeccion: string;

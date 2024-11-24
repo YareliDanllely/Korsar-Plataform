@@ -114,3 +114,21 @@ class AerogeneradorViewSet(viewsets.ModelViewSet):
             return Response({'error': 'Aerogenerador no encontrado'}, status=status.HTTP_404_NOT_FOUND)
 
 
+        # Obtener todos los aerogeneradores de un parque
+    @action(detail=False, methods=['get'], url_path='por-parque')
+    def listar_por_parque(self, request):
+        """
+        Listar todos los aerogeneradores de un parque específico
+        """
+        # Obtener el parámetro uuid_parque_eolico
+        uuid_parque_eolico = request.query_params.get('uuid_parque_eolico')
+
+        if not uuid_parque_eolico:
+            return Response({'error': 'El parámetro uuid_parque_eolico es requerido'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Filtrar aerogeneradores por parque eólico
+        aerogeneradores = Aerogenerador.objects.filter(uuid_parque_eolico=uuid_parque_eolico)
+
+        # Serializar los datos
+        serializer = self.get_serializer(aerogeneradores, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

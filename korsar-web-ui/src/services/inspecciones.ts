@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Inspeccion, CantidadSeveridadesPorComponente } from '../utils/interfaces';
+import { InspeccionFront,  Inspeccion, CantidadSeveridadesPorComponente } from '../utils/interfaces';
 import { obtenerEncabezadosAutenticacion } from '../utils/apiUtils';
 
 
@@ -8,6 +8,7 @@ const BASE_URL = 'http://localhost:8000/api';
 const api = axios.create({
   baseURL: BASE_URL,
 });
+
 
 
 
@@ -66,18 +67,23 @@ export const obtenerInspeccionPorUuid = async (uuid_inspeccion: string): Promise
   }
 };
 
+
+
 // Obtener última inspección por empresa
-export const ultimaInspeccionParqueEmpresa = async (uuid_empresa: string): Promise<Inspeccion[]> => {
+export const ultimaInspeccionParqueEmpresa = async (uuid_empresa: string): Promise<InspeccionFront[]> => {
   if (!uuid_empresa) {
     throw new Error('El parámetro "uuid_empresa" es requerido.');
   }
 
   try {
-    const response = await api.get('/inspecciones/items/ultima-inspeccion-por-empresa', {
+    console.log('Headers:', obtenerEncabezadosAutenticacion());
+    console.log('Params:', { uuid_empresa });
+
+    const response = await api.get('/inspecciones/items/ultima-y-proxima-inspeccion-empresa', {
       headers: obtenerEncabezadosAutenticacion(),
       params: { uuid_empresa },
     });
-    return response.data.ultimas_inspecciones;
+    return response.data.inspecciones;
   } catch (error) {
     console.error('Error al obtener las últimas inspecciones por empresa:', error);
     throw new Error('No se pudieron obtener las inspecciones.');

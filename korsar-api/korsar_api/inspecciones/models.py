@@ -18,6 +18,9 @@ class Inspeccion(models.Model):
 
     progreso = models.CharField(max_length=255)
 
+    def belongs_to_company(self, uuid_company):
+        return self.uuid_parque_eolico.uuid_empresa.uuid_empresa == uuid_company
+
     def __str__(self):
         return f"Inspección {self.uuid_inspeccion} del Parque {self.uuid_parque_eolico.nombre_parque}"
 

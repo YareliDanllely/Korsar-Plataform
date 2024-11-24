@@ -87,14 +87,15 @@ const EstadoAerogeneradores: React.FC<TurbinaComponentesProps> = ({ colores, anc
           {tooltip.text}
         </div>
       )}
-
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        width={ancho}
-        height={alto}
+        width="100%" // Cambiado de ancho fijo a porcentual
+        height="100%" // Cambiado de alto fijo a porcentual
         viewBox="0 0 462 640"
-        preserveAspectRatio="xMidYMid meet"
+        preserveAspectRatio="xMidYMid meet" // Asegura que se escale proporcionalmente
+        className="max-w-full max-h-full" // Asegura que no exceda el contenedor
       >
+
         <g clipPath="url(#a)">
           {/* Torre */}
           <g

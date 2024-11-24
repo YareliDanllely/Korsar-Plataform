@@ -22,5 +22,8 @@ class Aerogenerador(models.Model):
     coordenada_longitud = models.FloatField()
     coordenada_latitud = models.FloatField()
 
+    def belongs_to_company(self, uuid_company):
+        return self.uuid_parque_eolico.uuid_company == uuid_company
+
     def __str__(self):
         return f"Aerogenerador {self.numero_aerogenerador} - {self.modelo_aerogenerador}"

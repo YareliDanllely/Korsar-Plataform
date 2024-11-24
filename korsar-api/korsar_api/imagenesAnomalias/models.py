@@ -15,5 +15,8 @@ class ImagenAnomalia(models.Model):
     uuid_imagen = models.ForeignKey(Imagen, on_delete=models.CASCADE)
     uuid_anomalia = models.ForeignKey(Anomalia, on_delete=models.CASCADE)
 
+    def belongs_to_company(self, uuid_company):
+        return self.uuid_imagen.uuid_aerogenerador.uuid_parque_eolico.uuid_empresa == uuid_company
+
     def __str__(self):
         return f"Imagen Anomalía {self.uuid_imagen_anomalia}"

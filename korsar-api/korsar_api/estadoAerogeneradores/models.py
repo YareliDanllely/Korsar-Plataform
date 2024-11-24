@@ -25,6 +25,8 @@ class EstadoAerogenerador(models.Model):
 
     estado_final_clasificacion = models.IntegerField(choices=SEVERIDAD_CHOICES, null=True, blank=True)
 
+    def belongs_to_company(self, uuid_company):
+        return self.uuid_aerogenerador.uuid_parque_eolico.uuid_empresa== uuid_company
 
     def __str__(self):
         return f"Estado {self.estado_final_clasificacion} del Aerogenerador {self.uuid_aerogenerador}"

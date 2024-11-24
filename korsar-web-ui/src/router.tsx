@@ -25,7 +25,7 @@ const router = (
                 <Routes>
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/parquesEolicos/:uuid_parque_eolico" element={<ParquesEolicos />} />
-                  <Route path="/aerogeneradores" element={<Aerogeneradores />} />
+                  <Route path="/aerogeneradores/:uuid_empresa" element={<Aerogeneradores />} />
                   <Route path="/inspecciones" element={<Inspecciones />} />
                   <Route path="/revisar/:uuid_inspeccion/:uuid_parque" element={<RevisarInspeccion />} />
                 </Routes>

@@ -24,5 +24,8 @@ class ParquesEolicos(models.Model):
     uuid_empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE, related_name='parques')
 
 
+    def belongs_to_company(self, uuid_company):
+        return self.uuid_empresa== uuid_company
+
     def __str__(self):
         return self.nombre_parque

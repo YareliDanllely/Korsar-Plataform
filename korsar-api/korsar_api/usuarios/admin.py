@@ -1,6 +1,7 @@
 from django.contrib import admin
 from .models import Usuario
 
+
 @admin.register(Usuario)
 class UsuarioAdmin(admin.ModelAdmin):
     """
@@ -16,3 +17,14 @@ class UsuarioAdmin(admin.ModelAdmin):
     def get_nombre_empresa(self, obj):
         return obj.uuid_empresa.nombre_empresa if obj.uuid_empresa else 'Sin Empresa'
     get_nombre_empresa.short_description = 'Nombre de la Empresa'
+
+    # Sobrescribir el método save_model para encriptar la contraseña
+    def save_model(self, request, obj, form, change):
+        """
+        Sobrescribir el método save_model para encriptar la contraseña
+        si se modifica en el formulario.
+        """
+        if 'password' in form.cleaned_data:
+            # Encriptar la contraseña si se modifica
+            obj.set_password(form.cleaned_data['password'])
+        super().save_model(request, obj, form, change)
