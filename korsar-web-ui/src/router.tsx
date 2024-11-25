@@ -6,10 +6,14 @@ import Layout from "./layout/layout";
 import ParquesEolicos from "./routes/parquesEolicos";
 import Inspecciones from "./routes/inspecciones";
 import Aerogeneradores from "./routes/aerogeneradores";
-import RevisarInspeccion from "./routes/revisarInspeccion";
+import RevisarInspeccion from "./routes/revisarInspeccionTecnicos";
 import AdministradorSesion from "./utils/administradorSesion"; // Importa el componente
+import RevisarInspeccionClientes from "./routes/revisarInspeccionClientes";
 
 const router = (
+
+
+
   <Router>
     <Routes>
       <Route path="/" element={<Navigate to="/login" />} />
@@ -27,6 +31,7 @@ const router = (
                   <Route path="/parquesEolicos/:uuid_parque_eolico" element={<ParquesEolicos />} />
                   <Route path="/aerogeneradores/:uuid_empresa" element={<Aerogeneradores />} />
                   <Route path="/inspecciones" element={<Inspecciones />} />
+                  <Route path="/revisarClientes/:uuid_inspeccion/:uuid_parque" element={<RevisarInspeccionClientes />} />
                   <Route path="/revisar/:uuid_inspeccion/:uuid_parque" element={<RevisarInspeccion />} />
                 </Routes>
               </Layout>

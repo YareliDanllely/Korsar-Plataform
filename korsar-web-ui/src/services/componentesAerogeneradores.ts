@@ -9,7 +9,7 @@ const api = axios.create({
 
 
 
-export const obtenerComponentesAerogenerador = async (uuid_aerogenerador: string, uuid_inspeccion: string): Promise<ComponenteAerogenerador[]> => {
+export const obtenerComponentesAerogeneradorInspeccion= async (uuid_aerogenerador: string, uuid_inspeccion: string): Promise<ComponenteAerogenerador[]> => {
     const token = localStorage.getItem('token');
 
     try {
@@ -51,3 +51,25 @@ export const obtenerTipoComponente = async (uuid_componente: string): Promise<st
     }
 }
 
+
+
+export const obtenerComponentesAerogenerador = async (uuid_aerogenerador: string): Promise<ComponenteAerogenerador[]> => {
+    const token = localStorage.getItem('token');
+
+    try {
+        const response = await api.get('/componentes-aerogenerador/items/componentes-por-aerogenerador', {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+            params: {
+                uuid_aerogenerador,
+            },
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error('Error al obtener los componentes del aerogenerador:', error);
+        throw error;
+    }
+
+}

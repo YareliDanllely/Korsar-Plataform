@@ -586,7 +586,7 @@ export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogen
       <hr className="my-4 border-gray-300" />
 
 
-{/* Orientación de la Anomalía */}
+{/* Dimension de la Anomalía */}
       <h2 className="text-xl text-korsar-negro-90 font-semibold mb-1">Dimensiones de la Anomalía</h2>
       <p className="text-korsar-text-1">Ingrese la dimensiones del daño en el componente</p>
       {errores.dimensionAnomalia && errorVisibility.dimensionAnomalia && (

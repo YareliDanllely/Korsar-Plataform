@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 /**
  * Propiedades para el componente `EstadoAerogeneradores`
@@ -42,6 +42,10 @@ const EstadoAerogeneradores: React.FC<TurbinaComponentesProps> = ({ colores, anc
   const [tooltip, setTooltip] = useState({ visible: false, text: '', x: 0, y: 0 });
 
   const isDamage = (color: string) => color !== "#6ABF4B" && color !== "#5DAF3E";
+
+  useEffect(() => {
+    console.log('Colores:', colores);
+  }, [colores]);
 
 /**
  *  Muestra informacion sobre el estado del componente seleccionado
@@ -89,8 +93,8 @@ const EstadoAerogeneradores: React.FC<TurbinaComponentesProps> = ({ colores, anc
       )}
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        width="100%" // Cambiado de ancho fijo a porcentual
-        height="100%" // Cambiado de alto fijo a porcentual
+        width={ancho} // Cambiado de ancho fijo a porcentual
+        height={alto} // Cambiado de alto fijo a porcentual
         viewBox="0 0 462 640"
         preserveAspectRatio="xMidYMid meet" // Asegura que se escale proporcionalmente
         className="max-w-full max-h-full" // Asegura que no exceda el contenedor

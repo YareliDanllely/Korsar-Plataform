@@ -16,7 +16,13 @@ class Inspeccion(models.Model):
     fecha_inspeccion = models.DateField()
     fecha_siguiente_inspeccion = models.DateField(null=True, blank=True)
 
-    progreso = models.CharField(max_length=255)
+    # Opciones de progreso
+    PROGRESO_OPCIONES = (
+        (1, "Completado"),
+        (0, "No Completado"),  # Pendiente
+    )
+
+    progreso = models.IntegerField(choices=PROGRESO_OPCIONES, default=0)
 
     def belongs_to_company(self, uuid_company):
         return self.uuid_parque_eolico.uuid_empresa.uuid_empresa == uuid_company

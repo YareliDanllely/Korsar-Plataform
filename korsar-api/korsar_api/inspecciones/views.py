@@ -38,6 +38,46 @@ class InspeccionViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
+    @action(detail=False, methods=['get'], url_path='por-usuario')
+    def inspecciones_por_usuario(self, request):
+        """
+        Retorna las inspecciones dependiendo del tipo de usuario autenticado.
+        """
+        user = request.user
+
+        if user.is_tecnico():  # Usuario es Técnico
+            # Técnicos obtienen todas las inspecciones
+            inspecciones = Inspeccion.objects.all()
+
+        elif user.is_cliente():  # Usuario es Cliente
+            # Clientes obtienen inspecciones solo de su empresa
+            print("---CLIENTE",user.uuid_empresa)
+            if not user.uuid_empresa:
+                return Response(
+                    {"detail": "El usuario no está asociado a ninguna empresa."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            # Filtrar parques de la empresa del cliente
+            parques = ParquesEolicos.objects.filter(uuid_empresa=user.uuid_empresa)
+
+
+            # Filtrar inspecciones de esos parques
+            inspecciones = Inspeccion.objects.filter(uuid_parque_eolico__in=parques).exclude(progreso=0)
+
+        else:
+            # Si el tipo de usuario no es válido
+            return Response(
+                {"detail": "El rol del usuario no está autorizado para esta acción."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        # Serializar y retornar inspecciones
+        serializer = self.get_serializer(inspecciones, many=True)
+        return Response(serializer.data)
+
+
+
+
 
     @action(detail=True, methods=['get'], url_path='ultima-y-proxima-inspeccion')
     def ultima_y_proxima_inspeccion(self, request, pk=None):

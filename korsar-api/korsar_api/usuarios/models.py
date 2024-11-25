@@ -35,5 +35,13 @@ class Usuario(AbstractUser):
         verbose_name='user permissions',
     )
 
+    def is_tecnico(self):
+        """Devuelve True si el usuario es Técnico."""
+        return self.tipo_usuario == 1
+
+    def is_cliente(self):
+        """Devuelve True si el usuario es Cliente."""
+        return self.tipo_usuario == 2
+
     def __str__(self):
         return self.username

@@ -10,12 +10,10 @@ const api = axios.create({
 });
 
 
-
-
-// Obtener todas las inspecciones
 export const obtenerInspecciones = async () => {
+
   try {
-    const response = await api.get('/inspecciones/items', {
+    const response = await api.get('/inspecciones/items/por-usuario', {
       headers: obtenerEncabezadosAutenticacion(),
     });
 
@@ -24,7 +22,9 @@ export const obtenerInspecciones = async () => {
     console.error('Error al obtener las inspecciones:', error);
     throw new Error('No se pudieron cargar las inspecciones.');
   }
-};
+}
+
+
 
 // Cambiar progreso de inspección
 export const cambiarProgresoInspeccion = async (uuid_inspeccion: string, progreso: string) => {

@@ -47,7 +47,7 @@ export function AerogeneradorCarrusel({
 }: {
   uuid_parque_eolico: string;
   uuid_inspeccion: string;
-  cambioEstadoFinalAero: boolean;
+  cambioEstadoFinalAero?: boolean;
 }) {
   const [aerogeneradores, setAerogeneradores] = useState<AerogeneradorConEstado[]>([]);
   const [error, setError] = useState<string | null>(null);

@@ -49,7 +49,7 @@ export function MenuDesplegableAerogeneradores({
   useEffect(() => {
     const fetchComponentes = async () => {
       if (selectedAerogenerador) {
-        const data = await obtenerComponentesAerogenerador(selectedAerogenerador.uuid_aerogenerador, uuid_inspeccion);
+        const data = await obtenerComponentesAerogenerador(selectedAerogenerador.uuid_aerogenerador);
         setComponentes(data);
         if (data.length > 0) {
           setSelectedComponente(data[0]);

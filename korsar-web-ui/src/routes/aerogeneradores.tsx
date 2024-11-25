@@ -6,7 +6,6 @@ import { obtenerAnomaliasPorAerogenerador } from '../services/anomalias';
 import AnomaliasComponente from '../components/aerogeneradores/anomaliasComponentes';
 import { Anomalia, ParqueEolico } from '../utils/interfaces';
 import EstadoAerogeneradores from '../components/aerogeneradores/estadoAerogeneradores';
-import {claseColores} from "../utils/colores";
 import { obtenerAerogeneradoresPorParque } from "../services/aerogeneradores";
 import { obtenerParquesPorEmpresa } from '../services/parquesEolicos';
 import { Aerogenerador } from "../utils/interfaces";
@@ -121,8 +120,17 @@ function Aerogeneradores() {
 
 // -------------------------------------------------------------------------------------- //
 
+       const colores: Record<number, string> = {
+        1: "#E5E5E5",
+        2: "#34B0AD",
+        3: "#FCD023",
+        4: "#FF9500",
+        5: "#D9514E",
+      };
+
+
       {/* OBTENER COLOR DE SEVERIDAD */}
-      const obtenerColor = (number: number) => claseColores[number] || "";
+      const obtenerColor = (number: number) => colores[number] || "";
 
 
 // -------------------------------------------------------------------------------------- //
@@ -144,6 +152,7 @@ function Aerogeneradores() {
           try {
             if (ultimaInspeccion && aerogeneradoSeleccionado) {
               const response = await obtenerAnomaliasPorAerogenerador(aerogeneradoSeleccionado, ultimaInspeccion);
+              console.log("Anomalías del aerogenerador:", response);
 
               setAspasAnomalias({
                 helice_a: response.helice_a || [],
@@ -272,7 +281,7 @@ function Aerogeneradores() {
               {/* Gráfico o componente */}
               <div className="flex items-center justify-center">
                 <div className="relative w-full h-[400px] max-w-full max-h-full">
-                  <EstadoAerogeneradores colores={damageColors} ancho="100%" alto="100%" />
+                  <EstadoAerogeneradores colores={damageColors} ancho="200%" alto="200%" />
                 </div>
               </div>
 

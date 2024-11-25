@@ -12,7 +12,7 @@ export interface Anomalia {
     severidad_anomalia: number;      // IntegerField para choices, se mantiene como number en TypeScript
 
     dimension_anomalia: string;      // CharField mapeado a string
-    ubicacion_anomalia: string;      // CharField mapeado a string
+    ubicacion_componente: string;      // CharField mapeado a string
     orientacion_anomalia: string;    // CharField mapeado a string
     descripcion_anomalia: string;   // TextField, opcional en TypeScript
 
@@ -32,7 +32,7 @@ export interface InspeccionFront {
     nombre_parque: string;
     fecha_inspeccion: string;
     fecha_siguiente_inspeccion: string;
-    progreso: string;
+    progreso: number;
   }
 
 

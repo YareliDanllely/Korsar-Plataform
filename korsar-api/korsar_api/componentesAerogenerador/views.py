@@ -5,7 +5,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import action
 from estadoComponentes.models import EstadoComponente
-
+from aerogeneradores.models import Aerogenerador
+from parquesEolicos.models import ParquesEolicos
 
 
 class ComponenteAerogeneradorViewSet(viewsets.ModelViewSet):
@@ -72,3 +73,31 @@ class ComponenteAerogeneradorViewSet(viewsets.ModelViewSet):
         else:
             return Response({'error': 'No se encontró componente'}, status=status.HTTP_404_NOT_FOUND)
 
+
+
+
+    # Obtener todos los componentes de un aerogenerador
+    @action(detail=False, methods=['get'], url_path='componentes-por-aerogenerador')
+    def componentes_por_aerogenerador(self, request):
+        """
+        Listar todos los componentes de un aerogenerador
+        """
+
+        # Obtener parámetros de la URL
+        uuid_aerogenerador_url = request.query_params.get('uuid_aerogenerador')
+
+        # Validar que los parámetros no sean nulos
+        if not uuid_aerogenerador_url:
+            return Response({'error': 'Parámetro uuid_aerogenerador es requerido'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Filtrar los componentes por aerogenerador
+        componentes = ComponenteAerogenerador.objects.filter(uuid_aerogenerador=uuid_aerogenerador_url)
+
+        componentes_list = []
+        for componente in componentes:
+            componentes_list.append({
+                'uuid_componente': str(componente.uuid_componente),  # Convertir UUID a cadena
+                'tipo_componente': componente.tipo_componente
+            })
+
+        return Response(componentes_list, status=status.HTTP_200_OK)
