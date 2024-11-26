@@ -5,6 +5,8 @@ from rest_framework.response import Response
 from .serializers import EmpresaSerializer
 from rest_framework.decorators import action
 from rest_framework import status
+from usuarios.models import Usuario
+from utils.utils import is_valid_uuid
 from parquesEolicos.serializers import ParqueEolicoSerializer
 
 
@@ -16,6 +18,8 @@ class EmpresaViewSet(viewsets.ModelViewSet):
     serializer_class = EmpresaSerializer  # Se utiliza el serializador de empresas
     permission_classes = [IsAuthenticated]  # Solo usuarios autenticados pueden acceder
 
+#--------------------------------------------------------------------#
+
     # Obtener todos los parques asociados a una empresa
     @action(detail=True, methods=['get'], url_path='parques')
     def get_parques_de_empresa(self, request, pk=None):
@@ -23,6 +27,8 @@ class EmpresaViewSet(viewsets.ModelViewSet):
         Obtenemos toda la información de los parques asociados a una empresa en particular.
         """
         try:
+
+
             # Obtenemos la empresa correspondiente usando el PK
             empresa = self.get_object()
 
@@ -37,18 +43,37 @@ class EmpresaViewSet(viewsets.ModelViewSet):
         except Empresa.DoesNotExist:
             return Response({'error': 'Empresa no encontrada'}, status=status.HTTP_404_NOT_FOUND)
 
+
+#--------------------------------------------------------------------#
+
+
     # Obtener información de una empresa por su UUID
     @action(detail=False, methods=['get'], url_path='empresa-por-uuid')
     def get_empresa_por_uuid(self, request):
         """
         Obtenemos toda la información de una empresa en particular, dado su UUID.
         """
+        # Obtener usuario autenticado
+        user = request.user
+
+        # Obtener y validar el parámetro uuid_empresa
         uuid_empresa = request.query_params.get('uuid_empresa')
-        if not uuid_empresa:
-            return Response({'error': 'El parámetro uuid_empresa es requerido'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not uuid_empresa or not is_valid_uuid(uuid_empresa):
+            return Response({'error': 'El parámetro uuid_empresa es requerido y debe ser válido'},
+                            status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            # Obtenemos la empresa correspondiente usando el UUID
+            # Validar acceso del usuario si es cliente
+            if user.is_cliente:
+                if not Usuario.objects.filter(
+                    uuid_usuario=user.uuid_usuario,
+                    uuid_empresa__uuid_empresa=uuid_empresa
+                ).exists():
+                    return Response({'error': 'No tiene acceso a la empresa solicitada'},
+                                    status=status.HTTP_403_FORBIDDEN)
+
+            # Obtener la empresa correspondiente usando el UUID
             empresa = Empresa.objects.get(uuid_empresa=uuid_empresa)
 
             # Serializamos la empresa para devolverla como JSON
@@ -56,8 +81,21 @@ class EmpresaViewSet(viewsets.ModelViewSet):
 
             # Retornamos la empresa en el formato JSON
             return Response(serializer.data, status=status.HTTP_200_OK)
-        except Empresa.DoesNotExist:
-            return Response({'error': 'Empresa no encontrada'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Manejo de excepciones
+        except (Empresa.DoesNotExist, ValueError) as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        except PermissionError as e:
+            return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
+
+        except Exception as e:
+         return Response({'error': 'Error interno del servidor', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+
+#--------------------------------------------------------------------#
 
     # Obtener todas las empresas
     @action(detail=False, methods=['get'], url_path='todas-las-empresas')

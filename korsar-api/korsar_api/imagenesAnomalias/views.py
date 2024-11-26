@@ -22,7 +22,11 @@ class ImagenAnomaliaViewSet(viewsets.ModelViewSet):
         """
         Obtener todas las imágenes asociadas a una anomalía
         """
+        # Obtener usuario autenticado
+        user = request.user
+
         uuid_anomalia = request.query_params.get('uuid_anomalia')
+
 
         # Filtramos las imágenes por anomalía
         imagenes_anomalias = ImagenAnomalia.objects.filter(uuid_anomalia=uuid_anomalia)

@@ -267,15 +267,6 @@ const RevisarInspeccionClientes: React.FC = () => {
                             </Dropdown>
                         </div>
 
-                        {/* <div className="flex justify-end">
-                            <Button
-                                className="text-sm py-0 px-1 bg-korsar-turquesa-viento text-white rounded-xl ml-auto"
-                                onClick={buscarAnomalias}
-                                >
-                                Buscar
-
-                            </Button>
-                        </div> */}
 
                         <div className='w-full justify-center items-center mt-4 p-4'>
                             <VisualizadorAnomalias

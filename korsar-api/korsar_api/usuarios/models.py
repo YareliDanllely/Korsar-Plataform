@@ -20,25 +20,12 @@ class Usuario(AbstractUser):
     uuid_empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE, null=True, blank=True)  # Permitir valores nulos
     telefono = models.CharField(max_length=20, blank=True, null=True)
 
-    groups = models.ManyToManyField(
-        'auth.Group',
-        related_name='usuarios_user_set',
-        blank=True,
-        help_text='The groups this user belongs to.',
-        verbose_name='groups',
-    )
-    user_permissions = models.ManyToManyField(
-        'auth.Permission',
-        related_name='usuarios_user_permissions_set',
-        blank=True,
-        help_text='Specific permissions for this user.',
-        verbose_name='user permissions',
-    )
-
+    @property
     def is_tecnico(self):
         """Devuelve True si el usuario es Técnico."""
         return self.tipo_usuario == 1
 
+    @property
     def is_cliente(self):
         """Devuelve True si el usuario es Cliente."""
         return self.tipo_usuario == 2

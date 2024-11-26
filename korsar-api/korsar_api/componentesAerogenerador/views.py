@@ -4,9 +4,9 @@ from .models import ComponenteAerogenerador
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import action
-from estadoComponentes.models import EstadoComponente
 from aerogeneradores.models import Aerogenerador
-from parquesEolicos.models import ParquesEolicos
+from utils.utils import is_valid_uuid
+
 
 
 class ComponenteAerogeneradorViewSet(viewsets.ModelViewSet):
@@ -18,63 +18,51 @@ class ComponenteAerogeneradorViewSet(viewsets.ModelViewSet):
     serializer_class = ComponenteAerogenerador
     permission_classes = [IsAuthenticated]  # Solo usuarios autenticados pueden acceder
 
-    # Obtener listado de todos los componentes con su estado final, por aerogenerador e inspección en específico
-    @action(detail=False, methods=['get'], url_path='estado-por-inspeccion-aerogenerador')
-    def listar_por_aerogenerador_inspeccion(self, request):
-        """
-        Listar todos los componentes, con su estado final, por aerogenerador e inspección en específico
-        """
+ #----------------------------------------------------------------------------------------------------------#
 
-        # Obtener parámetros de la URL
-        uuid_aerogenerador_url = request.query_params.get('uuid_aerogenerador')
-        uuid_inspeccion_url = request.query_params.get('uuid_inspeccion')
-
-        # Validar que los parámetros no sean nulos
-        if not uuid_aerogenerador_url or not uuid_inspeccion_url:
-            return Response({'error': 'Parámetros uuid_aerogenerador y uuid_inspeccion son requeridos'}, status=status.HTTP_400_BAD_REQUEST)
-
-        # Filtrar los componentes por aerogenerador
-        componentes = ComponenteAerogenerador.objects.filter(uuid_aerogenerador=uuid_aerogenerador_url)
-
-        # Filtrar el estado final de los componentes por inspección
-        componentes_con_estado = []
-        for componente in componentes:
-            # Obtener el estado final del componente en la inspección
-            estado_final = EstadoComponente.objects.filter(uuid_componente=componente.uuid_componente, uuid_inspeccion=uuid_inspeccion_url).first()
-
-            if estado_final:
-                componentes_con_estado.append({
-                    'uuid_componente': str(componente.uuid_componente),  # Convertir UUID a cadena
-                    'tipo_componente': componente.tipo_componente,
-                    'estado_final': estado_final.estado_final_clasificacion,
-                    'progreso': estado_final.progreso
-                })
-
-        return Response(componentes_con_estado, status=status.HTTP_200_OK)
-
-
-
-    # Obtener el tipo de un componente por su uuid unico
+    # OBTENER EL TIPO DE COMPONENTE
     @action(detail=False, methods=['get'], url_path='tipo-componente')
     def tipo_componente(self,request):
         """
         Obtiene el tipo del componente en base a su identificador unico
         """
+        # Obtener usuario autenticado
+        user = request.user
 
+        # Obtener parámetros de la URL
         uuid_componente_url = request.query_params.get('uuid_componente')
 
-        if not uuid_componente_url:
-            return Response({'error': 'Parámetro uuid_componente es requerido'}, status=status.HTTP_400_BAD_REQUEST)
+        # Validar que los parámetros no sean nulos
+        if not uuid_componente_url or not is_valid_uuid(uuid_componente_url):
+            return Response({'error': 'Parámetro uuid_componente es requerido y debe ser valido'}, status=status.HTTP_400_BAD_REQUEST)
 
-        componente = ComponenteAerogenerador.objects.filter(uuid_componente=uuid_componente_url).first()
+        try:
+            # Validar acceso del usuario al aerogenerador
+            if user.is_cliente:
+                if not ComponenteAerogenerador.objects.filter(
+                    uuid_componente=uuid_componente_url,
+                    uuid_aerogenerador__uuid_parque_eolico__uuid_empresa__uuid_empresa=user.uuid_empresa_uuid_empresa
+                    ).exists():
+                    return Response({'error': 'No tiene acceso a este componente'}, status=status.HTTP_403_FORBIDDEN)
 
-        if componente:
-            return Response({'tipo_componente': componente.tipo_componente}, status=status.HTTP_200_OK)
-        else:
-            return Response({'error': 'No se encontró componente'}, status=status.HTTP_404_NOT_FOUND)
+
+            componente = ComponenteAerogenerador.objects.filter(uuid_componente=uuid_componente_url).first()
+
+            if componente:
+                return Response({'tipo_componente': componente.tipo_componente}, status=status.HTTP_200_OK)
+
+         # Manejo de excepciones
+        except (ComponenteAerogenerador.DoesNotExist, ValueError) as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        except PermissionError as e:
+            return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
+
+        except Exception as e:
+            return Response({'error': 'Error interno del servidor', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-
+#----------------------------------------------------------------------------------------------------------#
 
     # Obtener todos los componentes de un aerogenerador
     @action(detail=False, methods=['get'], url_path='componentes-por-aerogenerador')
@@ -82,22 +70,46 @@ class ComponenteAerogeneradorViewSet(viewsets.ModelViewSet):
         """
         Listar todos los componentes de un aerogenerador
         """
+        # Obtener usuario autenticado
+        user = request.user
 
-        # Obtener parámetros de la URL
+        # Obtener los parámetros de la URL
         uuid_aerogenerador_url = request.query_params.get('uuid_aerogenerador')
 
         # Validar que los parámetros no sean nulos
-        if not uuid_aerogenerador_url:
-            return Response({'error': 'Parámetro uuid_aerogenerador es requerido'}, status=status.HTTP_400_BAD_REQUEST)
+        if not uuid_aerogenerador_url or not is_valid_uuid(uuid_aerogenerador_url):
+            return Response({'error': 'El parámetro uuid_aerogenerador es requerido y debe ser válido'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Filtrar los componentes por aerogenerador
-        componentes = ComponenteAerogenerador.objects.filter(uuid_aerogenerador=uuid_aerogenerador_url)
+        try:
+            # Validar acceso del usuario al aerogenerador
+            if user.is_cliente:
+                  if not Aerogenerador.objects.filter(
+                    uuid_aerogenerador=uuid_aerogenerador_url,
+                    uuid_parque_eolico__uuid_empresa__uuid_empresa=user.uuid_empresa
 
-        componentes_list = []
-        for componente in componentes:
-            componentes_list.append({
-                'uuid_componente': str(componente.uuid_componente),  # Convertir UUID a cadena
-                'tipo_componente': componente.tipo_componente
-            })
+                ).exists():
+                    return Response({'error': 'No tiene acceso a este aerogenerador'}, status=status.HTTP_403_FORBIDDEN)
 
-        return Response(componentes_list, status=status.HTTP_200_OK)
+            # Filtrar los componentes por aerogenerador
+            componentes = ComponenteAerogenerador.objects.filter(uuid_aerogenerador=uuid_aerogenerador_url)
+
+            componentes_list = []
+            for componente in componentes:
+                componentes_list.append({
+                    'uuid_componente': str(componente.uuid_componente),  # Convertir UUID a cadena
+                    'tipo_componente': componente.tipo_componente
+                })
+
+            return Response(componentes_list, status=status.HTTP_200_OK)
+
+
+        # Manejo de excepciones
+        except (Aerogenerador.DoesNotExist, ValueError) as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        except PermissionError as e:
+            return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
+
+        except Exception as e:
+            return Response({'error': 'Error interno del servidor', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+

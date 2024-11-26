@@ -238,25 +238,35 @@ class InspeccionViewSet(viewsets.ModelViewSet):
         return Response(respuesta, status=status.HTTP_200_OK)
 
 
-    #Obtener informacion de la ultima inspeccion por parque eolico
     @action(detail=False, methods=['get'], url_path='informacion-ultima-inspeccion')
     def informacion_ultima_inspeccion(self, request):
         """
-        Obtener la información de la última inspección por parque eólico
+        Obtener la información de la última inspección completada por parque eólico.
         """
+        # Obtener el parámetro de la solicitud
         uuid_parque_eolico = request.query_params.get('uuid_parque_eolico')
 
+        # Validar que el parámetro no sea nulo
         if not uuid_parque_eolico:
-            return Response({'error': 'uuid_parque_eolico es requerido'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'El parámetro uuid_parque_eolico es requerido'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            # Filtrar la última inspección por parque eólico
-            ultima_inspeccion = Inspeccion.objects.filter(uuid_parque_eolico=uuid_parque_eolico).latest('fecha_inspeccion')
+            # Filtrar la última inspección completada por parque eólico (excluyendo progreso=0)
+            ultima_inspeccion = Inspeccion.objects.filter(
+                uuid_parque_eolico=uuid_parque_eolico
+            ).exclude(progreso=0).latest('fecha_inspeccion')
+
+            # Serializar y retornar la información de la inspección
             serializer = self.get_serializer(ultima_inspeccion)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        except Inspeccion.DoesNotExist:
-            return Response({'error': 'No se encontró inspección'}, status=status.HTTP_404_NOT_FOUND)
 
+        except Inspeccion.DoesNotExist:
+            return Response({'error': 'No se encontró ninguna inspección completada para el parque eólico indicado'},
+                            status=status.HTTP_404_NOT_FOUND)
+
+        except Exception as e:
+            return Response({'error': 'Error interno del servidor', 'details': str(e)},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 # class InspeccionViewSet(viewsets.ModelViewSet):

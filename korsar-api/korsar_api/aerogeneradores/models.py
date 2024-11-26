@@ -1,6 +1,7 @@
 from django.db import models
 import uuid
 
+
 class Aerogenerador(models.Model):
     """
     Modelo Aerogenerador usando UUID como clave primaria.
@@ -9,7 +10,7 @@ class Aerogenerador(models.Model):
     # Llave primaria UUID
     uuid_aerogenerador = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
-    # Relaciones con parque eólico
+    # Relación con el parque eólico
     uuid_parque_eolico = models.ForeignKey('parquesEolicos.ParquesEolicos', on_delete=models.CASCADE)
 
     # Campos
@@ -22,8 +23,6 @@ class Aerogenerador(models.Model):
     coordenada_longitud = models.FloatField()
     coordenada_latitud = models.FloatField()
 
-    def belongs_to_company(self, uuid_company):
-        return self.uuid_parque_eolico.uuid_company == uuid_company
 
     def __str__(self):
         return f"Aerogenerador {self.numero_aerogenerador} - {self.modelo_aerogenerador}"

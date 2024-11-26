@@ -58,7 +58,6 @@ INSTALLED_APPS = [
     'imagenes',
     'imagenesAnomalias',
     'componentesAerogenerador',
-    'estadoComponentes',
     'django_extensions',
 ]
 

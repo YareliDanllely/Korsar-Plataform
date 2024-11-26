@@ -101,7 +101,7 @@ const ParquesEolicos: React.FC = () => {
         try {
           const response = await obtenerAerogeneradores(uuid_parque_eolico, ultimaInspeccion.uuid_inspeccion);
           setEstadoAerogeneradores(response);
-          console.log("Aerogeneradores con estado:", response);
+          console.log("Aerogeneradores con SDADASDAestado:", response);
 
           // Seleccionar el primer aerogenerador por defecto si existen
           if (response.length > 0) {

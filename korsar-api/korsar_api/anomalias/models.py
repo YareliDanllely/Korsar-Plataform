@@ -49,7 +49,6 @@ class Anomalia(models.Model):
     descripcion_anomalia = models.TextField()
 
 
-
     def __str__(self):
         return f"Anomalía {self.codigo_anomalia} - Severidad {self.severidad_anomalia}"
 

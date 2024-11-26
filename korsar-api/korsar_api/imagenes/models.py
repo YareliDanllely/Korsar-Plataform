@@ -32,8 +32,6 @@ class Imagen(models.Model):
         default='no_clasificada'
     )
 
-    def belongs_to_company(self, uuid_company):
-        return self.uuid_aerogenerador.uuid_parque_eolico.uuid_empresa== uuid_company
 
     def __str__(self):
         return f"Imagen {self.nombre_imagen} - Inspección {self.uuid_inspeccion}"

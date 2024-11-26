@@ -4,10 +4,9 @@ from aerogeneradores.models import Aerogenerador
 from estadoAerogeneradores.models import EstadoAerogenerador
 from inspecciones.models import Inspeccion
 
-
 class ComponenteAerogenerador(models.Model):
     """
-    Definir el modelo ComponenteAerogenerador para la base de datos
+    Modelo ComponenteAerogenerador para la base de datos
     """
 
     # LLave primaria UUID
@@ -30,9 +29,6 @@ class ComponenteAerogenerador(models.Model):
         max_length=50,
         choices=TIPO_COMPONENTE_CHOICES,
     )
-
-    def belongs_to_company(self, uuid_company):
-        return self.uuid_aerogenerador.uuid_parque_eolico.uuid_empresa.uuid_company == uuid_company
 
     def __str__(self):
         return f"Componente {self.get_tipo_componente_display()} del Aerogenerador {self.uuid_aerogenerador}"

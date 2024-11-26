@@ -15,7 +15,7 @@ export const obtenerAnomaliasFiltradas = async (uuid_turbina:string, uuid_compon
 
   try {
     // Asegúrate de que los nombres de los parámetros coincidan con los que espera el backend
-    const response = await api.get('/anomalias/recientes/', {
+    const response = await api.get('/anomalias/items/filtrar-por-aerogenerador-componente-inspeccion', {
       headers: {
         Authorization: `Bearer ${token}`,
       },

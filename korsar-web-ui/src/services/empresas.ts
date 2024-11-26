@@ -12,7 +12,7 @@ export const obtenerEmpresas = async (uuid_empresa: string): Promise<Empresa> =>
     const token = localStorage.getItem('token');
 
     try {
-        const response = await api.get('/empresas/items/empresa_por_uuid', {
+        const response = await api.get('/empresas/items/empresa-por-uuid', {
             headers: {
             Authorization: `Bearer ${token}`,
             },
