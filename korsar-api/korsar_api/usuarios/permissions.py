@@ -1,34 +1,16 @@
 from rest_framework.permissions import BasePermission
 
-class IsTechnicianOrReadOnlyForClient(BasePermission):
+class AccesoEmpresa(BasePermission):
     """
-    Permiso que permite a técnicos realizar cualquier acción,
-    y a clientes únicamente realizar operaciones de lectura (GET).
+    Permite acceso completo a los técnicos y controla el acceso de los clientes basado en su empresa.
     """
-    def has_permission(self, request, view):
-        if not request.user.is_authenticated:
-            return False
-
-        # Técnicos tienen acceso total
-        if request.user.is_tecnico:
-            return True
-
-        # Clientes solo tienen acceso de lectura
-        if request.user.is_cliente:
-            return request.method in ['GET']
-
-        return False
 
     def has_object_permission(self, request, view, obj):
-        # Técnicos tienen acceso total a cualquier objeto
         if request.user.is_tecnico:
-            return True
+            return True  # Los técnicos tienen acceso a todos los objetos
 
-        # Clientes pueden acceder a sus propios datos si se define `belongs_to_user` en el modelo
         if request.user.is_cliente:
-            if hasattr(obj, 'belongs_to_user'):
-                return obj.belongs_to_user(request.user.uuid_empresa)
-            # Si no hay método definido, denegar por defecto
-            return False
+            # Verifica si el cliente tiene acceso a la empresa asociada al objeto
+            return obj.usuario_tiene_acceso(request.user.uuid_usuario)
 
         return False

@@ -1,9 +1,8 @@
 import uuid
 from django.db import models
-from utils.mixin import ValidacionAccesoMixin
 from inspecciones.models import Inspeccion
 
-class EstadoAerogenerador(models.Model, ValidacionAccesoMixin):
+class EstadoAerogenerador(models.Model):
     """
     Modelo de la tabla EstadoAerogeneradores
     """
@@ -25,15 +24,14 @@ class EstadoAerogenerador(models.Model, ValidacionAccesoMixin):
 
     estado_final_clasificacion = models.IntegerField(choices=SEVERIDAD_CHOICES, null=True, blank=True)
 
-    def pertenece_a_empresa(self, uuid_empresa):
+    def existe_estado_para_usuario(uuid_estado, user):
         """
-        Verifica si la Anomalia pertenece a una empresa específica.
-
-        :param uuid_empresa: UUID de la empresa que se desea verificar.
-        :return: True si pertenece a la empresa, False en caso contrario.
+        Verifica si un estado con el UUID dado pertenece a la empresa del usuario.
         """
-        return self.uuid_aerogenerador.uuid_parque_eolico.uuid_empresa.uuid_empresa == uuid_empresa
 
+        return EstadoAerogenerador.objects.filter(
+            uuid_estado=uuid_estado,
+            uuid_aerogenerador__uuid_parque_eolico__uuid_empresa=user.uuid_empresa.uuid_empresa).exists()
 
     def __str__(self):
         return f"Estado {self.estado_final_clasificacion} del Aerogenerador {self.uuid_aerogenerador}"

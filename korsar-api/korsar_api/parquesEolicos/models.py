@@ -1,9 +1,8 @@
 import uuid
 from django.db import models
 from empresas.models import Empresa
-from utils.mixin import ValidacionAccesoMixin
 
-class ParquesEolicos(models.Model, ValidacionAccesoMixin):
+class ParquesEolicos(models.Model):
     """
     Modelo que representa los parques eólicos.
     """
@@ -24,16 +23,14 @@ class ParquesEolicos(models.Model, ValidacionAccesoMixin):
     # Relación con Empresa: Un parque está asociado a una empresa
     uuid_empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE, related_name='parques')
 
-    def pertenece_a_empresa(self, uuid_empresa):
+    def existe_parque_para_usuario(uuid_parque_eolico, user):
         """
-        Verifica si la Anomalia pertenece a una empresa específica.
-
-        :param uuid_empresa: UUID de la empresa que se desea verificar.
-        :return: True si pertenece a la empresa, False en caso contrario.
+        Verifica si un parque con el UUID dado pertenece a la empresa del usuario.
         """
-        return self.uuid_empresa.uuid_empresa == uuid_empresa
 
-
+        return ParquesEolicos.objects.filter(
+            uuid_parque_eolico=uuid_parque_eolico,
+            uuid_empresa=user.uuid_empresa.uuid_empresa).exists()
 
     def __str__(self):
         return self.nombre_parque

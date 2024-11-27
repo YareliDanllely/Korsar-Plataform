@@ -32,4 +32,3 @@ class AerogeneradorAdmin(admin.ModelAdmin):
         return obj.uuid_parque_eolico.nombre_parque  # Acceder al nombre del parque relacionado
     get_nombre_parque_eolico.short_description = 'Nombre del Parque'
 
-    # Si id_ultimo_estado no existe en el modelo, se omite get_ultimo_estado

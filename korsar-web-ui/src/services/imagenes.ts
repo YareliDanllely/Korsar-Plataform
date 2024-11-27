@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { obtenerEncabezadosAutenticacion } from '../utils/apiUtils';
 
 const BASE_URL = 'http://localhost:8000/api';
 
@@ -6,15 +7,13 @@ const api = axios.create({
   baseURL: BASE_URL,
 });
 
+//----------------------------------------------------------------------------------------------//
+
 // Función para obtener imágenes filtradas
 export const obtenerImagenesFiltradas = async (uuid_aerogenerador: string, uuid_componente: string, uuid_parque: string) => {
-  const token = localStorage.getItem('token');
-
   try {
     const response = await api.get('/imagenes/filtrar/', {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      headers: obtenerEncabezadosAutenticacion(),
       params: {
         aerogeneradores: uuid_aerogenerador, // Parámetro 'aerogeneradores' para el UUID del aerogenerador
         componente: uuid_componente,          // Parámetro 'componente' para el UUID del componente

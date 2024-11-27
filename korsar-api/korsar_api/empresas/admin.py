@@ -13,3 +13,6 @@ class EmpresaAdmin(admin.ModelAdmin):
     # Permitir la búsqueda por nombre de empresa
     search_fields = ('nombre_empresa',)
 
+
+    def __str__(self):
+        return f"{self.nombre_empresa} (ID: {self.uuid_empresa})"

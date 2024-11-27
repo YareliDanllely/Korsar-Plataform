@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { ImagenAnomaliaFront, ImagenAnomaliaPost } from '../utils/interfaces';
+import { obtenerEncabezadosAutenticacion } from '../utils/apiUtils';
 
 const BASE_URL = 'http://localhost:8000/api';
 
@@ -9,6 +10,7 @@ const api = axios.create({
 });
 
 
+//----------------------------------------------------------------------------------------------//
 
 export const crearImagenAnomalia = async (data: ImagenAnomaliaPost): Promise<void> => {
     const token = localStorage.getItem('token');
@@ -27,40 +29,36 @@ export const crearImagenAnomalia = async (data: ImagenAnomaliaPost): Promise<voi
   };
 
 
-  export const obtenerImagenesAnomalia = async (uuid_anomalia: string): Promise<ImagenAnomaliaFront[]> => {
-    const token = localStorage.getItem('token');
+//----------------------------------------------------------------------------------------------//
 
-    try {
-      const response = await api.get(`/imagenes-anomalias/items/filtrar-anomalias/`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        params: {
-          uuid_anomalia,
-        },
-      });
+    export const obtenerImagenesAnomalia = async (uuid_anomalia: string): Promise<ImagenAnomaliaFront[]> => {
 
-      return response.data;
-    } catch (error) {
-      console.error('Error al obtener las imágenes de la anomalía:', error);
-      throw error;
-    }
-  }
+      try {
+          // Ajustamos la URL para incluir uuid_anomalia como parte del path
+          const response = await api.get(`/imagenes-anomalias/items/${uuid_anomalia}/`, {
+            headers: obtenerEncabezadosAutenticacion(),
+
+          });
+
+          return response.data; // Devuelve las imágenes de la anomalía
+      } catch (error) {
+          console.error('Error al obtener las imágenes de la anomalía:', error);
+          throw error;
+      }
+    };
 
 
 
-// Eliminar múltiples imágenes asociadas a una anomalía
+//----------------------------------------------------------------------------------------------//
+
+
 export const eliminarImagenesAnomalias = async (imagenesIds: string[]): Promise<void> => {
-  const token = localStorage.getItem('token');
 
   try {
-    await api.post(
-      `/imagenes-anomalias/eliminar-imagenes/`,
+    await api.post(`/imagenes-anomalias/eliminar-imagenes/`,
       { imagenes_ids: imagenesIds }, // Enviar la lista de IDs en el cuerpo
       {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: obtenerEncabezadosAutenticacion(),
       }
     );
   } catch (error) {

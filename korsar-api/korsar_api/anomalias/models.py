@@ -49,6 +49,16 @@ class Anomalia(models.Model):
     descripcion_anomalia = models.TextField()
 
 
+    def existe_anomalia_para_usuario(uuid_anomalia, user):
+        """
+        Verifica si una anomalía con el UUID dado pertenece a la empresa del usuario.
+        """
+
+        return Anomalia.objects.filter(
+            uuid_anomalia=uuid_anomalia,
+            uuid_aerogenerador__uuid_parque_eolico__uuid_empresa=user.uuid_empresa.uuid_empresa).exists()
+
+
     def __str__(self):
         return f"Anomalía {self.codigo_anomalia} - Severidad {self.severidad_anomalia}"
 

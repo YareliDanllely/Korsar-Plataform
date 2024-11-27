@@ -24,5 +24,16 @@ class Aerogenerador(models.Model):
     coordenada_latitud = models.FloatField()
 
 
+    @staticmethod
+    def existe_aerogenerador_para_usuario(uuid_aerogenerador, user):
+        """
+        Verifica si un aerogenerador con el UUID dado pertenece a la empresa del usuario.
+        """
+
+        return Aerogenerador.objects.filter(
+            uuid_aerogenerador=uuid_aerogenerador,
+            uuid_parque_eolico__uuid_empresa=user.uuid_empresa.uuid_empresa).exists()
+
+
     def __str__(self):
         return f"Aerogenerador {self.numero_aerogenerador} - {self.modelo_aerogenerador}"

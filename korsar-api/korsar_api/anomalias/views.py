@@ -5,10 +5,13 @@ from django.db.models import Count
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from .models import Aerogenerador
+from utils.validarAcceso import ValidarAcceso
+from rest_framework.exceptions import ValidationError
 from collections import defaultdict
 from utils.utils import is_valid_uuid
 from rest_framework import status
 from inspecciones.models import Inspeccion
+from componentesAerogenerador.models import ComponenteAerogenerador
 from rest_framework import generics
 from .serializers import AnomaliaSerializer
 import re
@@ -20,45 +23,34 @@ class AnomaliaViewSet(viewsets.ModelViewSet):
 
 #----------------------------------------------------------------------------------------------------------#
 
+
     # OBTENER LA CANTIDAD DE SEVERIDADES DE DAÑOS POR INSPECCIÓN
-    @action(detail=False, methods=['get'], url_path='severidades-por-inspeccion')
-    def obtener_severidades_por_inspeccion(self, request):
+    @action(detail=True, methods=['get'], url_path='severidades-por-inspeccion')
+    def obtener_severidades_por_inspeccion(self, request, pk=None):
         """
         Obtener la cantidad de severidades de daños por inspección.
-        params: uuid_inspeccion
-        return: lista de severidades
         """
-        # Obtener usuario autenticado
-        user = request.user
-
-        uuid_inspeccion_url = request.query_params.get('uuid_inspeccion')
-
-        if not uuid_inspeccion_url or not is_valid_uuid(uuid_inspeccion_url):
-            return Response({'error': 'El parámetro uuid_inspeccion no es requerido y debe es válido'},
-                            status=status.HTTP_400_BAD_REQUEST)
-
+        validador = ValidarAcceso(request.user)
         try:
-            # Validar que la inspección pertenece a la empresa del usuario
-            if user.is_cliente:
-                # Validar que la inspección pertenece a la empresa del usuario
-                if not Inspeccion.objects.filter(
-                    uuid_inspeccion=uuid_inspeccion_url,
-                    uuid_parque_eolico__uuid_empresa__uuid_empresa=user.uuid_empresa.uuid_empresa
-                    ).exists():
-                        return Response({'error': 'No tiene acceso a la inspección'},
-                                        status=status.HTTP_403_FORBIDDEN)
+            # Validar pk de inspección
+            validador.validar_pk(
+                pk=pk,
+                metodo_validacion=Inspeccion.existe_inspeccion_para_usuario
+            )
 
-            # Filtrar anomalías por uuid_inspeccion (después de validar acceso)
-            anomalias = Anomalia.objects.filter(uuid_inspeccion=uuid_inspeccion_url)
-
-            # Obtener las severidades de las anomalías
+            # Filtrar anomalías por inspección
+            anomalias = Anomalia.objects.filter(uuid_inspeccion=pk)
             severidades = anomalias.values_list('severidad_anomalia', flat=True)
+
             return Response({'severidades': list(severidades)}, status=status.HTTP_200_OK)
 
         # Manejo de excepciones
         except (Anomalia.DoesNotExist, ValueError) as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+        except ValidationError as e:
+            return Response({'error': e.detail}, status=status.HTTP_400_BAD_REQUEST)
+
         except PermissionError as e:
             return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
 
@@ -66,54 +58,48 @@ class AnomaliaViewSet(viewsets.ModelViewSet):
             return Response({'error': 'Error interno del servidor', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+
+
 #----------------------------------------------------------------------------------------------------------#
 
-
     # OBTENER LA CANTIDAD DE SEVERIDADES DE DAÑOS POR COMPONENTE
-    @action(detail=False, methods=['get'], url_path='severidades-por-componente')
-    def obtener_severidades_por_componente(self, request):
+    @action(detail=True, methods=['get'], url_path='severidades-por-componente')
+    def obtener_severidades_por_componente(self, request,  pk=None):
         """
         Obtener la cantidad de severidades de daños por componente.
         params: uuid_inspeccion
         return: lista con cantidad de serveridades
         """
         # Obtener usuario autenticado
-        user = request.user
-
-        # Obtener los parámetros de la URL
-        uuid_inspeccion_url = request.query_params.get('uuid_inspeccion')
-
-        # Validar que el parámetro uuid_inspeccion no sea nulo y sea válido
-        if not uuid_inspeccion_url or not is_valid_uuid(uuid_inspeccion_url):
-            return Response({'error': 'uuid_inspeccion es requerido'}, status=status.HTTP_400_BAD_REQUEST)
+        validador = ValidarAcceso(request.user)
 
         try:
-            # Validar acceso del usuarrio
-            if user.is_cliente:
-                if not Anomalia.objects.filter(
-                    uuid_inspeccion=uuid_inspeccion_url,
-                    uuid_inspeccion__uuid_parque_eolico__uuid_empresa__uuid_empresa=user.uuid_empresa.uuid_empresa
-                ).exists():
-                    return Response({'error': 'No tiene acceso a la inspección'},
-                                    status=status.HTTP_403_FORBIDDEN)
-
-            # Filtrar anomalías por uuid_inspeccion
-            resultados = (
-                Anomalia.objects.filter(uuid_inspeccion=uuid_inspeccion_url)
-                .values('uuid_componente__tipo_componente', 'severidad_anomalia')
-                .annotate(cantidad=Count('severidad_anomalia'))
+            # Validar pk de inspección
+            validador.validar_pk(
+                pk=pk,
+                metodo_validacion=Inspeccion.existe_inspeccion_para_usuario
             )
-            return Response({'resultados': list(resultados)}, status=status.HTTP_200_OK)
+
+            # Filtrar anomalías por inspección
+            anomalias = Anomalia.objects.filter(uuid_inspeccion=pk)
+            severidades = anomalias.values_list('severidad_anomalia', flat=True)
+
+            return Response({'severidades': list(severidades)}, status=status.HTTP_200_OK)
+
 
         # Manejo de excepciones
         except (Anomalia.DoesNotExist, ValueError) as e:
-             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        except ValidationError as e:
+            return Response({'error': e.detail}, status=status.HTTP_400_BAD_REQUEST)
 
         except PermissionError as e:
             return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
 
         except Exception as e:
             return Response({'error': 'Error interno del servidor', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 
 
@@ -121,39 +107,26 @@ class AnomaliaViewSet(viewsets.ModelViewSet):
 
 
     # OBTENER EL SIGUENTE NUMERO DE DAÑO PARA UNA ANOMALIA
-    @action(detail=False, methods=['get'], url_path='siguiente-numero-dano')
-    def obtener_siguiente_numero_damage(self, request):
+    @action(detail=True, methods=['get'], url_path='siguiente-numero-dano')
+    def obtener_siguiente_numero_damage(self, request, pk=None):
         """
         Obtener el siguente numero de daño para una anomalía.
         params: uuid_componente
         return: siguiente número de daño
         """
-
-        # Obtener usuario autenticado
-        user = request.user
-
-        # Obtener uuid_componente de los parámetros de la URL
-        uuid_componente_url = request.query_params.get('uuid_componente')
-
-        # Validar que el parámetro uuid_componente no sea nulo y sea válido
-        if not uuid_componente_url or not is_valid_uuid(uuid_componente_url):
-            return Response({'error': 'uuid_componente es requerido'}, status=status.HTTP_400_BAD_REQUEST)
+        validador = ValidarAcceso(request.user)
 
         try:
+            # Validar pk de inspección
+            validador.validar_pk(
+                pk=pk,
+                metodo_validacion=Inspeccion.existe_inspeccion_para_usuario
+            )
+
             # Filtrar anomalías por uuid_componente
-            anomalias = Anomalia.objects.filter(uuid_componente=uuid_componente_url)
+            anomalias = Anomalia.objects.filter(uuid_componente=pk)
 
-            # Validar acceso del usuario
-            if user.is_cliente:
-                # Validar que el componente pertenece a la empresa del usuario
-                if not Anomalia.objects.filter(
-                uuid_componente=uuid_componente_url,
-                uuid_aerogenerador__uuid_parque_eolico__uuid_empresa__uuid_empresa=user.uuid_empresa.uuid_empresa
-                ).exists():
-                    return Response({'error': 'No tiene acceso a las anomalías del componente'},
-                                    status=status.HTTP_403_FORBIDDEN)
-
-            # Lista para almacenar números de daño
+             # Lista para almacenar números de daño
             numero_damage = []
 
             for anomalia in anomalias:
@@ -170,13 +143,18 @@ class AnomaliaViewSet(viewsets.ModelViewSet):
 
         # Manejo de excepciones
         except (Anomalia.DoesNotExist, ValueError) as e:
-             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        except ValidationError as e:
+            return Response({'error': e.detail}, status=status.HTTP_400_BAD_REQUEST)
 
         except PermissionError as e:
             return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
 
         except Exception as e:
             return Response({'error': 'Error interno del servidor', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 
 
 
@@ -203,45 +181,27 @@ class AnomaliaViewSet(viewsets.ModelViewSet):
                 }
                 - Cada clave contiene una lista de anomalías serializadas relacionadas con el componente específico.
         """
-        # Obtener usuario autenticado
-        user = request.user
 
-        # Obtener y validar los parámetros de la URL
-        parametros = {
-            'uuid_aerogenerador': request.data.get('uuid_aerogenerador'),
-            'uuid_inspeccion': request.data.get('uuid_inspeccion'),
-        }
-
-        # Validar que los parámetros no sean nulos y que sean UUID válidos
-        for nombre, valor in parametros.items():
-            if not valor:
-                return Response({'error': f'El parámetro {nombre} es requerido'}, status=status.HTTP_400_BAD_REQUEST)
-            if not is_valid_uuid(valor):
-                return Response({'error': f'El parámetro {nombre} no es válido'}, status=status.HTTP_400_BAD_REQUEST)
+        # Instanciar validador
+        validador = ValidarAcceso(request.user)
 
         try:
-
-            if user.is_cliente:
-
-                # Validar acceso del usuario al aerogenerador
-                if not Aerogenerador.objects.filter(
-                    uuid_aerogenerador=parametros['uuid_aerogenerador'],
-                    uuid_parque_eolico__uuid_empresa__uuid_empresa=user.uuid_empresa
-                ).exists():
-                    return Response({'error': 'No tiene acceso al aerogenerador'}, status=status.HTTP_403_FORBIDDEN)
-
-                # Validar acceso del usuario a la inspección
-                if not Inspeccion.objects.filter(
-                    uuid_inspeccion=parametros['uuid_inspeccion'],
-                    uuid_parque_eolico__uuid_empresa_uuid_empresa=user.uuid_empresa
-                ).exists():
-                    return Response({'error': 'No tiene acceso a la inspección'}, status=status.HTTP_403_FORBIDDEN)
-
+            parametros = validador.validar_query_params(
+                parametros={
+                    'uuid_aerogenerador': True,
+                    'uuid_inspeccion': True
+                },
+                request_data=request.data,
+                validaciones_por_parametro={
+                    'uuid_aerogenerador': Aerogenerador.existe_aerogenerador_para_usuario,
+                    'uuid_inspeccion': Inspeccion.existe_inspeccion_para_usuario
+                }
+            )
 
             # Obtener anomalías filtradas
             anomalias = Anomalia.objects.filter(uuid_aerogenerador=parametros['uuid_aerogenerador'], uuid_inspeccion=parametros['uuid_inspeccion'])
 
-                # Diccionario de mapeo para traducir los nombres de la base de datos a las claves esperadas
+            # Diccionario de mapeo para traducir los nombres de la base de datos a las claves esperadas
             componente_map = {
                 'Hélice A': 'helice_a',
                 'Hélice B': 'helice_b',
@@ -271,14 +231,19 @@ class AnomaliaViewSet(viewsets.ModelViewSet):
             return Response(data, status=status.HTTP_200_OK)
 
         # Manejo de excepciones
+
         except (Anomalia.DoesNotExist, ValueError) as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        except ValidationError as e:
+            return Response({'error': e.detail}, status=status.HTTP_400_BAD_REQUEST)
 
         except PermissionError as e:
             return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
 
         except Exception as e:
-         return Response({'error': 'Error interno del servidor', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({'error': 'Error interno del servidor', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 
 
@@ -313,50 +278,43 @@ class AnomaliaViewSet(viewsets.ModelViewSet):
                     ...
                 ]
         """
-        # Obtener usuario autenticado
-        user = request.user
-
-        # Obtener parámetros de la solicitud
-        parametros = {
-            'uuid_aerogenerador': request.query_params.get('turbina'),
-            'uuid_componentenente': request.query_params.get('componente'),
-            'uuid_inspeccion': request.query_params.get('inspeccion'),
-        }
-
-        # Validar que los parámetros no sean nulos y que sean UUID válidos
-        for nombre, valor in parametros.items():
-            if not valor:
-                return Response({'error': f'El parámetro {nombre} es requerido'}, status=status.HTTP_400_BAD_REQUEST)
-            if not is_valid_uuid(valor):
-                return Response({'error': f'El parámetro {nombre} no es válido'}, status=status.HTTP_400_BAD_REQUEST)
+        # Instanciar validador
+        validador = ValidarAcceso(request.user)
 
         try:
-
-            if user.is_cliente:
-                if not Anomalia.objects.filter(
-                    uuid_aerogenerador=parametros['uuid_aerogenerador'],
-                    uuid_componente=parametros['uuid_componente'],
-                    uuid_inspeccion=parametros['uuid_inspeccion'],
-                    uuid_aerogenerador__uuid_parque_eolico__uuid_empresa=user.uuid_empresa
-                ).exists():
-                    return Response({'error': 'No tiene acceso a las anomalías del componente'},
-                                    status=status.HTTP_403_FORBIDDEN)
+            # Validar los parámetros de la solicitud
+            parametros = validador.validar_query_params(
+                parametros={
+                    'uuid_aerogenerador': True,
+                    'uuid_componente': True,
+                    'uuid_inspeccion': True
+                },
+                request_data=request.query_params,
+                validaciones_por_parametro={
+                    'uuid_aerogenerador': Aerogenerador.existe_aerogenerador_para_usuario,
+                    'uuid_componente': ComponenteAerogenerador.existe_componente_para_usuario,
+                    'uuid_inspeccion': Inspeccion.existe_inspeccion_para_usuario
+                }
+            )
 
 
             # Obtener el queryset de anomalías después de la validación
-            queryset = Anomalia.objects.filter(
+            anomalias = Anomalia.objects.filter(
                 uuid_aerogenerador=parametros['uuid_aerogenerador'],
                 uuid_componente=parametros['uuid_componente'],
                 uuid_inspeccion=parametros['uuid_inspeccion']
             )
 
+
             # Serializar y devolver los datos
-            serializer = self.get_serializer(queryset, many=True)
+            serializer = self.get_serializer(anomalias, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
-        # Manejo de excepciones
         except (Anomalia.DoesNotExist, ValueError) as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        except ValidationError as e:
+            return Response({'error': e.detail}, status=status.HTTP_400_BAD_REQUEST)
 
         except PermissionError as e:
             return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
@@ -366,5 +324,5 @@ class AnomaliaViewSet(viewsets.ModelViewSet):
 
 
 
-#----------------------------------------------------------------------------------------------------------#
+
 

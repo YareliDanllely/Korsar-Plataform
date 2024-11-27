@@ -2,9 +2,8 @@ import uuid
 from django.db import models
 from imagenes.models import Imagen
 from anomalias.models import Anomalia
-from utils.mixin import ValidacionAccesoMixin
 
-class ImagenAnomalia(models.Model, ValidacionAccesoMixin):
+class ImagenAnomalia(models.Model):
     """
     Definición de la clase ImagenAnomalia para el modelo de datos de ImagenAnomalia
     """
@@ -16,14 +15,14 @@ class ImagenAnomalia(models.Model, ValidacionAccesoMixin):
     uuid_imagen = models.ForeignKey(Imagen, on_delete=models.CASCADE)
     uuid_anomalia = models.ForeignKey(Anomalia, on_delete=models.CASCADE)
 
-    def pertenece_a_empresa(self, uuid_empresa):
+    def existe_imagen_anomalia_para_usuario(uuid_imagen_anomalia, user):
         """
-        Verifica si la Anomalia pertenece a una empresa específica.
+        Verifica si una imagen de anomalía con el UUID dado pertenece a la empresa del usuario.
+        """
 
-        :param uuid_empresa: UUID de la empresa que se desea verificar.
-        :return: True si pertenece a la empresa, False en caso contrario.
-        """
-        return self.uuid_anomalia.uuid_aerogenerador.uuid_parque_eolico.uuid_empresa.uuid_empresa == uuid_empresa
+        return ImagenAnomalia.objects.filter(
+            uuid_imagen_anomalia=uuid_imagen_anomalia,
+            uuid_anomalia__uuid_aerogenerador__uuid_parque_eolico__uuid_empresa=user.uuid_empresa.uuid_empresa).exists()
 
 
     def __str__(self):

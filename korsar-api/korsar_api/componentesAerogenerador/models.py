@@ -30,5 +30,15 @@ class ComponenteAerogenerador(models.Model):
         choices=TIPO_COMPONENTE_CHOICES,
     )
 
+    def existe_componente_para_usuario(uuid_componente, user):
+        """
+        Verifica si un componente con el UUID dado pertenece a la empresa del usuario.
+        """
+
+        return ComponenteAerogenerador.objects.filter(
+            uuid_componente=uuid_componente,
+            uuid_aerogenerador__uuid_parque_eolico__uuid_empresa=user.uuid_empresa.uuid_empresa).exists()
+
+
     def __str__(self):
         return f"Componente {self.get_tipo_componente_display()} del Aerogenerador {self.uuid_aerogenerador}"

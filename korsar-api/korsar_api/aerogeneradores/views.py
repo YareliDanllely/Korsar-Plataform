@@ -1,12 +1,13 @@
 from rest_framework.decorators import action
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework import status
+from utils.validarAcceso import ValidarAcceso
 from .models import Aerogenerador
 from parquesEolicos.models import ParquesEolicos
 from inspecciones.models import Inspeccion
-from utils.utils import is_valid_uuid
 from .serializers import AerogeneradorSerializer
 from estadoAerogeneradores.models import EstadoAerogenerador
 
@@ -22,6 +23,7 @@ class AerogeneradorViewSet(viewsets.ModelViewSet):
 
 
  #----------------------------------------------------------------------------------------------------------#
+
 
     # OBTENER LISTADO DE TODOS LOS AEROGENERADORES CON SU ESTADO FINAL
     @action(detail=False, methods=['get'], url_path='estado-por-inspeccion')
@@ -45,47 +47,36 @@ class AerogeneradorViewSet(viewsets.ModelViewSet):
             ]
 
         """
-        # Obtener usuario autenticado
-        user = request.user
-
-        parametros = {
-            'uuid_parque_eolico': request.query_params.get('uuid_parque_eolico'),
-            'uuid_inspeccion': request.query_params.get('uuid_inspeccion')
-        }
-
-        # Validar que los parámetros no sean nulos y que sean UUID válidos
-        for nombre, valor in parametros.items():
-            if not valor:
-                return Response({'error': f'El parámetro {nombre} es requerido'}, status=status.HTTP_400_BAD_REQUEST)
-            if not is_valid_uuid(valor):
-                return Response({'error': f'El parámetro {nombre} no es válido'}, status=status.HTTP_400_BAD_REQUEST)
+        # Instaciar el validador
+        validador  = ValidarAcceso(request.user)
 
         try:
-            # Validar acceso del usuario al parque e inspección
-            if user.is_cliente:
-                if not ParquesEolicos.objects.filter(
-                    uuid_parque_eolico=parametros['uuid_parque_eolico'],
-                    uuid_empresa__uuid_empresa=user.uuid_empresa.uuid_empresa
-                ).exists():
-                    raise PermissionError('No tiene acceso al parque solicitado')
-
-                if not Inspeccion.objects.filter(
-                    uuid_inspeccion=parametros['uuid_inspeccion'],
-                    uuid_parque_eolico__uuid_empresa__uuid_empresa=user.uuid_empresa.uuid_empresa
-                ).exists():
-                    raise PermissionError('No tiene acceso a la inspección solicitada')
+            # Validar parametros y pertenecia de recursos
+            parametros = validador.validar_query_params(
+                parametros= {
+                    'uuid_parque_eolico': True,
+                    'uuid_inspeccion': True,
+                },
+                request_data=request.query_params,
+                validaciones_por_parametro={
+                    'uuid_parque_eolico': ParquesEolicos.existe_parque_para_usuario,
+                    'uuid_inspeccion': Inspeccion.existe_inspeccion_para_usuario
+                }
+            )
 
             # Filtrar los aerogeneradores por parque
             aerogeneradores = Aerogenerador.objects.filter(uuid_parque_eolico=parametros['uuid_parque_eolico'])
 
-            # Filtrar el estado final de los aerogeneradores por inspección
+            # Obtener el estado final de los aerogeneradores por inspección
             aerogeneradores_con_estado = []
             for aerogenerador in aerogeneradores:
 
                 estado_final = EstadoAerogenerador.objects.get(
                     uuid_aerogenerador=aerogenerador.uuid_aerogenerador,
-                    uuid_inspeccion=parametros['uuid_parque_eolico']
+                    uuid_inspeccion=parametros['uuid_inspeccion']
                 )
+
+                # Agregar la información del aerogenerador y su estado final a la lista
                 aerogeneradores_con_estado.append({
                     'uuid_aerogenerador': aerogenerador.uuid_aerogenerador,
                     'numero_aerogenerador': aerogenerador.numero_aerogenerador,
@@ -93,7 +84,6 @@ class AerogeneradorViewSet(viewsets.ModelViewSet):
                     'coordenada_latitud': aerogenerador.coordenada_latitud,
                     'coordenada_longitud': aerogenerador.coordenada_longitud
                 })
-
 
             return Response(aerogeneradores_con_estado, status=status.HTTP_200_OK)
 
@@ -104,58 +94,44 @@ class AerogeneradorViewSet(viewsets.ModelViewSet):
         except PermissionError as e:
             return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
 
+        except ValidationError as e:
+            return Response({'error': e.detail}, status=status.HTTP_400_BAD_REQUEST)
+
         except Exception as e:
-         return Response({'error': 'Error interno del servidor', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
-
-
+            return Response({'error': 'Error interno del servidor', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
  #----------------------------------------------------------------------------------------------------------#
 
     # OBTENER NUMERO DE AEROGENERADOR
-    @action(detail=False, methods=['get'], url_path='numero-aerogenerador')
-    def obtener_numero_aerogenerador(self, request):
+    @action(detail=True, methods=['get'], url_path='numero-aerogenerador')
+    def obtener_numero_aerogenerador(self, request, pk=None):
         """
         Obtener el número de un aerogenerador basado en su UUID.
-        params: uuid_aerogenerador
         """
-        # Obtener usuario autenticado
-        user = request.user
-
-        # Obtener los parámetros de la URL
-        uuid_aerogenerador_url = request.query_params.get('uuid_aerogenerador')
-
-        # Validar que los parámetros no sean nulos
-        if not uuid_aerogenerador_url or not is_valid_uuid(uuid_aerogenerador_url):
-            return Response({'error': 'El parámetro uuid_aerogenerador es requerido y debe ser válido'}, status=status.HTTP_400_BAD_REQUEST)
+        # Instanciar el validador
+        validador = ValidarAcceso(request.user)
 
         try:
-            # Validar acceso del usuario al aerogenerador
-            if user.is_cliente:
-                # Verificar que el aerogenerador pertenece a la empresa del cliente
-                if not Aerogenerador.objects.filter(
-                    uuid_aerogenerador=uuid_aerogenerador_url,
-                    uuid_parque_eolico__uuid_empresa__uuid_empresa=user.uuid_empresa
-
-                ).exists():
-                    return Response({'error': 'No tiene acceso a este aerogenerador'}, status=status.HTTP_403_FORBIDDEN)
+            # Validar el pk y el acceso del usuario al recurso
+            validador.validar_pk(pk, Aerogenerador.existe_aerogenerador_para_usuario)
 
             # Obtener el número del aerogenerador
-            aerogenerador = Aerogenerador.objects.get(pk=uuid_aerogenerador_url)
+            aerogenerador = Aerogenerador.objects.get(pk=pk)
             return Response({'numero_aerogenerador': aerogenerador.numero_aerogenerador}, status=status.HTTP_200_OK)
-
 
         # Manejo de excepciones
         except (Aerogenerador.DoesNotExist, ValueError) as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+        # Manejo de excepciones
         except PermissionError as e:
             return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
 
+        except ValidationError as e:
+            return Response({'error': e.detail}, status=status.HTTP_400_BAD_REQUEST)
+
         except Exception as e:
             return Response({'error': 'Error interno del servidor', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
 
  #----------------------------------------------------------------------------------------------------------#
 
@@ -165,47 +141,31 @@ class AerogeneradorViewSet(viewsets.ModelViewSet):
         Obtener el estado final de clasificacion de un aerogenerador por inspeccion y aerogenerador
         params: uuid_aerogenerador, uuid_inspeccion
         """
-        # Obtener usuario autenticado
-        user = request.user
-
-        # Obtener y validar los parámetros de la URL
-        parametros = {
-            'uuid_aerogenerador': request.query_params.get('uuid_aerogenerador'),
-            'uuid_inspeccion': request.query_params.get('uuid_inspeccion')
-        }
-
-        # Validar que los parámetros no sean nulos y que sean UUID válidos
-        for nombre, valor in parametros.items():
-            if not valor:
-                return Response({'error': f'El parámetro {nombre} es requerido'}, status=status.HTTP_400_BAD_REQUEST)
-            if not is_valid_uuid(valor):
-                return Response({'error': f'El parámetro {nombre} no es válido'}, status=status.HTTP_400_BAD_REQUEST)
+        # Instanciar validador
+        validador = ValidarAcceso(request.user)
 
         try:
+            parametros = validador.validar_query_params(
+                parametros = {
+                        'uuid_aerogenerador': True,
+                        'uuid_inspeccion': True
+                    },
+                    request_data=request.query_params,
+                    validaciones_por_parametro={
+                        'uuid_aerogenerador': Aerogenerador.existe_aerogenerador_para_usuario,
+                        'uuid_inspeccion': Inspeccion.existe_inspeccion_para_usuario
+                    }
+             )
 
-            # Validar acceso al aerogenerador y la inspección
-            if user.is_cliente:
-
-                # Validar acceso del usuario al aerogenerador
-                if not Aerogenerador.objects.filter(
-                    uuid_aerogenerador=parametros['uuid_aerogenerador'],
-                    uuid_parque_eolico__uuid_empresa__uuid_empresa=user.uuid_empresa
-                ).exists():
-                    return Response({'error': 'No tiene acceso al aerogenerador'}, status=status.HTTP_403_FORBIDDEN)
-
-                # Validar acceso del usuario a la inspección
-                if not Inspeccion.objects.filter(
-                    uuid_inspeccion=parametros['uuid_inspeccion'],
-                    uuid_parque_eolico__uuid_empresa_uuid_empresa=user.uuid_empresa
-                ).exists():
-                    return Response({'error': 'No tiene acceso a la inspección'}, status=status.HTTP_403_FORBIDDEN)
-
-            # Obtener el estado final
+            # Intentar obtener el estado final del aerogenerador
             estado_final = EstadoAerogenerador.objects.get(
                 uuid_aerogenerador=parametros['uuid_aerogenerador'],
                 uuid_inspeccion=parametros['uuid_inspeccion']
             )
+
+
             return Response({'estado_final': estado_final.estado_final_clasificacion}, status=status.HTTP_200_OK)
+
 
         # Manejo de excepciones
         except (EstadoAerogenerador.DoesNotExist, ValueError) as e:
@@ -213,6 +173,9 @@ class AerogeneradorViewSet(viewsets.ModelViewSet):
 
         except PermissionError as e:
             return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
+
+        except ValidationError as e:
+            return Response({'error': e.detail}, status=status.HTTP_400_BAD_REQUEST)
 
         except Exception as e:
             return Response({'error': 'Error interno del servidor', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -224,139 +187,74 @@ class AerogeneradorViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['put'], url_path='cambiar-estado-final')
     def cambiar_estado_final_aerogenerador(self, request):
         """
-        Cambiar el estado final de clasificacion de un aerogeneador por inspeccion y aerogenerador
+        Cambiar el estado final de clasificación de un aerogenerador por inspección y aerogenerador.
         params: uuid_aerogenerador, uuid_inspeccion, estado_final
         """
-
-        # Obtener usuario autenticado
-        user = request.user
-
-        # Obtener y validar los parámetros de la URL
-        parametros = {
-            'uuid_aerogenerador': request.data.get('uuid_aerogenerador'),
-            'uuid_inspeccion': request.data.get('uuid_inspeccion'),
-            'estado_final': request.data.get('estado_final')
-        }
-
-        # Validar que los parámetros no sean nulos y que sean UUID válidos
-        for nombre, valor in parametros.items():
-            if not valor:
-                return Response({'error': f'El parámetro {nombre} es requerido'}, status=status.HTTP_400_BAD_REQUEST)
-            if not is_valid_uuid(valor):
-                return Response({'error': f'El parámetro {nombre} no es válido'}, status=status.HTTP_400_BAD_REQUEST)
+        # Instanciar el validador
+        validador = ValidarAcceso(request.user)
 
         try:
-             # Validar acceso del usuario al aerogenerador
-            if user.is_cliente:
+            # Validar parámetros y acceso
+            parametros = validador.validar_query_params(
+                parametros={
+                    'uuid_aerogenerador': True,
+                    'uuid_inspeccion': True,
+                    'estado_final': False,  # No es un UUID, pero es obligatorio
+                },
+                request_data=request.data,
+                validaciones_por_parametro={
+                    'uuid_aerogenerador': Aerogenerador.existe_aerogenerador_para_usuario,
+                    'uuid_inspeccion': Inspeccion.existe_inspeccion_para_usuario
+                }
+            )
 
-                # Validación de acceso para clientes
-                if not EstadoAerogenerador.objects.filter(
-                    uuid_aerogenerador=parametros['uuid_aerogenerador'],
-                    uuid_inspeccion=parametros['uuid_inspeccion'],
-                    uuid_aerogenerador__uuid_parque_eolico__uuid_empresa_uuid_empresa=user.uuid_empresa.uuid_empresa
-                    ).exists():
-                    return Response({'error': 'No tiene acceso a la información de este aerogenerador'}, status=status.HTTP_403_FORBIDDEN)
+            # Intentar obtener el estado del aerogenerador
+            estado_aerogenerador = EstadoAerogenerador.objects.get(
+                uuid_aerogenerador=parametros['uuid_aerogenerador'],
+                uuid_inspeccion=parametros['uuid_inspeccion']
+            )
 
-
-            estado_aerogenerador = EstadoAerogenerador.objects.get(uuid_aerogenerador=parametros['uuid_aerogenerador'], uuid_inspeccion=parametros['uuid_inspeccion'])
+            # Actualizar el estado final
             estado_aerogenerador.estado_final_clasificacion = parametros['estado_final']
             estado_aerogenerador.save()
 
-            return Response({'mensaje': 'Estado final actualizado'}, status=status.HTTP_200_OK)
-
+            return Response({'mensaje': 'Estado final actualizado correctamente'}, status=status.HTTP_200_OK)
 
         # Manejo de excepciones
+
         except (EstadoAerogenerador.DoesNotExist, ValueError) as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-        except PermissionError as e:
-            return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
-
-        except Exception as e:
-            return Response({'error': 'Error interno del servidor', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
-
- #----------------------------------------------------------------------------------------------------------#
-
-    @action(detail=False, methods=['get'], url_path='informacion-aerogenerador')
-    def obtener_info_aerogenerador(self, request):
-        """
-        Obtener la informacion de un aerogenerador por su UUID.
-        params: uuid_aerogenerador
-        """
-        # Obtener usuario autenticado
-        user = request.user
-
-        # Obtener los parámetros de la URL
-        uuid_aerogenerador_url = request.query_params.get('uuid_aerogenerador')
-
-        # Validar que los parámetros no sean nulos
-        if not uuid_aerogenerador_url or not is_valid_uuid(uuid_aerogenerador_url):
-            return Response({'error': 'El parámetro uuid_aerogenerador es requerido y debe ser válido'}, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-             # Validar acceso del usuario al aerogenerador
-            if user.is_cliente:
-                # Validación de acceso para clientes
-                if not Aerogenerador.objects.filter(
-                    uuid_aerogenerador=uuid_aerogenerador_url,
-                    uuid_parque_eolico__uuid_empresa__uuid_empresa=user.uuid_empresa.uuid_empresa
-                ).exists():
-                    return Response({'error': 'No tiene acceso a la información de este aerogenerador'}, status=status.HTTP_403_FORBIDDEN)
-
-
-            # Obtener la información del aerogenerador
-            aerogenerador = Aerogenerador.objects.get(pk=uuid_aerogenerador_url)
-            serializer = AerogeneradorSerializer(aerogenerador)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-        # Manejo de excepciones
-        except (Aerogenerador.DoesNotExist, ValueError) as e:
-             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        except ValidationError as e:
+            return Response({'error': e.detail}, status=status.HTTP_400_BAD_REQUEST)
 
         except PermissionError as e:
             return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
 
         except Exception as e:
             return Response({'error': 'Error interno del servidor', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
 
 
  #----------------------------------------------------------------------------------------------------------#
 
     # OBTENER LISTADO DE AEROGENERADORES POR PARQUE EÓLICO
-    @action(detail=False, methods=['get'], url_path='por-parque')
-    def listar_por_parque(self, request):
+    @action(detail=True, methods=['get'], url_path='por-parque')
+    def listar_por_parque(self, request, pk=None):
         """
-        Obtener todos los aerogeneradores de un parque específico.
-        params: uuid_parque_eolico
+        Obtener todos los aerogeneradores de un parque específico utilizando el pk (uuid_parque_eolico).
         """
-        # Obtener usuario autenticado
-        user = request.user
-
-        # Obtener los parámetros de la solicitud
-        uuid_parque_eolico_url = request.query_params.get('uuid_parque_eolico')
-
-        # Validar que los parámetros no sean nulos
-        if not uuid_parque_eolico_url or not is_valid_uuid(uuid_parque_eolico_url):
-            return Response({'error': 'El parámetro uuid_parque_eolico es requerido y debe ser válido'},
-                            status=status.HTTP_400_BAD_REQUEST)
+        # Instanciar el validador
+        validador = ValidarAcceso(request.user)
 
         try:
-
-            # Validar acceso del usuario al parque
-            if user.is_cliente:
-                if not ParquesEolicos.objects.filter(
-                    uuid_parque_eolico=uuid_parque_eolico_url,
-                    uuid_empresa__uuid_empresa=user.uuid_empresa.uuid_empresa
-                ).exists():
-                    raise PermissionError('No tiene acceso al parque solicitado')
-
+            # Validar el pk y acceso al parque eólico
+            validador.validar_pk(
+                pk=pk,
+                metodo_validacion=ParquesEolicos.existe_parque_para_usuario
+            )
 
             # Filtrar aerogeneradores por parque eólico
-            aerogeneradores = Aerogenerador.objects.filter(uuid_parque_eolico=uuid_parque_eolico_url)
+            aerogeneradores = Aerogenerador.objects.filter(uuid_parque_eolico=pk)
 
             # Serializar los datos
             serializer = self.get_serializer(aerogeneradores, many=True)
@@ -367,24 +265,14 @@ class AerogeneradorViewSet(viewsets.ModelViewSet):
         except (Aerogenerador.DoesNotExist, ValueError) as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+        except ValidationError as e:
+            return Response({'error': e.detail}, status=status.HTTP_400_BAD_REQUEST)
+
         except PermissionError as e:
             return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
 
         except Exception as e:
             return Response({'error': 'Error interno del servidor', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

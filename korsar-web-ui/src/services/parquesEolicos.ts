@@ -11,6 +11,9 @@ const api = axios.create({
   baseURL: BASE_URL,
 });
 
+
+//----------------------------------------------------------------------------------------------//
+
 /**
  * Obtener la abreviatura de un parque eólico por su UUID
  * @param uuid_parque_eolico
@@ -22,9 +25,8 @@ export const obtenerAbreviaturaParque = async (uuid_parque_eolico: string): Prom
   }
 
   try {
-    const response = await api.get('/parques-eolicos/abreviatura-por-id/', {
+    const response = await api.get(`/parques-eolicos/${uuid_parque_eolico}/abreviatura/`, {
       headers: obtenerEncabezadosAutenticacion(), // Incluye los headers de autenticación
-      params: { uuid_parque_eolico },
     });
 
     console.log('Abreviatura del Parque Eólico:', response.data.abreviatura_parque);
@@ -34,6 +36,9 @@ export const obtenerAbreviaturaParque = async (uuid_parque_eolico: string): Prom
     throw new Error('No se pudo obtener la abreviatura del parque eólico.');
   }
 };
+
+//----------------------------------------------------------------------------------------------//
+
 
 /**
  * Obtener todos los parques asociados al usuario (técnico o empresa)
@@ -46,9 +51,8 @@ export const obtenerParquesPorEmpresa = async (uuid_empresa:string): Promise<Par
   }
 
   try {
-    const response = await api.get('/parques-eolicos/items/parques-por-empresa', {
+    const response = await api.get(`/empresas/${uuid_empresa}/parques-eolicos/`, {
       headers: obtenerEncabezadosAutenticacion(), // Incluye los headers de autenticación
-      params: { uuid_empresa },
     });
 
     console.log('Parques Eólicos:', response.data);
@@ -59,6 +63,10 @@ export const obtenerParquesPorEmpresa = async (uuid_empresa:string): Promise<Par
   }
 
 };
+
+
+//----------------------------------------------------------------------------------------------//
+
 
 /**
  * Obtener información de un parque eólico por UUID
