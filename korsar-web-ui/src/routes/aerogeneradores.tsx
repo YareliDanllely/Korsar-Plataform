@@ -22,8 +22,6 @@ interface EstructuraAnomalias {
 }
 
 
-
-
 function Aerogeneradores() {
       const {uuid_empresa } = useParams<{ uuid_empresa: string }>();
       const [uuid_parque_eolico, setUuidParqueEolico] = useState<string | null>(null);

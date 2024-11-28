@@ -20,6 +20,13 @@ class Usuario(AbstractUser):
     uuid_empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE, null=True, blank=True)  # Permitir valores nulos
     telefono = models.CharField(max_length=20, blank=True, null=True)
 
+    def usuario_esta_asociado_a_empresa(uuid_empresa,usuario):
+        """
+        Verifica si un usuario con el UUID dado está asociado a la empresa.
+        """
+        return Usuario.objects.filter(uuid_usuario=usuario.uuid_usuario, uuid_empresa=uuid_empresa).exists()
+
+
     @property
     def is_tecnico(self):
         """Devuelve True si el usuario es Técnico."""

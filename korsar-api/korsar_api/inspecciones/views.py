@@ -11,6 +11,7 @@ from django.db.models import Count
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
+from usuarios.models import Usuario
 from uuid import UUID
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
@@ -49,22 +50,26 @@ class InspeccionViewSet(viewsets.ModelViewSet):
         Retorna las inspecciones dependiendo del tipo de usuario autenticado.
         """
         user = request.user
+        print(f"Usuario autenticado: {user}")
+        print(f"Tipo de usuario: {user.tipo_usuario}")
+        print("esl cliente",user.is_cliente)
 
         try:
 
-            if user.is_tecnico():  # Usuario es Técnico
+            if user.is_tecnico:  # Usuario es Técnico
+                print("Usuario es técnico")
                 # Técnicos obtienen todas las inspecciones
                 inspecciones = Inspeccion.objects.all()
 
-            elif user.is_cliente():  # Usuario es Cliente
+            elif user.is_cliente:  # Usuario es Cliente
                 # Clientes obtienen inspecciones solo de su empresa
-                if not user.uuid_empresa:
+                if not user.uuid_empresa.uuid_empresa:
                     return Response(
                         {"detail": "El usuario no está asociado a ninguna empresa."},
                         status=status.HTTP_400_BAD_REQUEST
                     )
                 # Filtrar parques de la empresa del cliente
-                parques = ParquesEolicos.objects.filter(uuid_empresa=user.uuid_empresa)
+                parques = ParquesEolicos.objects.filter(uuid_empresa=user.uuid_empresa.uuid_empresa)
 
                 # Filtrar inspecciones de esos parques
                 inspecciones = Inspeccion.objects.filter(uuid_parque_eolico__in=parques).exclude(progreso=0)
@@ -142,6 +147,7 @@ class InspeccionViewSet(viewsets.ModelViewSet):
     def ultima_y_proxima_inspeccion_empresa(self, request, pk=None):
         """
         Devuelve las últimas y próximas inspecciones para todos los parques de una empresa usando pk.
+        De las ultimas inspecciones completadas.
         """
         # Instanciar el validador
         validador = ValidarAcceso(request.user)
@@ -149,7 +155,7 @@ class InspeccionViewSet(viewsets.ModelViewSet):
 
         try:
             # Validar el pk y el acceso del usuario al recurso
-            validador.validar_recurso(pk, Empresa.usuario_tiene_acceso)
+            validador.validar_recurso(pk, Usuario.usuario_esta_asociado_a_empresa)
 
             # Filtrar los parques asociados a la empresa
             parques = ParquesEolicos.objects.filter(uuid_empresa=pk)
@@ -158,7 +164,7 @@ class InspeccionViewSet(viewsets.ModelViewSet):
             inspecciones = []
             for parque in parques:
                 # Obtener la última inspección
-                ultima_inspeccion = Inspeccion.objects.filter(uuid_parque_eolico=parque).order_by('-fecha_inspeccion').first()
+                ultima_inspeccion = Inspeccion.objects.filter(uuid_parque_eolico=parque, progreso = 1).order_by('-fecha_inspeccion').first()
                 print(f"Parque: {parque.nombre_parque}, Última inspección: {ultima_inspeccion.fecha_inspeccion}")
 
                 # Agregar la información al resultado
@@ -286,7 +292,7 @@ class InspeccionViewSet(viewsets.ModelViewSet):
 #----------------------------------------------------------------------------------#
 
 
-    @action(detail=True, methods=['get'], url_path='informacion-ultima-inspeccion')
+    @action(detail=True, methods=['get'], url_path='ultima-inspeccion')
     def informacion_ultima_inspeccion(self, request, pk=None):
         """
         Obtener la información de la última inspección completada por parque eólico.
@@ -295,7 +301,7 @@ class InspeccionViewSet(viewsets.ModelViewSet):
         validador = ValidarAcceso(request.user)
 
         try:
-            validador.validar_recurso(pk, ParquesEolicos.existe_aerogenerador_para_usuario)
+            validador.validar_recurso(pk, ParquesEolicos.existe_parque_para_usuario)
 
             # Filtrar la última inspección completada por parque eólico (excluyendo progreso=0)
             ultima_inspeccion = Inspeccion.objects.filter(

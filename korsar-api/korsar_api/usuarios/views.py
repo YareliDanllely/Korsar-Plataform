@@ -5,7 +5,7 @@ from rest_framework import status
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .models import Usuario
 from .serializers import UsuarioSerializer
-from .permissions import IsTechnicianOrClient  # Importar el permiso correcto
+
 
 
 
@@ -24,6 +24,8 @@ class CustomTokenObtainPairView(TokenObtainPairView):
         response.data['username'] = user.username
         response.data['tipo_usuario'] = user.tipo_usuario
 
+        print(f"Usuario autenticado: {user.username}")  # Log para depuración
+
         return response
 
     except Exception as e:
@@ -35,7 +37,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 class UsuarioViewSet(viewsets.ModelViewSet):
     queryset = Usuario.objects.all()
     serializer_class = UsuarioSerializer
-    permission_classes = [IsAuthenticated, IsTechnicianOrClient]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         if self.request.user.tipo_usuario == 2:  # Cliente

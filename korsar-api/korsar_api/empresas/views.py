@@ -78,11 +78,11 @@ class EmpresaViewSet(viewsets.ModelViewSet):
                 if not Empresa.objects.filter(uuid_empresa=request.user.uuid_empresa.uuid_empresa).exists():
                     return Response({'error': 'No tiene acceso a ninguna empresa o la empresa no existe'}, status=status.HTTP_404_NOT_FOUND)
 
-            empresas = Empresa.objects.filter(uuid_empresa=request.user.uuid_empresa.uuid_empresa)
+                empresas = Empresa.objects.filter(uuid_empresa=request.user.uuid_empresa.uuid_empresa)
 
-            # Serializamos la lista de empresas
+                # Serializamos la lista de empresas
+
             serializer = self.get_serializer(empresas, many=True)
-
             # Retornamos la lista en formato JSON
             return Response(serializer.data, status=status.HTTP_200_OK)
 

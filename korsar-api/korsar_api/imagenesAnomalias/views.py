@@ -33,7 +33,7 @@ class ImagenAnomaliaViewSet(viewsets.ModelViewSet):
         validador = ValidarAcceso(request.user)
 
         try:
-            validador.validar_pk(
+            validador.validar_recurso(
                 pk=pk,
                 metodo_validacion = Anomalia.existe_anomalia_para_usuario)
 

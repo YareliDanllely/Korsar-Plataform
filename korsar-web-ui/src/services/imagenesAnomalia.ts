@@ -35,7 +35,7 @@ export const crearImagenAnomalia = async (data: ImagenAnomaliaPost): Promise<voi
 
       try {
           // Ajustamos la URL para incluir uuid_anomalia como parte del path
-          const response = await api.get(`/imagenes-anomalias/items/${uuid_anomalia}/`, {
+          const response = await api.get(`/imagenes-anomalias/items/${uuid_anomalia}/filtrar-anomalias/`, {
             headers: obtenerEncabezadosAutenticacion(),
 
           });

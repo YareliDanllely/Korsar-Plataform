@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Anomalia } from "../../utils/interfaces";
-import { Card, Button, Pagination } from "flowbite-react";
+import {  Button, Pagination } from "flowbite-react";
 
 interface VisualizadorProps {
   anomalias: Anomalia[];
@@ -28,7 +28,10 @@ const VisualizadorAnomalias: React.FC<VisualizadorProps> = ({
       {/* Listado de Anomalías Paginado */}
       {anomaliasPaginadas.map((anomalia) => (
 
-        <div className="w-full shadow-lg p-10 rounded-lg border border-gray-200">
+        <div
+        key={anomalia.uuid_anomalia}
+        className="w-full shadow-lg p-10 rounded-lg border border-gray-200"
+        >
 
           <div className="flex flex-col gap-6">
 

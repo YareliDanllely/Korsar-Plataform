@@ -7,12 +7,9 @@ from rest_framework.response import Response
 from .models import Aerogenerador
 from utils.validarAcceso import ValidarAcceso
 from rest_framework.exceptions import ValidationError
-from collections import defaultdict
-from utils.utils import is_valid_uuid
 from rest_framework import status
 from inspecciones.models import Inspeccion
 from componentesAerogenerador.models import ComponenteAerogenerador
-from rest_framework import generics
 from .serializers import AnomaliaSerializer
 import re
 
@@ -33,7 +30,7 @@ class AnomaliaViewSet(viewsets.ModelViewSet):
         validador = ValidarAcceso(request.user)
         try:
             # Validar pk de inspección
-            validador.validar_pk(
+            validador.validar_recurso(
                 pk=pk,
                 metodo_validacion=Inspeccion.existe_inspeccion_para_usuario
             )
@@ -75,7 +72,7 @@ class AnomaliaViewSet(viewsets.ModelViewSet):
 
         try:
             # Validar pk de inspección
-            validador.validar_pk(
+            validador.validar_recurso(
                 pk=pk,
                 metodo_validacion=Inspeccion.existe_inspeccion_para_usuario
             )
@@ -191,7 +188,7 @@ class AnomaliaViewSet(viewsets.ModelViewSet):
                     'uuid_aerogenerador': True,
                     'uuid_inspeccion': True
                 },
-                request_data=request.data,
+                request_data=request.query_params,
                 validaciones_por_parametro={
                     'uuid_aerogenerador': Aerogenerador.existe_aerogenerador_para_usuario,
                     'uuid_inspeccion': Inspeccion.existe_inspeccion_para_usuario

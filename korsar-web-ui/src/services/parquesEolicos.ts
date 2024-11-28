@@ -51,7 +51,7 @@ export const obtenerParquesPorEmpresa = async (uuid_empresa:string): Promise<Par
   }
 
   try {
-    const response = await api.get(`/empresas/${uuid_empresa}/parques-eolicos/`, {
+    const response = await api.get(`/parques-eolicos/items/${uuid_empresa}/parques-por-empresa/ `, {
       headers: obtenerEncabezadosAutenticacion(), // Incluye los headers de autenticación
     });
 

@@ -113,7 +113,7 @@ class AerogeneradorViewSet(viewsets.ModelViewSet):
 
         try:
             # Validar el pk y el acceso del usuario al recurso
-            validador.validar_pk(pk, Aerogenerador.existe_aerogenerador_para_usuario)
+            validador.validar_recurso(pk, Aerogenerador.existe_aerogenerador_para_usuario)
 
             # Obtener el número del aerogenerador
             aerogenerador = Aerogenerador.objects.get(pk=pk)
@@ -248,7 +248,7 @@ class AerogeneradorViewSet(viewsets.ModelViewSet):
 
         try:
             # Validar el pk y acceso al parque eólico
-            validador.validar_pk(
+            validador.validar_recurso(
                 pk=pk,
                 metodo_validacion=ParquesEolicos.existe_parque_para_usuario
             )
@@ -275,6 +275,37 @@ class AerogeneradorViewSet(viewsets.ModelViewSet):
             return Response({'error': 'Error interno del servidor', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+#----------------------------------------------------------------------------------------------------------#
 
+    #OBTENER INFORMACION DE AEROGEENRADOR POR SU UUID
+    @action(detail=True, methods=['get'], url_path='informacion-aerogenerador')
+    def informacion_aerogenerador(self, request, pk=None):
+        """
+        Obtener la información de un aerogenerador basado en su UUID.
+        """
+        # Instanciar el validador
+        validador = ValidarAcceso(request.user)
 
+        try:
+            # Validar el pk y el acceso del usuario al recurso
+            validador.validar_recurso(pk, Aerogenerador.existe_aerogenerador_para_usuario)
+
+            # Obtener la información del aerogenerador
+            aerogenerador = Aerogenerador.objects.get(pk=pk)
+            serializer = self.get_serializer(aerogenerador)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        # Manejo de excepciones
+        except (Aerogenerador.DoesNotExist, ValueError) as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Manejo de excepciones
+        except PermissionError as e:
+            return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
+
+        except ValidationError as e:
+            return Response({'error': e.detail}, status=status.HTTP_400_BAD_REQUEST)
+
+        except Exception as e:
+            return Response({'error': 'Error interno del servidor', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 

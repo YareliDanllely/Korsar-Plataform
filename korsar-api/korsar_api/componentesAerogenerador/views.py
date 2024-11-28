@@ -31,7 +31,7 @@ class ComponenteAerogeneradorViewSet(viewsets.ModelViewSet):
         validador = ValidarAcceso(request.user)
         try:
             # Validar pk del componente
-            validador.validar_pk(
+            validador.validar_recurso(
                 pk=pk,
                 metodo_validacion=ComponenteAerogenerador.existe_componente_para_usuario
             )
@@ -60,24 +60,19 @@ class ComponenteAerogeneradorViewSet(viewsets.ModelViewSet):
 #----------------------------------------------------------------------------------------------------------#
 
     # OBTENER TODOS LOS COMPONENTES DE UN AEROGENERADOR
-    @action(detail=False, methods=['get'], url_path='componentes-por-aerogenerador')
-    def componentes_por_aerogenerador(self, request):
+    @action(detail=True, methods=['get'], url_path='componentes-por-aerogenerador')
+    def componentes_por_aerogenerador(self, request, pk=None):
         """
         Listar todos los componentes de un aerogenerador.
         params: uuid_aerogenerador
         """
         validador = ValidarAcceso(request.user)
+
         try:
-            parametros = validador.validar_query_params(
-                parametros={'uuid_aerogenerador': True},
-                request_data=request.query_params,
-                validaciones_por_parametro={
-                    'uuid_aerogenerador': Aerogenerador.existe_aerogenerador_para_usuario
-                }
-            )
+            validador.validar_recurso(pk=pk, metodo_validacion=Aerogenerador.existe_aerogenerador_para_usuario)
 
             # Filtrar los componentes por aerogenerador
-            componentes = ComponenteAerogenerador.objects.filter(uuid_aerogenerador=parametros['uuid_aerogenerador'])
+            componentes = ComponenteAerogenerador.objects.filter(uuid_aerogenerador=pk)
 
 
             componentes_list = []

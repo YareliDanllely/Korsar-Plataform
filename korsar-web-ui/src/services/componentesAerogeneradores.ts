@@ -38,7 +38,7 @@ const api = axios.create({
         export const obtenerTipoComponente = async (uuid_componente: string): Promise<string> => {
 
             try {
-                const response = await api.get(`/componentes-aerogenerador/items/tipo-componente/${uuid_componente}/`, {
+                const response = await api.get(`/componentes-aerogenerador/items/${uuid_componente}/tipo-componente/`, {
                     headers: obtenerEncabezadosAutenticacion(),
 
                 });
@@ -60,7 +60,7 @@ const api = axios.create({
 
             try {
                 // Ajustamos la URL para incluir uuid_aerogenerador como parte del path
-                const response = await api.get(`/componentes-aerogenerador/componentes-por-aerogenerador/${uuid_aerogenerador}/`, {
+                const response = await api.get(`/componentes-aerogenerador/items/${uuid_aerogenerador}/componentes-por-aerogenerador/`, {
                     headers: obtenerEncabezadosAutenticacion(),
                 });
 

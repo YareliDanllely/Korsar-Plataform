@@ -108,7 +108,7 @@ const api = axios.create({
   export const informacionAerogenerador = async (uuid_aerogenerador: string): Promise<Aerogenerador> => {
 
       try {
-        const response = await api.get(`/aerogeneradores/items/informacion-aerogenerador/${uuid_aerogenerador}`, {
+        const response = await api.get(`/aerogeneradores/items/${uuid_aerogenerador}/informacion-aerogenerador/`, {
           headers: obtenerEncabezadosAutenticacion(),
         });
 
@@ -126,7 +126,7 @@ const api = axios.create({
     export const obtenerAerogeneradoresPorParque = async (uuid_parque_eolico: string): Promise<Aerogenerador[]> => {
 
       try {
-        const response = await api.get(`/aerogeneradores/items/por-parque/${uuid_parque_eolico}`, {
+        const response = await api.get(`/aerogeneradores/items/${uuid_parque_eolico}/por-parque/`, {
           headers: obtenerEncabezadosAutenticacion(),
         });
 

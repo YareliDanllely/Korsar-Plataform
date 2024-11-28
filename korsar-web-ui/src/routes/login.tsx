@@ -23,17 +23,19 @@ function Login() {
 
         const { access, refresh, user_id, empresa_id, tipo_usuario, username: usernameResponse } = response.data;
 
-        // Guarda ambos tokens y datos del usuario en localStorage
-        localStorage.setItem('token', access);
-        localStorage.setItem('refresh_token', refresh);
-        localStorage.setItem('user_id', user_id);
-        localStorage.setItem('empresa_id', empresa_id);
-        localStorage.setItem('username', usernameResponse);
-        localStorage.setItem('tipo_usuario', tipo_usuario);
+        // Verifica que todos los valores no sean null o undefined antes de almacenarlos
+        if (access && refresh && user_id && empresa_id && usernameResponse && tipo_usuario) {
+            localStorage.setItem('token', access);
+            localStorage.setItem('refresh_token', refresh);
+            localStorage.setItem('user_id', user_id);
+            localStorage.setItem('empresa_id', empresa_id);
+            localStorage.setItem('username', usernameResponse);
+            localStorage.setItem('tipo_usuario', tipo_usuario);
+            navigate('/dashboard');
+        } else {
+            setError('Hubo un problema al procesar el inicio de sesión.');
+        }
 
-
-        // Navega al dashboard
-        navigate('/dashboard');
 
         } catch (error) {
             setError('Error al iniciar sesión. Por favor, verifica tus credenciales.');

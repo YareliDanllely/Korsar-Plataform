@@ -22,11 +22,16 @@ class ValidarAcceso:
         :return: El recurso si es válido.
         :raises ValidationError: Si el recurso no es válido o no pertenece al usuario.
         """
-        # Validar si el pk es un UUID valido
+        # Validar si el pk es un UUID válido
         if not is_valid_uuid(pk):
             raise ValidationError("Clave primaria inválida.")
 
-        # Validar si el recurso pertenece al usuario con el metodo de validacion
+        # Si el usuario es técnico, tiene acceso completo
+        if self.user.is_tecnico:
+            print(f"Acceso permitido para el técnico: {self.user.username}")
+            return pk
+
+        # Validar si el recurso pertenece al usuario con el método de validación
         if metodo_validacion and not metodo_validacion(pk, self.user):
             raise ValidationError("No tiene acceso a este recurso.")
 
@@ -50,6 +55,7 @@ class ValidarAcceso:
 
         for nombre, es_uuid in parametros.items():
             valor = request_data.get(nombre)
+            print(f'Validando {nombre} con valor {valor}')
 
             # Validar presencia del parámetro
             if not valor:

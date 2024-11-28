@@ -28,6 +28,7 @@ const DonutChart: React.FC<DonutChartProps> = ({ uuidParque, uuidInspeccion }) =
     useEffect(() => {
         const obtenerDatos = async () => {
             try {
+                console.log(uuidInspeccion, uuidParque, "uuidInspeccion, uuidParque");
                 const response = await obtenerAerogeneradores(uuidParque, uuidInspeccion);
                 const estados: AerogeneradorConEstado[] = response;
 

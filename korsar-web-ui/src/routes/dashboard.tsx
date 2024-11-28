@@ -25,13 +25,17 @@ function Dashboard() {
 
         {/*OBTENER DATOS DESDE EL LOCAL STORAGE*/}
         useEffect(() => {
-            setUserId(localStorage.getItem('user_id'));
-            setEmpresaId(localStorage.getItem('empresa_id')); // Empresa asignada al cliente
-            setUsername(localStorage.getItem('username'));
-
+            const userId = localStorage.getItem('user_id');
+            const empresaId = localStorage.getItem('empresa_id');
+            const usernameStored = localStorage.getItem('username');
             const tipoUsuario = localStorage.getItem('tipo_usuario');
-            setTipoUsuario(tipoUsuario ? parseInt(tipoUsuario, 10) : null); // Convertir a número antes de guardar
+
+            setUserId(userId);
+            setEmpresaId(empresaId);
+            setUsername(usernameStored);
+            setTipoUsuario(tipoUsuario ? parseInt(tipoUsuario, 10) : null);
         }, []);
+
 
 
 
@@ -45,13 +49,14 @@ function Dashboard() {
                     try {
                         const empresasData = await obtenerTodasLasEmpresas();
                         setEmpresas(empresasData);
+                        console.log(empresasData, 'empresasData');
 
                         // Seleccionar la primera empresa por defecto
                         if (empresasData.length > 0 && !empresaSeleccionada) {
                             setEmpresaSeleccionada(empresasData[0].uuid_empresa);
                         }
                     } catch (error) {
-                        console.error('Error obteniendo empresas:', error);
+                        console.error('Error obteniendo empresasHOLA:', error);
                     }
                 }
             };
@@ -75,7 +80,7 @@ function Dashboard() {
     //--------------------------------------------------------------------------
 
 
-        {/*TECNICOS: OBTENER PARQUES ASOCIADOS A LA EMPRESA SELECCIONADA */}
+        {/*OBTENER PARQUES ASOCIADOS A LA EMPRESA SELECCIONADA */}
         useEffect(() => {
             const fetchParques = async () => {
                 if (empresaSeleccionada) {

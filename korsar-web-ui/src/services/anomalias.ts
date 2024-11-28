@@ -30,16 +30,16 @@ interface AnomaliaData {
 
 
     // funcion para obtener todas las anomalias por aerogenerador, componente e inspeccion
-    export const obtenerAnomaliasFiltradas = async (uuid_turbina:string, uuid_componente: string, uuid_inspeccion:string): Promise<Anomalia[]> => {
+    export const obtenerAnomaliasFiltradas = async (uuid_aerogenerador:string, uuid_componente: string, uuid_inspeccion:string): Promise<Anomalia[]> => {
 
       try {
         // Asegúrate de que los nombres de los parámetros coincidan con los que espera el backend
-        const response = await api.get('/anomalias/items/filtrar-por-aerogenerador-componente-inspeccion', {
+        const response = await api.get(`/anomalias/items/filtrar-por-aerogenerador-componente-inspeccion/`, {
           headers: obtenerEncabezadosAutenticacion(),
           params: {
-            turbina: uuid_turbina,      // Usar 'turbina' en lugar de 'uuid_turbina'
-            componente: uuid_componente, // Usar 'componente' en lugar de 'uuid_componente'
-            inspeccion: uuid_inspeccion, // Usar 'inspeccion' en lugar de 'uuid_inspeccion'
+            uuid_aerogenerador: uuid_aerogenerador,      // Usar 'turbina' en lugar de 'uuid_turbina'
+            uuid_componente: uuid_componente, // Usar 'componente' en lugar de 'uuid_componente'
+            uuid_inspeccion: uuid_inspeccion, // Usar 'inspeccion' en lugar de 'uuid_inspeccion'
           },
         });
 
@@ -95,7 +95,7 @@ interface AnomaliaData {
     export const obtenerAnomaliasPorAerogenerador = async (uuid_aerogenerador: string, uuid_inspeccion: string): Promise<AnomaliasAerogeneradores> => {
 
       try {
-        const response = await api.get('/anomalias/items/anomalias-por-aerogenerador', {
+        const response = await api.get('/anomalias/items/anomalias-por-aerogenerador/', {
           headers: obtenerEncabezadosAutenticacion(),
 
           params: {

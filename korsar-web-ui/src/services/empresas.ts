@@ -34,7 +34,7 @@ const api = axios.create({
         export const obtenerTodasLasEmpresas = async (): Promise<Empresa[]> => {
 
             try {
-                const response = await api.get('/empresas/items', {
+                const response = await api.get('/empresas/items/todas-las-empresas/', {
                     headers: obtenerEncabezadosAutenticacion(),
                 });
 

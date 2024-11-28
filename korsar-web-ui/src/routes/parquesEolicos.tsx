@@ -62,6 +62,7 @@ const ParquesEolicos: React.FC = () => {
         if (!uuid_parque_eolico) return;
         try {
           const response = await obtenerInformacionParque(uuid_parque_eolico);
+          console.log("response 222", response);
           setInformacionParqueEolico(response);
         } catch (error) {
           console.error("Error al obtener el parque eólico:", error);
@@ -81,6 +82,7 @@ const ParquesEolicos: React.FC = () => {
 
         try {
           const response: CantidadSeveridadesPorComponente = await cantidadSeveridadesPorComponentes(ultimaInspeccion.uuid_inspeccion);
+          console.log("response 333", response);
           setSeveridadesData(response);
         } catch (error) {
           console.error("Error al obtener los datos de severidades:", error);
@@ -101,7 +103,7 @@ const ParquesEolicos: React.FC = () => {
         try {
           const response = await obtenerAerogeneradores(uuid_parque_eolico, ultimaInspeccion.uuid_inspeccion);
           setEstadoAerogeneradores(response);
-          console.log("Aerogeneradores con SDADASDAestado:", response);
+          console.log("response 444", response);
 
           // Seleccionar el primer aerogenerador por defecto si existen
           if (response.length > 0) {

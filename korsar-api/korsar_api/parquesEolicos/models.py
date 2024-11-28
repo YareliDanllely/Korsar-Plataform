@@ -32,5 +32,6 @@ class ParquesEolicos(models.Model):
             uuid_parque_eolico=uuid_parque_eolico,
             uuid_empresa=user.uuid_empresa.uuid_empresa).exists()
 
+
     def __str__(self):
         return self.nombre_parque

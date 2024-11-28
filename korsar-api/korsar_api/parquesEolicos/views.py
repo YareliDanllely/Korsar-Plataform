@@ -5,7 +5,7 @@ from .serializers import ParqueEolicoSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
-from empresas.models import Empresa
+from usuarios.models import Usuario
 
 from rest_framework import status
 from utils.validarAcceso import ValidarAcceso
@@ -37,11 +37,13 @@ class ParqueEolicoViewSet(viewsets.ModelViewSet):
         validador = ValidarAcceso(request.user)
 
         try:
-            # Validar el pk y el acceso del usuario al recurso
-            validador.validar_pk(pk, Empresa.usuario_tiene_acceso)
 
-            parques = self.get_queryset().filter(uuid_empresa=uuid_empresa)
-            serializer = self.get_serializer(parques, many=True)
+            # Validar el pk y el acceso del usuario al recurso
+            validador.validar_recurso(pk, Usuario.usuario_esta_asociado_a_empresa)
+
+            print("Obteniendo parques por empresa")
+            parques =  ParquesEolicos.objects.filter(uuid_empresa=pk)
+            serializer = ParqueEolicoSerializer(parques, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
 

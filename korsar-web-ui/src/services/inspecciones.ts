@@ -15,7 +15,7 @@ const api = axios.create({
 export const obtenerInspecciones = async () => {
 
   try {
-    const response = await api.get('/inspecciones/items/por-usuario', {
+    const response = await api.get(`/inspecciones/items/por-usuario/`, {
       headers: obtenerEncabezadosAutenticacion(),
     });
 
