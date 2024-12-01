@@ -27,7 +27,7 @@ export const InformacionInspecciones = ({ uuid_parque_eolico }: { uuid_parque_eo
         <div className="h-full w-full grid grid-cols-2 grid-rows-3 gap-2" style={{ gridTemplateRows: '50px 1fr 50px', gridTemplateColumns: '1fr 1fr' }}>
             {/* Div superior más delgado */}
             <div className="col-span-2 border-b border-gray-300 flex items-center">
-                <h2 className="text-lg text-korsar-text-2">Inspecciones</h2>
+                <h2 className="text-xl px-2 font-light text-korsar-negro-90">Inspecciones</h2>
             </div>
 
             {/* Información de las inspecciones */}

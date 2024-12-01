@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
-import { Carousel, Badge } from "flowbite-react";
+import React, { useEffect, useState } from "react";
+import { Badge } from "flowbite-react";
+import { HiArrowCircleLeft, HiArrowCircleRight } from "react-icons/hi";
 import { obtenerAerogeneradores } from "../../services/aerogeneradores";
 import { AerogeneradorConEstado } from "../../utils/interfaces";
 import IconAerogenerador from "../iconos/iconAerogenerador";
@@ -40,73 +41,112 @@ const getSeverityText = (estado: number): string => {
   }
 };
 
-export function AerogeneradorCarrusel({
-  uuid_parque_eolico,
-  uuid_inspeccion,
-  cambioEstadoFinalAero,
-}: {
-  uuid_parque_eolico: string;
-  uuid_inspeccion: string;
-  cambioEstadoFinalAero?: boolean;
-}) {
-  const [aerogeneradores, setAerogeneradores] = useState<AerogeneradorConEstado[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  export function AerogeneradorCarrusel({
+    uuid_parque_eolico,
+    uuid_inspeccion,
+    cambioEstadoFinalAero,
+  }: {
+    uuid_parque_eolico: string;
+    uuid_inspeccion: string;
+    cambioEstadoFinalAero?: boolean;
+  }) {
+    const [aerogeneradores, setAerogeneradores] = useState<AerogeneradorConEstado[]>([]);
+    const [error, setError] = useState<string | null>(null);
+    const [loading, setLoading] = useState<boolean>(true);
 
-  useEffect(() => {
-    const fetchAerogeneradores = async () => {
-      try {
-        const data = await obtenerAerogeneradores(uuid_parque_eolico, uuid_inspeccion);
-        console.log("Aerogeneradores:", data);
-        setAerogeneradores(data);
-      } catch (error) {
-        setError("Error al obtener los aerogeneradores");
-      } finally {
-        setLoading(false);
+    // Estado para el índice del carrusel
+    const [carouselStartIndex, setCarouselStartIndex] = useState(0);
+    const visibleItems = 4; // Número de aerogeneradores visibles en el carrusel
+
+    useEffect(() => {
+      const fetchAerogeneradores = async () => {
+        try {
+          const data = await obtenerAerogeneradores(uuid_parque_eolico, uuid_inspeccion);
+          setAerogeneradores(data);
+        } catch (error) {
+          setError("Error al obtener los aerogeneradores");
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchAerogeneradores();
+    }, [uuid_parque_eolico, uuid_inspeccion, cambioEstadoFinalAero]);
+
+    const handlePrevious = () => {
+      if (carouselStartIndex > 0) {
+        setCarouselStartIndex(carouselStartIndex - 1);
       }
     };
-    fetchAerogeneradores();
-  }, [uuid_parque_eolico, uuid_inspeccion, cambioEstadoFinalAero]);
 
-  const turbineGroups = [];
-  for (let i = 0; i < aerogeneradores.length; i += 4) {
-    turbineGroups.push(aerogeneradores.slice(i, i + 4));
-  }
+    const handleNext = () => {
+      if (carouselStartIndex < aerogeneradores.length - visibleItems) {
+        setCarouselStartIndex(carouselStartIndex + 1);
+      }
+    };
 
-  return (
-    <div className="w-full h-full rounded-lg">
-      {loading ? (
-        <div className="flex justify-center items-center h-full">Cargando...</div>
-      ) : error ? (
-        <div className="flex justify-center items-center h-full text-red-500">{error}</div>
-      ) : (
-        <Carousel slide={false}>
-          {turbineGroups.map((group, index) => (
-            <div key={index} className="flex justify-center space-x-1">
-              {group.map((turbine) => (
-                <div
-                  key={turbine.uuid_aerogenerador}
-                  className="flex-none w-20 sm:w-15 md:w-15 h-48 flex flex-col items-center justify-center space-y-2 p-3 bg-transparent rounded-lg"
+    return (
+  <div className="w-full h-full rounded-lg relative overflow-hidden">
+    {loading ? (
+      <div className="flex justify-center items-center h-full">Cargando...</div>
+    ) : error ? (
+      <div className="flex justify-center items-center h-full text-red-500">{error}</div>
+    ) : (
+      <div className="flex items-center space-x-10 w-full h-full overflow-hidden">
+        {/* Botón Anterior */}
+        <button
+          onClick={handlePrevious}
+          disabled={carouselStartIndex === 0}
+          className={`absolute left-0 z-10 p-2 ${
+            carouselStartIndex === 0 ? "opacity-50 cursor-not-allowed" : ""
+          }`}
+        >
+          <HiArrowCircleLeft className="text-3xl text-korsar-turquesa-viento hover:text-korsar-turquesa-viento" />
+        </button>
+
+        {/* Lista de Aerogeneradores */}
+        <div className="flex justify-start items-center space-x-2 w-full h-full overflow-x-auto">
+          {aerogeneradores
+            .slice(carouselStartIndex, carouselStartIndex + visibleItems)
+            .map((turbine) => (
+              <div
+                key={turbine.uuid_aerogenerador}
+                className="flex-none w-20 sm:w-24 md:w-28 h-48 flex flex-col items-center justify-center"
+              >
+                {/* Icono del Aerogenerador */}
+                <IconAerogenerador width={"60px"} height={"60px"} />
+
+                {/* Número del Aerogenerador */}
+                <span className="text-lg font-semibold">#{turbine.numero_aerogenerador}</span>
+
+                {/* Badge de Severidad */}
+                <Badge
+                  className={`border ${getColorClass(turbine.estado_final)} text-xs px-2 py-1 rounded-full`}
+                  style={{
+                    backgroundColor: "transparent",
+                    fontSize: "0.7rem",
+                  }}
                 >
-                  {/* Icon above the turbine number */}
-                  <IconAerogenerador width={"60px"} height={"60px"}  />
+                  {getSeverityText(turbine.estado_final)}
+                </Badge>
+              </div>
+            ))}
+        </div>
 
-                  {/* Turbine number */}
-                  <span className="text-lg font-semibold">#{turbine.numero_aerogenerador}</span>
+        {/* Botón Siguiente */}
+        <button
+          onClick={handleNext}
+          disabled={carouselStartIndex >= aerogeneradores.length - visibleItems}
+          className={`absolute right-0 z-10 p-2 ${
+            carouselStartIndex >= aerogeneradores.length - visibleItems
+              ? "opacity-50 cursor-not-allowed"
+              : ""
+          }`}
+        >
+          <HiArrowCircleRight className="text-3xl text-korsar-turquesa-viento hover:text-korsar-turquesa-viento" />
+        </button>
+      </div>
+    )}
+  </div>
 
-                  {/* Severity Badge */}
-                  <Badge
-                    className={`border ${getColorClass(turbine.estado_final)} text-xs px-1 py-0.5 rounded-full`}
-                    style={{ backgroundColor: "transparent", fontSize: "0.7rem" }}
-                  >
-                    {getSeverityText(turbine.estado_final)}
-                  </Badge>
-                </div>
-              ))}
-            </div>
-          ))}
-        </Carousel>
-      )}
-    </div>
-  );
-}
+    );
+  }

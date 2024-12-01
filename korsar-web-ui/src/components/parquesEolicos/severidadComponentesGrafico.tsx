@@ -31,7 +31,7 @@ const DonutChartComponets: React.FC<DonutChartProps> = ({ data, componente }) =>
             labels: ['Sin daño', 'Daño menor', 'Daño significativo', 'Daño mayor', 'Daño crítico'],
             datasets: [
                 {
-                    label: `Estado de Daños en ${componente}`,
+                    label: `Daños en ${componente}`,
                     data: [
                         severidadesComponente['Sin daño'] || 0,
                         severidadesComponente['Menor'] || 0,
@@ -48,30 +48,31 @@ const DonutChartComponets: React.FC<DonutChartProps> = ({ data, componente }) =>
     }, [data, componente]);
 
     return (
-        <div className="flex-grow  w-full max-w-full h-full flex items-center justify-center">
-            <Doughnut
-                data={chartData}
-                options={{
-                    maintainAspectRatio: false,
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'right',
-                            labels: {
-                                boxWidth: 12,
-                                padding: 8,
-                                font: {
-                                    size: 10,
+
+            <div className="flex items-center justify-center">
+                <Doughnut
+                    data={chartData}
+                    options={{
+                        maintainAspectRatio: false,
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                                labels: {
+                                    boxWidth: 12,
+                                    padding: 8,
+                                    font: {
+                                        size: 8,
+                                    },
+                                    usePointStyle: true,
+                                    pointStyle: 'circle',
                                 },
-                                usePointStyle: true,
-                                pointStyle: 'circle',
                             },
                         },
-                    },
-                    cutout: '50%',
-                }}
-            />
-        </div>
+                        cutout: '40%',
+                    }}
+                />
+            </div>
     );
 };
 

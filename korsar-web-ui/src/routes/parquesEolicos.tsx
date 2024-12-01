@@ -24,7 +24,7 @@ const ParquesEolicos: React.FC = () => {
 
 
     {/* OBTENER COLOR DE SEVERIDAD */}
-    const obtenerColor = (number: number) => claseColores[number] || "";
+    const obtenerColor = (number: number) => claseColores[number] || ""
 
 
 //-------------------------------------------------------------------------------//
@@ -136,49 +136,91 @@ const ParquesEolicos: React.FC = () => {
 
 //-------------------------------------------------------------------------------//
     return (
-      <div className="w-full h-screen overflow-y-auto flex justify-center items-start">
-        <div
-          className="w-full max-w-6xl grid grid-cols-5 gap-4 p-10"
-          style={{
-            gridTemplateRows: "1fr 0.5fr 0.5fr",
-            gridTemplateColumns: "1fr 1.5fr 2fr 1fr 1fr",
-          }}
-        >
-          <div className="col-span-2 bg-white shadow-md rounded-lg">
-              {aerogeneradorSeleccionado &&
-              <InformacionAerogenerador uuid_aerogenerador={aerogeneradorSeleccionado} />
-              }
-          </div>
 
-          <div className="col-span-2 col-start-1 row-start-2 bg-white shadow-md rounded-lg p-4">
-              {uuid_parque_eolico && <InformacionInspecciones uuid_parque_eolico={uuid_parque_eolico} />}
-          </div>
+      <div className="w-full flex items-center justify-center min-h-screen">
+              <div className="w-full max-w-7xl space-y-7 p-10 h-full">
 
-          <div className="col-span-3 row-span-2 col-start-3 row-start-1 bg-white shadow-md rounded-lg p-4">
-            {/* <div className="h-[600px] w-full">
-              {informacionParqueEolico && (
-                <MapaParqueEolico
-                  latitud_parque_eolico={informacionParqueEolico.coordenada_latitud}
-                  longitud_parque_eolico={informacionParqueEolico.coordenada_longitud}
-                  markers={markers}
-                  onMarkerClick={aerogeneradorEscogido}
-                />
-              )}
-            </div> */}
-          </div>
 
-          <div className="col-span-5 row-start-3 grid grid-cols-4 gap-4">
-            {severidadesData && (
-              <>
-                <DonutChartComponets data={severidadesData} componente="Aspa Interna" />
-                <DonutChartComponets data={severidadesData} componente="Aspa Externa" />
-                <DonutChartComponets data={severidadesData} componente="Nacelle/Hub" />
-                <DonutChartComponets data={severidadesData} componente="Torre" />
-              </>
-            )}
-          </div>
-        </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-5  sm:grid-rows-4 gap-4">
+
+
+                        <div className=" sm:col-span-2 sm:row-span-2 bg-white shadow-lg rounded-lg">
+                                {aerogeneradorSeleccionado && <InformacionAerogenerador uuid_aerogenerador={aerogeneradorSeleccionado} />}
+
+                        </div>
+
+                        <div className="sm:col-span-2  sm:col-start-1 sm:row-start-3 bg-white shadow-lg rounded-lg p-2">
+                                {uuid_parque_eolico && <InformacionInspecciones uuid_parque_eolico={uuid_parque_eolico} />}
+
+                        </div>
+                        <div className=" sm:col-span-3 sm:row-span-3 sm:col-start-3 sm:row-start-1 bg-white shadow-lg rounded-lg">
+                                <div className="h-[700px] w-full items-center justify-center p-10 rounded-md">
+                                    <h1 className="text-center text-2xl font-light text-korsar-text-1 mb-4"> Mapa Aerogeneradores </h1>
+
+                                  {/* {informacionParqueEolico && (
+                                    <MapaParqueEolico
+                                      latitud_parque_eolico={informacionParqueEolico.coordenada_latitud}
+                                      longitud_parque_eolico={informacionParqueEolico.coordenada_longitud}
+                                      markers={markers}
+                                      onMarkerClick={aerogeneradorEscogido}
+                                    />
+                                  )} */}
+                                </div>
+
+                        </div>
+                        <div className="sm:col-span-5 sm:row-start-4 bg-white shadow-lg rounded-lg p-2 h-auto">
+                                      {severidadesData && (
+                                        <>
+
+                                          <div className="flex flex-col justify-start gap-1 h-full w-full">
+                                              <h3 className="text-center text-2xl font-light text-korsar-text-1 mb-4">
+                                                Severidades por Componentes
+                                              </h3>
+
+                                              <div className="grid grid-cols-1 p-2 sm:grid-cols-4 justify-start gap-2 h-full w-full">
+                                                    <div >
+                                                          <h1 className="text-korsar-text-1 font-thin text-lg">Aspa Interna</h1>
+                                                          <DonutChartComponets data={severidadesData} componente="Aspa Interna" />
+                                                    </div>
+
+                                                    <div >
+                                                          <h1 className="text-korsar-text-1 font-thin text-lg">Aspa Externa</h1>
+                                                          <DonutChartComponets data={severidadesData} componente="Aspa Externa" />
+                                                    </div>
+
+                                                    <div >
+                                                          <h1 className="text-korsar-text-1 font-thin text-lg">Torre</h1>
+                                                          <DonutChartComponets data={severidadesData} componente="Torre" />
+                                                    </div>
+
+                                                    <div className="flex flex-col">
+                                                            <h1 className="text-korsar-text-1 font-thin text-lg">Nacelle/Hub</h1>
+                                                            <DonutChartComponets data={severidadesData} componente="Nacelle/Hub" />
+                                                    </div>
+                                            </div>
+
+                                          </div>
+                                        </>
+                                      )}
+                        </div>
+                    </div>
+              </div>
       </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     );
 };
 

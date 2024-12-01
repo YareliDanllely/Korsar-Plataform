@@ -115,9 +115,8 @@ class AnomaliaViewSet(viewsets.ModelViewSet):
 
         try:
             # Validar pk de inspección
-            validador.validar_pk(
+            validador.validar_recurso(
                 pk=pk,
-                metodo_validacion=Inspeccion.existe_inspeccion_para_usuario
             )
 
             # Filtrar anomalías por uuid_componente

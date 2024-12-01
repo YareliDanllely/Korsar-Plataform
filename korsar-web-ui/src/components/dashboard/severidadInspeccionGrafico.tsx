@@ -68,7 +68,7 @@ const DonutChart: React.FC<DonutChartProps> = ({ uuidParque, uuidInspeccion }) =
     }, [uuidParque, uuidInspeccion]);
 
     return (
-        <div className="w-full flex items-center justify-center p-10" style={{ maxWidth: '100%', overflow: 'hidden' }}>
+        <div className="w-full h-full flex-col items-center justify-center p-2" style={{ maxWidth: '100%', overflow: 'hidden' }}>
         <Doughnut
             data={data}
             options={{
@@ -78,7 +78,7 @@ const DonutChart: React.FC<DonutChartProps> = ({ uuidParque, uuidInspeccion }) =
                         position: 'right',
                         labels: {
                             boxWidth: 12,
-                            padding: 8,
+                            padding: 6,
                             font: {
                                 size: 10,
                             },
@@ -89,7 +89,7 @@ const DonutChart: React.FC<DonutChartProps> = ({ uuidParque, uuidInspeccion }) =
                 },
                 cutout: '50%',
             }}
-            style={{ width: '80%', height: '80%', maxWidth: '100%', maxHeight: '100%' }} // Ajusta el tamaño
+            style={{ width: '90%', height: '10%', maxWidth: '100%', maxHeight: '100%' }}
         />
     </div>
 

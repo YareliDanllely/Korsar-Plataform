@@ -174,117 +174,222 @@ const RevisarInspeccionClientes: React.FC = () => {
     // }
 
     return (
+<div className="w-full flex items-center justify-center min-h-screen">
+  <div className="w-full max-w-7xl space-y-7 p-10 h-full">
 
-          <div className="w-full flex items-center justify-center min-h-screen">
-                <div className="w-full max-w-7xl h-screen overflow-y-auto grid grid-cols-2 gap-3 p-3" style={{ gridTemplateRows: "min-content minmax(140px, 0.5fr) 2fr" }}>
-                {/* Título de la inspección */}
+    <div className="grid grid-cols-1 sm:grid-cols-8 sm:grid-rows-4 gap-4 h-full">
 
-                    <div className="col-span-2 flex flex-row items-start py-4 px-3">
-                        <div className="flex flex-col justify-between w-full">
-                            <h2 className="text-2xl font-semibold">Inspección</h2>
-                            <p className="text-korsar-text-1 text-l">Parque Eólico {inspeccionInformacion?.nombre_parque}</p>
-                            <p className="text-korsar-azul-noche underline mt-1">Fecha: {inspeccionInformacion?.fecha_inspeccion}</p>
+      {/* Aerogenerador Carrusel */}
+      <div className=" sm:col-span-4 rounded-lg shadow-md p-4 flex items-center justify-center">
+                <AerogeneradorCarrusel
+                uuid_inspeccion={uuid_inspeccion || ''}
+                uuid_parque_eolico={uuid_parque || ''}
+                />
+      </div>
+
+      {/* Detalles de la Anomalía */}
+      <div className=" sm:col-span-4 sm:row-span-3 sm:col-start-1 sm:row-start-2 rounded-lg shadow-md p-4">
+                    <h1 className="text-3xl font-light text-korsar-azul-noche mb-4">Detalles de la Anomalía</h1>
+                    {anomaliaSeleccionadaInformacion && (
+                    <>
+                        {/* Dropdowns */}
+                        <div className="flex flex-wrap gap-2 mb-4">
+                        <Dropdown
+                            label={
+                            aerogeneradorSeleccionado
+                                ? `Aerogenerador: ${aerogeneradorSeleccionado.numero_aerogenerador}`
+                                : 'Seleccione Aerogenerador'
+                            }
+                            size="xs"
+                        >
+                            {aerogeneradoresInspeccion.map((aero) => (
+                            <Dropdown.Item
+                                key={aero.numero_aerogenerador}
+                                onClick={() => setAerogeneradorSeleccionado(aero)}
+                                className="text-sm"
+                            >
+                                Número Aerogenerador: {aero.numero_aerogenerador}
+                            </Dropdown.Item>
+                            ))}
+                        </Dropdown>
+
+                        <Dropdown
+                            label={
+                            componenteSeleccionado
+                                ? `Componente: ${componenteSeleccionado.tipo_componente}`
+                                : 'Seleccione Componente'
+                            }
+                            size="xs"
+                        >
+                            {componentesAerogenerador.map((componente) => (
+                            <Dropdown.Item
+                                key={componente.uuid_componente}
+                                onClick={() => setComponenteSeleccionado(componente)}
+                                className="text-sm"
+                            >
+                                Tipo Componente: {componente.tipo_componente}
+                            </Dropdown.Item>
+                            ))}
+                        </Dropdown>
                         </div>
 
-                </div>
-
-                {/* Carrusel de Aerogeneradores */}
-                <div className="bg-white w-full h-full shadow-md rounded-lg col-start-1 row-start-2">
-                    <AerogeneradorCarrusel
-                    uuid_inspeccion={uuid_inspeccion || ''}
-                    uuid_parque_eolico={uuid_parque || ''}
-                    />
-                </div>
-
-                {/* Panel de Anomalías */}
-                <div className="bg-white w-full h-full shadow-md rounded-lg row-span-2 col-start-2 row-start-2 overflow-y-auto p-10">
-
-                      <div className='flex flex-col gap-10'>
-                        <div className='flex flex-row justify-between items-center'>
-                            <h1 className="text-3xl font-light text-korsar-azul-noche">Detalles de la Anomalía</h1>
-                            {anomaliaSeleccionadaInformacion && (
-                            <h2 className="text-xl text-korsar-text-1">{anomaliaSeleccionadaInformacion.codigo_anomalia}</h2>
-                            )}
-
+                        {/* Visualizador de Anomalías */}
+                        <div className="mt-4">
+                        <VisualizadorAnomalias
+                            anomalias={anomaliasInspeccion}
+                            anomaliaSeleccionada={seleccionAnomalia}
+                        />
                         </div>
+                    </>
+                    )}
+             </div>
 
+             <div className="sm:col-span-4 sm:row-span-4 sm:col-start-5 sm:row-start-1 rounded-lg shadow-md p-4 ">
 
-                        <div >
+                       <div className='flex flex-col gap-10'>
+                                <div className='flex flex-row justify-between items-center'>
+                                        <h1 className="text-3xl font-light text-korsar-azul-noche">Detalles de la Anomalía</h1>
+                                        {anomaliaSeleccionadaInformacion && (
+                                        <h2 className="text-xl text-korsar-text-1">{anomaliaSeleccionadaInformacion.codigo_anomalia}</h2>
+                                    )}
+                                </div>
+                         <div >
                             <h1 className="text-2xl font-medium text-korsar-azul-noche">Imágenes</h1>
-
                             <CarruselImagenes
                                 imagenes={imagenesAnomalia}
                             />
+                         </div>
 
-                        </div>
-
-                        <div >
-                        {anomaliaSeleccionadaInformacion  && (
-                            <DetalleAnomalia
-                                informacionAnomalia={anomaliaSeleccionadaInformacion}
-                            />
-                            )}
-                        </div>
-
-                    </div>
-                </div>
-
-                {/* Menú Anomalias Aerogenerador */}
-                <div className="bg-white w-full h-full shadow-md rounded-lg col-start-1 row-start-3 p-5">
-                        <div className="flex flex-row gap-2">
-                            <Dropdown
-                            label = {aerogeneradorSeleccionado ? `Aerogenerador: ${aerogeneradorSeleccionado.numero_aerogenerador}` : 'Seleccione Aerogenerador'}
-                            size = "xs"
-                            >
-                                {aerogeneradoresInspeccion.map((aero) => (
-                                    <Dropdown.Item
-                                    key={aero.numero_aerogenerador}
-                                    onClick={() => {
-                                        setAerogeneradorSeleccionado(aero);
-                                    }}
-                                    className="text-sm"
-                                    >
-                                    Número Aerogenerador: {aero.numero_aerogenerador}
-                                    </Dropdown.Item>
-                                ))}
-                            </Dropdown>
-
-                            <Dropdown
-                            label = {componenteSeleccionado ? `Componente: ${componenteSeleccionado.tipo_componente}` : 'Seleccione Componente'}
-                            size = "xs"
-                            >
-                                {componentesAerogenerador.map((componente) => (
-                                    <Dropdown.Item
-                                    key={componente.uuid_componente}
-                                    onClick={() => {
-                                        setComponenteSeleccionado(componente);
-                                    }}
-                                    className="text-sm"
-                                    >
-                                    Tipo Componente: {componente.tipo_componente}
-                                    </Dropdown.Item>
-                                ))}
-                            </Dropdown>
-                        </div>
+                         <div className='p-5' >
+                            {anomaliaSeleccionadaInformacion  && (
+                                <DetalleAnomalia
+                                    informacionAnomalia={anomaliaSeleccionadaInformacion}
+                                />
+                                )}
+                         </div>
+                     </div>
 
 
-                        <div className='w-full justify-center items-center mt-4 p-4'>
-                            <VisualizadorAnomalias
-                                anomalias={anomaliasInspeccion}
-                                anomaliaSeleccionada={seleccionAnomalia}
-                            />
-
-                        <div>
+             </div>
 
 
-                        </div>
-                    </div>
-                </div>
+    </div>
+  </div>
+</div>
 
 
 
-            </div>
-          </div>
+
+        //   <div className="w-full flex items-center justify-center min-h-screen">
+        //         <div className="w-full max-w-7xl h-screen overflow-y-auto grid grid-cols-2 gap-3 p-3" style={{ gridTemplateRows: "min-content minmax(140px, 0.5fr) 2fr" }}>
+        //         {/* Título de la inspección */}
+
+        //             <div className="col-span-2 flex flex-row items-start py-4 px-3">
+        //                 <div className="flex flex-col justify-between w-full">
+        //                     <h2 className="text-2xl font-semibold">Inspección</h2>
+        //                     <p className="text-korsar-text-1 text-l">Parque Eólico {inspeccionInformacion?.nombre_parque}</p>
+        //                     <p className="text-korsar-azul-noche underline mt-1">Fecha: {inspeccionInformacion?.fecha_inspeccion}</p>
+        //                 </div>
+
+        //         </div>
+
+        //         {/* Carrusel de Aerogeneradores */}
+        //         <div className="bg-white w-full h-full shadow-md rounded-lg col-start-1 row-start-2">
+        //             <AerogeneradorCarrusel
+        //             uuid_inspeccion={uuid_inspeccion || ''}
+        //             uuid_parque_eolico={uuid_parque || ''}
+        //             />
+        //         </div>
+
+        //         {/* Panel de Anomalías */}
+        //         <div className="bg-white w-full h-full shadow-md rounded-lg row-span-2 col-start-2 row-start-2 overflow-y-auto p-10">
+
+        //               <div className='flex flex-col gap-10'>
+        //                 <div className='flex flex-row justify-between items-center'>
+        //                     <h1 className="text-3xl font-light text-korsar-azul-noche">Detalles de la Anomalía</h1>
+        //                     {anomaliaSeleccionadaInformacion && (
+        //                     <h2 className="text-xl text-korsar-text-1">{anomaliaSeleccionadaInformacion.codigo_anomalia}</h2>
+        //                     )}
+
+        //                 </div>
+
+
+        //                 <div >
+        //                     <h1 className="text-2xl font-medium text-korsar-azul-noche">Imágenes</h1>
+
+        //                     <CarruselImagenes
+        //                         imagenes={imagenesAnomalia}
+        //                     />
+
+        //                 </div>
+
+        //                 <div >
+        //                 {anomaliaSeleccionadaInformacion  && (
+        //                     <DetalleAnomalia
+        //                         informacionAnomalia={anomaliaSeleccionadaInformacion}
+        //                     />
+        //                     )}
+        //                 </div>
+
+        //             </div>
+        //         </div>
+
+        //         {/* Menú Anomalias Aerogenerador */}
+        //         <div className="bg-white w-full h-full shadow-md rounded-lg col-start-1 row-start-3 p-5">
+        //                 <div className="flex flex-row gap-2">
+        //                     <Dropdown
+        //                     label = {aerogeneradorSeleccionado ? `Aerogenerador: ${aerogeneradorSeleccionado.numero_aerogenerador}` : 'Seleccione Aerogenerador'}
+        //                     size = "xs"
+        //                     >
+        //                         {aerogeneradoresInspeccion.map((aero) => (
+        //                             <Dropdown.Item
+        //                             key={aero.numero_aerogenerador}
+        //                             onClick={() => {
+        //                                 setAerogeneradorSeleccionado(aero);
+        //                             }}
+        //                             className="text-sm"
+        //                             >
+        //                             Número Aerogenerador: {aero.numero_aerogenerador}
+        //                             </Dropdown.Item>
+        //                         ))}
+        //                     </Dropdown>
+
+        //                     <Dropdown
+        //                     label = {componenteSeleccionado ? `Componente: ${componenteSeleccionado.tipo_componente}` : 'Seleccione Componente'}
+        //                     size = "xs"
+        //                     >
+        //                         {componentesAerogenerador.map((componente) => (
+        //                             <Dropdown.Item
+        //                             key={componente.uuid_componente}
+        //                             onClick={() => {
+        //                                 setComponenteSeleccionado(componente);
+        //                             }}
+        //                             className="text-sm"
+        //                             >
+        //                             Tipo Componente: {componente.tipo_componente}
+        //                             </Dropdown.Item>
+        //                         ))}
+        //                     </Dropdown>
+        //                 </div>
+
+
+        //                 <div className='w-full justify-center items-center mt-4 p-4'>
+        //                     <VisualizadorAnomalias
+        //                         anomalias={anomaliasInspeccion}
+        //                         anomaliaSeleccionada={seleccionAnomalia}
+        //                     />
+
+        //                 <div>
+
+
+        //                 </div>
+        //             </div>
+        //         </div>
+
+
+
+        //     </div>
+        //   </div>
 
 
       );

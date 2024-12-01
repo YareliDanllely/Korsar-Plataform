@@ -43,15 +43,6 @@ function Aerogeneradores() {
       });
 
 
-      const cambiarAerogenerador = () => {
-        if (aerogeneradores.length > 0) {
-          const siguienteIndex = (aerogeneradorIndex + 1) % aerogeneradores.length;
-          setAerogeneradorIndex(siguienteIndex);
-          setAerogeneradoSeleccionado(aerogeneradores[siguienteIndex].uuid_aerogenerador);
-        }
-      };
-
-
 // -------------------------------------------------------------------------------------- //
 
 
@@ -211,94 +202,86 @@ function Aerogeneradores() {
         heliceC: obtenerColor(getHighestSeverity(aspasAnomalias.helice_c))  || "E5E5E5",
         nacelle: obtenerColor(getHighestSeverity(estructuraAnomalias.nacelle))  || "E5E5E5"  };
 
+
+  // -------------------------------------------------------------------------------------- //
+
       return (
-        <div className="w-full px-8">
-          <div
-            className="w-full grid gap-2 p-10"
-            style={{
-              height: "120vh",
-              display: "grid",
-              gridTemplateColumns: "repeat(8, 1fr)",
-              gridTemplateRows: "repeat(6, 1fr)",
-            }}
-          >
-            <div className="bg-white shadow-md rounded-lg p-4 col-span-4 row-span-2">
-            {ultimaInspeccion && uuid_parque_eolico && (
-              <AerogeneradorCarrusel
-                uuid_inspeccion={ultimaInspeccion}
-                uuid_parque_eolico={uuid_parque_eolico}
-                cambioEstadoFinalAero={false}
-              />
-            )}
-            </div>
 
-            <div className="bg-white shadow-md rounded-lg p-4 col-span-4 row-span-3">
+          <div className="w-full flex items-center justify-center min-h-screen">
+            <div className="w-full max-w-7xl space-y-7 p-10 h-full">
+              <div className="grid grid-cols-1 sm:grid-cols-2 sm:grid-rows-4  gap-3 h-full">
+                {/* Elemento 1 */}
+                <div className="h-full bg-white shadow-lg rounded-lg">
+                  <div className=" w-full h-full flex items-center justify-center">
+                    {ultimaInspeccion && uuid_parque_eolico && (
+                      <AerogeneradorCarrusel
+                        uuid_inspeccion={ultimaInspeccion}
+                        uuid_parque_eolico={uuid_parque_eolico}
+                        cambioEstadoFinalAero={false}
+                      />
+                    )}
+                  </div>
+                </div>
 
+                {/* Elemento 2 */}
+                <div className="sm:row-span-2 h-full bg-white shadow-lg  rounded-lg">
+                  <div className="w-auto h-auto justify-between">
+                    <AnomaliasComponente cantidad={3} data={aspasAnomalias} />
+                  </div>
+                </div>
 
+                {/* Elemento 3 */}
+                <div className="sm:row-span-3 w-auto overflow-scroll bg-white shadow-lg">
+                  <div className="w-full h-full flex flex-col p-5">
+                    {/* Dropdowns arriba */}
+                    <div className="h-auto w-auto flex flex-col sm:flex-row items-center justify-center gap-10 ">
+                      <Dropdown label="Parques Eólicos" size="xs">
+                        {parquesEolicos.map((parque) => (
+                          <Dropdown.Item
+                            key={parque.uuid_parque_eolico}
+                            onClick={() => setUuidParqueEolico(parque.uuid_parque_eolico)}
+                          >
+                            {parque.nombre_parque}
+                          </Dropdown.Item>
+                        ))}
+                      </Dropdown>
 
-              <AnomaliasComponente cantidad={3} data={aspasAnomalias} />
-            </div>
+                      <Dropdown label="Aerogeneradores" size="xs">
+                        {aerogeneradores.map((aerogenerador) => (
+                          <Dropdown.Item
+                            key={aerogenerador.uuid_aerogenerador}
+                            onClick={() => setAerogeneradoSeleccionado(aerogenerador.uuid_aerogenerador)}
+                          >
+                            {aerogenerador.numero_aerogenerador}
+                          </Dropdown.Item>
+                        ))}
+                      </Dropdown>
+                    </div>
 
-            <div className="bg-white shadow-md rounded-lg p-4 col-span-4 row-span-6">
-              {/* Dropdowns arriba */}
-              <div className="flex items-center justify-center gap-4 mb-4">
-                <Dropdown label="Parques Eólicos" size="sm">
-                  {parquesEolicos.map((parque) => (
-                    <Dropdown.Item
-                      key={parque.uuid_parque_eolico}
-                      onClick={() => setUuidParqueEolico(parque.uuid_parque_eolico)}
-                    >
-                      {parque.nombre_parque}
-                    </Dropdown.Item>
-                  ))}
-                </Dropdown>
-
-                <Dropdown label="Aerogeneradores" size="sm">
-                  {aerogeneradores.map((aerogenerador) => (
-                    <Dropdown.Item
-                      key={aerogenerador.uuid_aerogenerador}
-                      onClick={() => setAerogeneradoSeleccionado(aerogenerador.uuid_aerogenerador)}
-                    >
-                      {aerogenerador.numero_aerogenerador}
-                    </Dropdown.Item>
-                  ))}
-                </Dropdown>
-
-
-              <Button
-                onClick={cambiarAerogenerador}
-                className="px-2 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-              >
-                Cambiar Aerogenerador
-              </Button>
-
+                    {/* Gráfico o componente */}
+                    <div className="flex items-center justify-center h-full">
+                      <div className="relative w-full h-[500px] max-w-full max-h-full overflow-hidden">
+                        <EstadoAerogeneradores colores={damageColors} ancho="100%" alto="100%" />
+                      </div>
+                    </div>
 
 
-              </div>
+                  </div>
+                </div>
 
-              {/* Gráfico o componente */}
-              <div className="flex items-center justify-center">
-                <div className="relative w-full h-[400px] max-w-full max-h-full">
-                  <EstadoAerogeneradores colores={damageColors} ancho="200%" alto="200%" />
+                {/* Elemento 6 */}
+                <div className="sm:row-span-2 sm:col-start-2 sm:row-start-3 h-full bg-white shadow-lg rounded-lg">
+                  <div className="w-auto h-auto justify-between">
+                    <AnomaliasComponente cantidad={1} data={{ torre: estructuraAnomalias.torre }} />
+                    <AnomaliasComponente cantidad={1} data={{ nacelle: estructuraAnomalias.nacelle }} />
+                  </div>
                 </div>
               </div>
-
-
-
-
-            </div>
-
-
-
-            <div className="bg-white shadow-md rounded-lg p-4 col-span-2 row-span-5">
-              <AnomaliasComponente cantidad={1} data={{ torre: estructuraAnomalias.torre }} />
-            </div>
-
-            <div className="bg-white shadow-md rounded-lg p-4 col-span-2 row-span-5">
-              <AnomaliasComponente cantidad={1} data={{ nacelle: estructuraAnomalias.nacelle }} />
             </div>
           </div>
-        </div>
+
+
+
       );
 }
 

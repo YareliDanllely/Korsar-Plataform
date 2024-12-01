@@ -27,19 +27,17 @@ const AnomaliasComponente: React.FC<AnomaliasComponenteProps> = ({ cantidad, dat
   const partes = Object.keys(data).slice(0, cantidad);
 
   return (
-    <div className="h-full w-full bg-white p-3 rounded-lg overflow-hidden">
-      {/* Título del componente */}
-      <h2 className="text-base mb-2">Condición de Hélice</h2>
+    <div className="h-full w-full bg-white p-10 rounded-lg overflow-hidden">
 
       {/* Contenedor principal que varía según la cantidad de partes */}
-      <div className={`grid gap-2 ${partes.length === 1 ? "grid-cols-1" : "grid-cols-2"} overflow-auto`}>
+      <div className={`grid gap-8 ${partes.length === 1 ? "grid-cols-1" : "grid-cols-2"} overflow-auto`}>
         {partes.map((parte) => (
           <div
             key={parte}
             className="text-center p-2 rounded-lg border overflow-hidden h-full"
           >
             {/* Título de la parte actual */}
-            <h3 className="text-sm font-semibold capitalize">
+            <h3 className="text-2xl font-light  text-korsar-negro-90  capitalize">
               {parte.replace("_", " ")} {/* Reemplaza los guiones bajos con espacios */}
             </h3>
 
@@ -49,8 +47,8 @@ const AnomaliasComponente: React.FC<AnomaliasComponenteProps> = ({ cantidad, dat
                 {/* Panel del acordeón */}
                 <Accordion.Panel className="my-4">
                   {/* Título del acordeón que indica el estado de la parte */}
-                  <Accordion.Title className="text-xs font-semibold">
-                    <p className={`${data[parte].length ? "text-red-600" : "text-green-600"} font-semibold`}>
+                  <Accordion.Title className="text-base font-semibold">
+                    <p className={`${data[parte].length ? "text-korsar-naranja-sol" : "text-korsar-verde-brillante"}   `}>
                       {data[parte].length ? "Dañada" : "Sin Daños"}
                     </p>
                   </Accordion.Title>

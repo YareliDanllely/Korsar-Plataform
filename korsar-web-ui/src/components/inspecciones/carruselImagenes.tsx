@@ -57,7 +57,7 @@ const CarruselImagenes: React.FC<CarruselProps> = ({ imagenes }) => {
       <button
         onClick={handleNext}
         disabled={carouselStartIndex >= imagenes.length - visibleItems}
-        className={`absolute right-0 z-10 p-2 ${
+        className={`absolute right-0 z-10 p-1 ${
           carouselStartIndex >= imagenes.length - visibleItems ? 'opacity-50 cursor-not-allowed' : ''
         }`}
         style={{ transform: 'translateY(-50%)' }}
