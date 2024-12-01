@@ -209,6 +209,17 @@ function Aerogeneradores() {
 
           <div className="w-full flex items-center justify-center min-h-screen">
             <div className="w-full max-w-7xl space-y-7 p-10 h-full">
+
+
+                            {/* Título al inicio */}
+                            <div className="w-full text-start mb-6">
+                  <h1 className="text-5xl font-light text-korsar-azul-noche mb-6">Monitoreo Parque Eólico</h1>
+                  <p className="text-start text-2xl font-light text-gray-600 w-3/4">
+                      Consulta detalles clave del parque, inspeccion reciente, anomalías y el estado general de los aerogeneradores.
+                  </p>
+              </div>
+
+
               <div className="grid grid-cols-1 sm:grid-cols-2 sm:grid-rows-4  gap-3 h-full">
                 {/* Elemento 1 */}
                 <div className="h-full bg-white shadow-lg rounded-lg">

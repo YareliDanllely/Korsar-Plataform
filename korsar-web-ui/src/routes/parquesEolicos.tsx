@@ -138,76 +138,72 @@ const ParquesEolicos: React.FC = () => {
     return (
 
       <div className="w-full flex items-center justify-center min-h-screen">
-              <div className="w-full max-w-7xl space-y-7 p-10 h-full">
+          <div className="w-full max-w-7xl space-y-7 p-10 h-full">
 
-
-                    <div className="grid grid-cols-1 sm:grid-cols-5  sm:grid-rows-4 gap-4">
-
-
-                        <div className=" sm:col-span-2 sm:row-span-2 bg-white shadow-lg rounded-lg">
-                                {aerogeneradorSeleccionado && <InformacionAerogenerador uuid_aerogenerador={aerogeneradorSeleccionado} />}
-
-                        </div>
-
-                        <div className="sm:col-span-2  sm:col-start-1 sm:row-start-3 bg-white shadow-lg rounded-lg p-2">
-                                {uuid_parque_eolico && <InformacionInspecciones uuid_parque_eolico={uuid_parque_eolico} />}
-
-                        </div>
-                        <div className=" sm:col-span-3 sm:row-span-3 sm:col-start-3 sm:row-start-1 bg-white shadow-lg rounded-lg">
-                                <div className="h-[700px] w-full items-center justify-center p-10 rounded-md">
-                                    <h1 className="text-center text-2xl font-light text-korsar-text-1 mb-4"> Mapa Aerogeneradores </h1>
-
-                                  {/* {informacionParqueEolico && (
-                                    <MapaParqueEolico
-                                      latitud_parque_eolico={informacionParqueEolico.coordenada_latitud}
-                                      longitud_parque_eolico={informacionParqueEolico.coordenada_longitud}
-                                      markers={markers}
-                                      onMarkerClick={aerogeneradorEscogido}
-                                    />
-                                  )} */}
-                                </div>
-
-                        </div>
-                        <div className="sm:col-span-5 sm:row-start-4 bg-white shadow-lg rounded-lg p-2 h-auto">
-                                      {severidadesData && (
-                                        <>
-
-                                          <div className="flex flex-col justify-start gap-1 h-full w-full">
-                                              <h3 className="text-center text-2xl font-light text-korsar-text-1 mb-4">
-                                                Severidades por Componentes
-                                              </h3>
-
-                                              <div className="grid grid-cols-1 p-2 sm:grid-cols-4 justify-start gap-2 h-full w-full">
-                                                    <div >
-                                                          <h1 className="text-korsar-text-1 font-thin text-lg">Aspa Interna</h1>
-                                                          <DonutChartComponets data={severidadesData} componente="Aspa Interna" />
-                                                    </div>
-
-                                                    <div >
-                                                          <h1 className="text-korsar-text-1 font-thin text-lg">Aspa Externa</h1>
-                                                          <DonutChartComponets data={severidadesData} componente="Aspa Externa" />
-                                                    </div>
-
-                                                    <div >
-                                                          <h1 className="text-korsar-text-1 font-thin text-lg">Torre</h1>
-                                                          <DonutChartComponets data={severidadesData} componente="Torre" />
-                                                    </div>
-
-                                                    <div className="flex flex-col">
-                                                            <h1 className="text-korsar-text-1 font-thin text-lg">Nacelle/Hub</h1>
-                                                            <DonutChartComponets data={severidadesData} componente="Nacelle/Hub" />
-                                                    </div>
-                                            </div>
-
-                                          </div>
-                                        </>
-                                      )}
-                        </div>
-                    </div>
+              {/* Título al inicio */}
+              <div className="w-full text-start mb-6">
+                  <h1 className="text-5xl font-light text-korsar-azul-noche mb-6">Monitoreo Parque Eólico</h1>
+                  <p className="text-start text-2xl font-light text-gray-600 w-3/4">
+                      Consulta detalles clave del parque, inspeccion reciente, anomalías y el estado general de los aerogeneradores.
+                  </p>
               </div>
-      </div>
 
+              <div className="grid grid-cols-1 sm:grid-cols-5 sm:grid-rows-4 gap-4">
 
+                  <div className="sm:col-span-2 sm:row-span-2 bg-white shadow-lg rounded-lg">
+                      {aerogeneradorSeleccionado && <InformacionAerogenerador uuid_aerogenerador={aerogeneradorSeleccionado} />}
+                  </div>
+
+                  <div className="sm:col-span-2 sm:col-start-1 sm:row-start-3 bg-white shadow-lg rounded-lg p-2">
+                      {uuid_parque_eolico && <InformacionInspecciones uuid_parque_eolico={uuid_parque_eolico} />}
+                  </div>
+
+                  <div className="sm:col-span-3 sm:row-span-3 sm:col-start-3 sm:row-start-1 bg-white shadow-lg rounded-lg">
+                      <div className="h-[700px] w-full items-center justify-center p-10 rounded-md">
+                          <h1 className="text-center text-2xl font-light text-korsar-text-1 mb-4">Mapa Aerogeneradores</h1>
+
+                          {/* {informacionParqueEolico && (
+                          <MapaParqueEolico
+                              latitud_parque_eolico={informacionParqueEolico.coordenada_latitud}
+                              longitud_parque_eolico={informacionParqueEolico.coordenada_longitud}
+                              markers={markers}
+                              onMarkerClick={aerogeneradorEscogido}
+                          />
+                          )} */}
+                      </div>
+                  </div>
+
+                  <div className="sm:col-span-5 sm:row-start-4 bg-white shadow-lg rounded-lg p-2 h-auto">
+                      {severidadesData && (
+                          <div className="flex flex-col justify-start gap-1 h-full w-full">
+                              <h3 className="text-center text-2xl font-light text-korsar-text-1 mb-4">
+                                  Severidades por Componentes
+                              </h3>
+
+                              <div className="grid grid-cols-1 p-2 sm:grid-cols-4 justify-start gap-2 h-full w-full">
+                                  <div>
+                                      <h1 className="text-korsar-text-1 font-thin text-lg">Aspa Interna</h1>
+                                      <DonutChartComponets data={severidadesData} componente="Aspa Interna" />
+                                  </div>
+                                  <div>
+                                      <h1 className="text-korsar-text-1 font-thin text-lg">Aspa Externa</h1>
+                                      <DonutChartComponets data={severidadesData} componente="Aspa Externa" />
+                                  </div>
+                                  <div>
+                                      <h1 className="text-korsar-text-1 font-thin text-lg">Torre</h1>
+                                      <DonutChartComponets data={severidadesData} componente="Torre" />
+                                  </div>
+                                  <div className="flex flex-col">
+                                      <h1 className="text-korsar-text-1 font-thin text-lg">Nacelle/Hub</h1>
+                                      <DonutChartComponets data={severidadesData} componente="Nacelle/Hub" />
+                                  </div>
+                              </div>
+                          </div>
+                      )}
+                  </div>
+              </div>
+          </div>
+  </div>
 
 
 
@@ -225,3 +221,41 @@ const ParquesEolicos: React.FC = () => {
 };
 
 export default ParquesEolicos;
+
+
+
+// <div className="col-span-2 flex flex-col sm:flex-row items-start py-4 px-3">
+// <div className="flex flex-col justify-between w-full">
+//       <h1 className="text-3xl font-light text-korsar-azul-noche">Detalles de la Inspección</h1>
+//     {inspeccionInformacion && (
+//     <div className="flex flex-col gap-4">
+//         <div>
+//             <span className="text-lg text-korsar-text-1">Parque Eólico {inspeccionInformacion?.nombre_parque}</span>
+//         </div>
+//         <div>
+//             <span className="text-lg text-korsar-text-1">Fecha: {inspeccionInformacion?.fecha_inspeccion}</span>
+//         </div>
+
+//         <div>
+//             <span className="text-lg text-korsar-text-1">Progeso: {inspeccionInformacion?.progreso}</span>
+//         </div>
+//         <div>
+
+//     </div>
+//     </div>
+//     )}
+
+// </div>
+
+// <div className="flex flex-col sm:flex-row justify-end w-full">
+//         <Button
+//           className="bg-korsar-verde-brillante rounded-2xl text-white"
+//           onClick={() => {
+//             confirmarTerminoInspeccion();
+//           }}
+//         >
+//           Terminar Inspección
+//         </Button>
+// </div>
+// </div>
+// </div>

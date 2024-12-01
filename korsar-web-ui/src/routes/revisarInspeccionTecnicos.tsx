@@ -145,62 +145,52 @@ const RevisarInspeccion: React.FC = () => {
       return (
         <DndContext onDragEnd={handleDrop}>
           <div className="w-full flex items-center justify-center min-h-screen">
-            <div className="w-full max-w-7xl h-screen overflow-y-auto grid grid-cols-2 gap-3 p-3" style={{ gridTemplateRows: "min-content minmax(140px, 0.5fr) 2fr" }}>
-              {/* Título de la inspección */}
-              <div className="col-span-2 flex flex-row items-start py-4 px-3">
-                <div className="flex flex-col justify-between w-full">
-                  <h2 className="text-2xl font-semibold">Inspección</h2>
-                  <p className="text-korsar-text-1 text-l">Parque Eólico {inspeccionInformacion?.nombre_parque}</p>
-                  <p className="text-korsar-azul-noche underline mt-1">Fecha: {inspeccionInformacion?.fecha_inspeccion}</p>
-                  <p className="text-korsar-azul-noche underline mt-1">Estado: {inspeccionInformacion?.progreso}</p>
-                </div>
-                <div className="flex flex-row justify-end w-full">
-                  <Button
-                    className="bg-korsar-verde-brillante rounded-2xl text-white"
-                    onClick={() => {
-                      confirmarTerminoInspeccion();
-                    }}
-                  >
-                    Terminar Inspección
-                  </Button>
-                </div>
-              </div>
+            <div className="w-full max-w-7xl space-y-7 p-10 h-full">
+              <div className="grid grid-cols-1 sm:grid-cols-4 sm:grid-rows-7 gap-4 h-full">
 
-              {/* Carrusel de Aerogeneradores */}
-              <div className="bg-white w-full h-full shadow-md rounded-lg col-start-1 row-start-2">
-                <AerogeneradorCarrusel
-                  uuid_inspeccion={uuid_inspeccion || ''}
-                  uuid_parque_eolico={uuid_parque || ''}
-                  cambioEstadoFinalAero={cambioEstadoFinalAero}
-                />
-              </div>
+                {/* Información de la Inspección */}
+                <div className="sm:col-span-4">
+                    <div className="col-span-2 flex flex-col sm:flex-row items-start py-4 px-3">
+                      <div className="flex flex-col justify-between w-full">
+                            <h1 className="text-5xl font-light text-korsar-azul-noche mb-4">Detalles de la Inspección</h1>
 
-              {/* Panel de Anomalías */}
-              <div className="bg-white w-full h-full shadow-md rounded-lg row-span-2 col-start-2 row-start-2 overflow-y-auto">
-                {uuidTurbina && uuidComponente ? (
-                  <PanelAnomalias
-                    uuid_turbina={uuidTurbina}
-                    uuid_componente={uuidComponente}
+                            {inspeccionInformacion && (
+                              <div className="flex flex-col gap-4">
+                                <div>
+                                  <span className="text-lg text-korsar-text-1">Parque Eólico: {inspeccionInformacion.nombre_parque}</span>
+                                </div>
+                                <div>
+                                  <span className="text-lg text-korsar-text-1">Fecha: {inspeccionInformacion.fecha_inspeccion}</span>
+                                </div>
+                                <div>
+                                  <span className="text-lg text-korsar-text-1">Estado: {inspeccionInformacion.progreso}</span>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="flex flex-col sm:flex-row justify-end w-full mt-4">
+                            <Button
+                              className="bg-korsar-verde-brillante rounded-2xl text-white"
+                              onClick={confirmarTerminoInspeccion}
+                            >
+                              Terminar Inspección
+                            </Button>
+                          </div>
+                    </div>
+                  </div>
+
+                {/* Aerogenerador Carrusel */}
+                <div className="sm:col-span-2 sm:row-start-2 rounded-lg shadow-md p-4 flex items-center justify-center bg-white">
+                  <AerogeneradorCarrusel
                     uuid_inspeccion={uuid_inspeccion || ''}
-                    uuid_parque={uuid_parque || ''}
-                    busquedaActivada={busquedaActivada}
-                    droppedImages={droppedImages}
-                    imagenesParaEliminar={imagenesParaEliminar}
-                    onRemoveImage={handleRemoveImage}
-                    resetDroppedImages={resetDroppedImages}
+                    uuid_parque_eolico={uuid_parque || ''}
                     cambioEstadoFinalAero={cambioEstadoFinalAero}
-                    actualizarEstadoFinalAero={actualizarCambioEstadoFinalAero}
-                    actualizarCrearAnomalia={actualizarEstadoCrearAnomalia}
-                    cargarImagenesAnomaliaCreada={cargarImagenesDesdeBackend}
                   />
-                ) : (
-                  <p>Seleccione un aerogenerador y un componente para ver las anomalías.</p>
-                )}
-              </div>
+                </div>
 
-              {/* Menú Desplegable de Aerogeneradores */}
-              <div className="bg-white w-full h-full shadow-md rounded-lg col-start-1 row-start-3 p-5">
-                <div className="p-5">
+                {/* Imágenes de la Inspección */}
+                <div className="sm:col-span-2 sm:row-span-4 sm:col-start-1 sm:row-start-3 rounded-lg shadow-md p-4 bg-white">
                   <MenuDesplegableAerogeneradores
                     uuid_parque_eolico={uuid_parque || ''}
                     uuid_inspeccion={uuid_inspeccion || ''}
@@ -211,10 +201,34 @@ const RevisarInspeccion: React.FC = () => {
                     onCreateAnomalia={onCreateAnomalia}
                   />
                 </div>
+
+                {/* Sección de Anomalías */}
+                <div className="sm:col-span-2 sm:row-span-5 sm:col-start-3 sm:row-start-2 rounded-lg shadow-md p-4 bg-white">
+                  {uuidTurbina && uuidComponente ? (
+                    <PanelAnomalias
+                      uuid_turbina={uuidTurbina}
+                      uuid_componente={uuidComponente}
+                      uuid_inspeccion={uuid_inspeccion || ''}
+                      uuid_parque={uuid_parque || ''}
+                      busquedaActivada={busquedaActivada}
+                      droppedImages={droppedImages}
+                      imagenesParaEliminar={imagenesParaEliminar}
+                      onRemoveImage={handleRemoveImage}
+                      resetDroppedImages={resetDroppedImages}
+                      cambioEstadoFinalAero={cambioEstadoFinalAero}
+                      actualizarEstadoFinalAero={actualizarCambioEstadoFinalAero}
+                      actualizarCrearAnomalia={actualizarEstadoCrearAnomalia}
+                      cargarImagenesAnomaliaCreada={cargarImagenesDesdeBackend}
+                    />
+                  ) : (
+                    <p>Seleccione un aerogenerador y un componente para ver las anomalías.</p>
+                  )}
+                </div>
               </div>
             </div>
           </div>
 
+          {/* Zona Toast */}
           {showToast && (
             <div className="fixed inset-0 flex items-center justify-center z-50">
               <div className="w-1/3">
@@ -223,12 +237,11 @@ const RevisarInspeccion: React.FC = () => {
             </div>
           )}
 
-          {/* ZONA MODALES */}
-          {/* Modal de confirmación de envío */}
+          {/* Zona de Modales */}
           <ConfirmacionModal
             openModal={abrirModalTerminarInspeccion}
             onConfirm={enviarCambioProgresoInspeccion}
-            message='¿Estas seguro que quieres terminar la Inspección?'
+            message="¿Estás seguro que quieres terminar la inspección?"
             onClose={() => setAbrirModalTerminarInspeccion(false)}
           />
 
@@ -240,6 +253,8 @@ const RevisarInspeccion: React.FC = () => {
           />
         </DndContext>
       );
+
+
 };
 
 export default RevisarInspeccion;
