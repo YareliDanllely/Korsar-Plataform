@@ -10,14 +10,14 @@ const api = axios.create({
 //----------------------------------------------------------------------------------------------//
 
 // Función para obtener imágenes filtradas
-export const obtenerImagenesFiltradas = async (uuid_aerogenerador: string, uuid_componente: string, uuid_parque: string) => {
+export const obtenerImagenesFiltradas = async (uuid_aerogenerador: string, uuid_componente: string, uuid_inspeccion: string) => {
   try {
-    const response = await api.get('/imagenes/filtrar/', {
+    const response = await api.get('/imagenes/items/filtrar/', {
       headers: obtenerEncabezadosAutenticacion(),
       params: {
-        aerogeneradores: uuid_aerogenerador, // Parámetro 'aerogeneradores' para el UUID del aerogenerador
-        componente: uuid_componente,          // Parámetro 'componente' para el UUID del componente
-        parque_eolico: uuid_parque,           // Parámetro 'parque_eolico' para el UUID del parque
+        uuid_aerogenerador: uuid_aerogenerador, // Parámetro 'aerogeneradores' para el UUID del aerogenerador
+        uuid_componente: uuid_componente,          // Parámetro 'componente' para el UUID del componente
+        uuid_inspeccion: uuid_inspeccion,           // Parámetro 'parque_eolico' para el UUID del parque
       },
     });
 

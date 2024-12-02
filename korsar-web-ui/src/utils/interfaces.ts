@@ -12,7 +12,7 @@ export interface Anomalia {
     severidad_anomalia: number;      // IntegerField para choices, se mantiene como number en TypeScript
 
     dimension_anomalia: string;      // CharField mapeado a string
-    ubicacion_componente: string;      // CharField mapeado a string
+    // ubicacion_componente: string;      // CharField mapeado a string
     orientacion_anomalia: string;    // CharField mapeado a string
     descripcion_anomalia: string;   // TextField, opcional en TypeScript
 

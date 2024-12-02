@@ -3,11 +3,14 @@ import { useEffect, useState } from "react";
 import { obtenerAnomaliasFiltradas } from "../../services/anomalias";
 import { Anomalia } from "../../utils/interfaces";
 import { FormularioAnomalias } from "./formularios/anomaliasFormulario";
+import { FormularioEditarAnomalias } from "./formularios/editarAnomaliaFormulario";
 import SuccessToast from "./avisoOperacionExitosa";
+
 
 interface Imagen {
   uuid_imagen: string;
   ruta_imagen: string;
+  uuid_imagen_anomalia?: string;
 }
 
 interface PanelAnomaliasProps {
@@ -69,19 +72,13 @@ export const PanelAnomalias: React.FC<PanelAnomaliasProps> = ({
 
   const handleVerMasClick = (anomalia: Anomalia) => {
     setAnomaliaSeleccionada(anomalia);
+    console.log(anomalia, 'anomalia');
     handleTabChange(2);
     cargarImagenesAnomaliaCreada(anomalia.uuid_anomalia);
     setMostrarPrevisualizar(true); // Activa el tab de previsualización al hacer clic en "Ver Más"
   };
 
   const handleVolverClick = () => {
-    if (droppedImages.length === 0) {
-
-      setToastMessage('Necesitas subir al menos una imagen para continuar');
-      setShowToast(true);
-      // setTimeout(() => setShowToast(false), 3000); // Oculta el Toast después de 3 segundos
-      return;
-    }
 
     setMostrarPrevisualizar(false);
     resetDroppedImages(); // Limpia las imágenes al volver
@@ -176,9 +173,10 @@ export const PanelAnomalias: React.FC<PanelAnomaliasProps> = ({
           {mostrarPrevisualizar && (
               <Tabs.Item title="Previsualizar/Editar">
                   <div className="h-full w-full p-4 overflow-auto">
-                      {anomaliaSeleccionada ? (
+                      {anomaliaSeleccionada ?
+                      (
                           <>
-                              <FormularioAnomalias
+                              <FormularioEditarAnomalias
                                   modoEditar={true}
                                   informacionIncialAnomalia={anomaliaSeleccionada}
                                   droppedImages={droppedImages}
@@ -187,7 +185,6 @@ export const PanelAnomalias: React.FC<PanelAnomaliasProps> = ({
                                   imagenesParaEliminar={imagenesParaEliminar}
                                   uuid_inspeccion={uuid_inspeccion}
                                   uuid_componente={uuid_componente}
-                                  uuid_parque={uuid_parque}
                                   resetDroppedImages={resetDroppedImages}
                                   cambioEstadoFinalAero={cambioEstadoFinalAero}
                                   actualizarAnomaliasDisplay={actualizarAnomaliasCreadas}

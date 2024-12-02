@@ -1,6 +1,5 @@
 from rest_framework import viewsets
 from rest_framework import status
-from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from .models import Imagen
 from rest_framework.exceptions import ValidationError
@@ -10,23 +9,17 @@ from .serializers import ImagenSerializer
 from utils.validarAcceso import ValidarAcceso
 
 
-
 class ImagenViewSet(viewsets.ModelViewSet):
     queryset = Imagen.objects.all()
     serializer_class = ImagenSerializer
     permission_classes = [IsAuthenticated]
 
-
-class ImagenFiltradaListView(generics.ListAPIView):
-    """
-    Vista que permite filtrar las imágenes por parque, aerogenerador y componente.
-    """
-    serializer_class = ImagenSerializer
-    permission_classes = [IsAuthenticated]  # Solo para usuarios autenticados
-
-    def get_queryset(self):
-        # Instanciar el validador
-        validador = ValidarAcceso(self.request.user)
+    @action(detail=False, methods=['get'], url_path='filtrar')
+    def filtrar_imagenes(self, request):
+        """
+        Filtra imágenes por parque, aerogenerador y componente.
+        """
+        validador = ValidarAcceso(request.user)
 
         try:
             # Validar los parámetros de la URL
@@ -34,38 +27,29 @@ class ImagenFiltradaListView(generics.ListAPIView):
                 parametros={
                     'uuid_aerogenerador': True,
                     'uuid_componente': True,
-                    'uuid_parque_eolico': True,
+                    'uuid_inspeccion': True,
                 },
-                request_data=self.request.query_params,
-                validaciones_por_parametro={
-                    'uuid_aerogenerador': Imagen.existe_aerogenerador_para_usuario,
-                    'uuid_parque_eolico': Imagen.existe_parque_para_usuario,
-                    'uuid_componente': Imagen.existe_componente_para_usuario,
-                }
+                request_data=request.query_params,
             )
-
 
             # Filtrar imágenes por los parámetros validados
             queryset = Imagen.objects.filter(
                 uuid_aerogenerador=parametros['uuid_aerogenerador'],
                 uuid_componente=parametros['uuid_componente'],
-                uuid_aerogenerador__uuid_parque_eolico=parametros['uuid_parque_eolico']
+                uuid_inspeccion=parametros['uuid_inspeccion']
             )
 
 
-            return queryset
+            # Serializar los datos
+            serializer = self.get_serializer(queryset, many=True)
+
+            # Devolver la respuesta serializada
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
         # Manejo de excepciones
-        except (Imagen.DoesNotExist, ValueError) as e:
-            return Response({'error': 'Empresa no encontrada'}, status=status.HTTP_404_NOT_FOUND)
-
         except ValidationError as e:
             return Response({'error': e.detail}, status=status.HTTP_400_BAD_REQUEST)
-
         except PermissionError as e:
             return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
-
         except Exception as e:
             return Response({'error': 'Error interno del servidor', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-

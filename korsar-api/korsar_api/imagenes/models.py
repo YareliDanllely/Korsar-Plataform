@@ -26,12 +26,13 @@ class Imagen(models.Model):
     nombre_imagen = models.CharField(max_length=255)
     fecha_creacion = models.DateField()
     ruta_imagen = models.CharField(max_length=255)
-    estado_clasificacion = models.CharField(
-        max_length=255,
-        choices=CLASIFICACION_CHOICES,
-        default='no_clasificada'
-    )
+
 
 
     def __str__(self):
         return f"Imagen {self.nombre_imagen} - Inspección {self.uuid_inspeccion}"
+
+
+    class Meta:
+        verbose_name = "Imagen"
+        verbose_name_plural = "Imagenes"

@@ -37,3 +37,8 @@ class Aerogenerador(models.Model):
 
     def __str__(self):
         return f"Aerogenerador {self.numero_aerogenerador} - {self.modelo_aerogenerador}"
+
+
+    class Meta:
+        verbose_name = "Aerogenerador"
+        verbose_name_plural = "Aerogeneradores"

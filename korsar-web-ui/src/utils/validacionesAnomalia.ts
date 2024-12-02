@@ -5,7 +5,6 @@ export const validarFormularioAnomalia = (
   dimensionAnomalia?: string,
   orientacionAnomalia?: string,
   descripcionAnomalia?: string,
-  ubicacionAnomalia?: string,
   imagenes?: ImagenAnomaliaFront[]
 ): ValidacionErrores => {
   const errores: ValidacionErrores = {};
@@ -34,9 +33,6 @@ export const validarFormularioAnomalia = (
       errores.descripcionAnomalia = "La descripción de la anomalía es obligatoria.";
   }
 
-  if (ubicacionAnomalia !== undefined && !ubicacionAnomalia.trim()) {
-      errores.ubicacionAnomalia = "La ubicación de la anomalía es obligatoria.";
-  }
 
   if (imagenes && imagenes.length === 0) {
       errores.imagenesAnomalia = "Debe asociar al menos una imagen.";

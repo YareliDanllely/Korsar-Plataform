@@ -11,3 +11,7 @@ class Empresa(models.Model):
 
     def __str__(self):
         return f"Empresa {self.nombre_empresa}"
+
+    class Meta:
+        verbose_name = "Empresa"
+        verbose_name_plural = "Empresas"

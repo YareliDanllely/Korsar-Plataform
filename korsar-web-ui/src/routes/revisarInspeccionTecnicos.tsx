@@ -64,6 +64,7 @@ const RevisarInspeccion: React.FC = () => {
       };
 
 
+//-----------------------------------------------------------------------------------------------//
 
       const cargarImagenesDesdeBackend = async (uuid_anomalia: string) => {
         try {
@@ -86,18 +87,35 @@ const RevisarInspeccion: React.FC = () => {
         setDraggingImage(imagen);
       };
 
+
+
+
       const handleDrop = (event: any) => {
         const imageId = event.active?.id;
 
-        if (imageId && draggingImage && !droppedImages.some(img => img.uuid_imagen === imageId)) {
-          setDroppedImages((prev) => [...prev, draggingImage]);
+        if (imageId && draggingImage) {
+          // Verifica si la imagen ya existe en `droppedImages`
+          const isAlreadyDropped = droppedImages.some(img => img.uuid_imagen === imageId);
+
+          // Si no existe, agregarla como nueva
+          if (!isAlreadyDropped) {
+            setDroppedImages((prev) => [
+              ...prev,
+              { ...draggingImage, uuid_imagen_anomalia: undefined } // Asegurarse de cumplir con la interfaz
+            ]);
+          }
         }
-        setDraggingImage(null); // Limpia el estado después de soltar
+
+        // Limpia el estado después del arrastre
+        setDraggingImage(null);
       };
+
+
 
       const handleRemoveImage = (image: Imagen) => {
         if (image.uuid_imagen_anomalia) {
           setShowDeleteModal(true); // Abre el modal solo si es del backend
+          setImageToDelete(image);
         } else {
           setDroppedImages((prev) => prev.filter((img) => img.uuid_imagen !== image.uuid_imagen));
         }
@@ -150,12 +168,12 @@ const RevisarInspeccion: React.FC = () => {
 
                 {/* Información de la Inspección */}
                 <div className="sm:col-span-4">
-                    <div className="col-span-2 flex flex-col sm:flex-row items-start py-4 px-3">
+                    <div className="col-span-2 flex flex-col sm:flex-row items-start py-2 px-2">
                       <div className="flex flex-col justify-between w-full">
-                            <h1 className="text-5xl font-light text-korsar-azul-noche mb-4">Detalles de la Inspección</h1>
+                            <h1 className="text-4xl font-light text-korsar-azul-noche mb-4">Detalles de la Inspección</h1>
 
                             {inspeccionInformacion && (
-                              <div className="flex flex-col gap-4">
+                              <div className="flex flex-col gap-1">
                                 <div>
                                   <span className="text-lg text-korsar-text-1">Parque Eólico: {inspeccionInformacion.nombre_parque}</span>
                                 </div>
@@ -163,7 +181,8 @@ const RevisarInspeccion: React.FC = () => {
                                   <span className="text-lg text-korsar-text-1">Fecha: {inspeccionInformacion.fecha_inspeccion}</span>
                                 </div>
                                 <div>
-                                  <span className="text-lg text-korsar-text-1">Estado: {inspeccionInformacion.progreso}</span>
+                                <span className="text-lg text-korsar-text-1">
+                               Estado: {inspeccionInformacion.progreso === 0 ? "Pendiente" : inspeccionInformacion.progreso === 1 ? "Completado" : "En progreso"} </span>
                                 </div>
                               </div>
                             )}
@@ -196,7 +215,6 @@ const RevisarInspeccion: React.FC = () => {
                     uuid_inspeccion={uuid_inspeccion || ''}
                     setUuidTurbina={setUuidTurbina}
                     setUuidComponente={setUuidComponente}
-                    onBuscar={handleBuscar}
                     onDragStart={handleDragStart}
                     onCreateAnomalia={onCreateAnomalia}
                   />

@@ -71,16 +71,23 @@ class AerogeneradorViewSet(viewsets.ModelViewSet):
             aerogeneradores_con_estado = []
             for aerogenerador in aerogeneradores:
 
-                estado_final = EstadoAerogenerador.objects.get(
-                    uuid_aerogenerador=aerogenerador.uuid_aerogenerador,
-                    uuid_inspeccion=parametros['uuid_inspeccion']
-                )
+                try:
+
+                    estado_final = EstadoAerogenerador.objects.get(
+                        uuid_aerogenerador=aerogenerador.uuid_aerogenerador,
+                        uuid_inspeccion=parametros['uuid_inspeccion']
+                    )
+
+                    estado_final_clasificacion = estado_final.estado_final_clasificacion
+
+                except EstadoAerogenerador.DoesNotExist:
+                    estado_final_clasificacion = "No disponible"
 
                 # Agregar la información del aerogenerador y su estado final a la lista
                 aerogeneradores_con_estado.append({
                     'uuid_aerogenerador': aerogenerador.uuid_aerogenerador,
                     'numero_aerogenerador': aerogenerador.numero_aerogenerador,
-                    'estado_final': estado_final.estado_final_clasificacion,
+                    'estado_final': estado_final_clasificacion,
                     'coordenada_latitud': aerogenerador.coordenada_latitud,
                     'coordenada_longitud': aerogenerador.coordenada_longitud
                 })
@@ -88,17 +95,11 @@ class AerogeneradorViewSet(viewsets.ModelViewSet):
             return Response(aerogeneradores_con_estado, status=status.HTTP_200_OK)
 
         # Manejo de excepciones
-        except (EstadoAerogenerador.DoesNotExist, ValueError) as e:
-            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
-        except PermissionError as e:
-            return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
-
-        except ValidationError as e:
-            return Response({'error': e.detail}, status=status.HTTP_400_BAD_REQUEST)
+        except (ValueError, PermissionError, ValidationError) as e:
+                return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         except Exception as e:
-            return Response({'error': 'Error interno del servidor', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                return Response({'error': 'Error interno del servidor', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
  #----------------------------------------------------------------------------------------------------------#
 
@@ -158,28 +159,26 @@ class AerogeneradorViewSet(viewsets.ModelViewSet):
              )
 
             # Intentar obtener el estado final del aerogenerador
-            estado_final = EstadoAerogenerador.objects.get(
-                uuid_aerogenerador=parametros['uuid_aerogenerador'],
-                uuid_inspeccion=parametros['uuid_inspeccion']
-            )
+            try:
+                estado_final = EstadoAerogenerador.objects.get(
+                    uuid_aerogenerador=parametros['uuid_aerogenerador'],
+                    uuid_inspeccion=parametros['uuid_inspeccion']
+                )
+                estado_final_clasificacion = estado_final.estado_final_clasificacion
+
+            except EstadoAerogenerador.DoesNotExist:
+                    estado_final_clasificacion = "No disponible"
 
 
-            return Response({'estado_final': estado_final.estado_final_clasificacion}, status=status.HTTP_200_OK)
+            return Response({'estado_final': estado_final_clasificacion}, status=status.HTTP_200_OK)
 
 
         # Manejo de excepciones
-        except (EstadoAerogenerador.DoesNotExist, ValueError) as e:
+        except (ValueError, PermissionError, ValidationError) as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
-        except PermissionError as e:
-            return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
-
-        except ValidationError as e:
-            return Response({'error': e.detail}, status=status.HTTP_400_BAD_REQUEST)
 
         except Exception as e:
             return Response({'error': 'Error interno del servidor', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
 
 
  #----------------------------------------------------------------------------------------------------------#
@@ -256,23 +255,22 @@ class AerogeneradorViewSet(viewsets.ModelViewSet):
             # Filtrar aerogeneradores por parque eólico
             aerogeneradores = Aerogenerador.objects.filter(uuid_parque_eolico=pk)
 
+            if not aerogeneradores.exists():
+                return Response({'mensaje': 'No disponible'}, status=status.HTTP_200_OK)
+
             # Serializar los datos
             serializer = self.get_serializer(aerogeneradores, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
-
-        # Manejo de excepciones
-        except (Aerogenerador.DoesNotExist, ValueError) as e:
+        except (ValueError, ValidationError) as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
-        except ValidationError as e:
-            return Response({'error': e.detail}, status=status.HTTP_400_BAD_REQUEST)
 
         except PermissionError as e:
             return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
 
         except Exception as e:
             return Response({'error': 'Error interno del servidor', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 
 #----------------------------------------------------------------------------------------------------------#
@@ -291,21 +289,18 @@ class AerogeneradorViewSet(viewsets.ModelViewSet):
             validador.validar_recurso(pk, Aerogenerador.existe_aerogenerador_para_usuario)
 
             # Obtener la información del aerogenerador
-            aerogenerador = Aerogenerador.objects.get(pk=pk)
-            serializer = self.get_serializer(aerogenerador)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            try:
+                aerogenerador = Aerogenerador.objects.get(pk=pk)
+                serializer = self.get_serializer(aerogenerador)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            except Aerogenerador.DoesNotExist:
+                return Response({'mensaje': 'No disponible'}, status=status.HTTP_200_OK)
 
-        # Manejo de excepciones
-        except (Aerogenerador.DoesNotExist, ValueError) as e:
+        except (ValueError, ValidationError) as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Manejo de excepciones
         except PermissionError as e:
             return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
 
-        except ValidationError as e:
-            return Response({'error': e.detail}, status=status.HTTP_400_BAD_REQUEST)
-
         except Exception as e:
             return Response({'error': 'Error interno del servidor', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-

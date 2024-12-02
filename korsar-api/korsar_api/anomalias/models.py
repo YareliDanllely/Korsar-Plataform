@@ -31,17 +31,6 @@ class Anomalia(models.Model):
     ]
     severidad_anomalia = models.IntegerField(choices=SEVERIDAD_CHOICES)
 
-    UBICACION_COMPONENTE_CHOICES = [
-        ('aspa_interna', 'Aspa Interna'),
-        ('aspa_externa', 'Aspa Externa'),
-        ('nacelle', 'Nacelle/Hub'),
-        ('torre', 'Torre'),
-    ]
-
-    ubicacion_componente = models.CharField(
-        max_length=15,
-        choices=UBICACION_COMPONENTE_CHOICES,
-    )
 
     dimension_anomalia = models.CharField(max_length=255)
 

@@ -35,3 +35,8 @@ class ParquesEolicos(models.Model):
 
     def __str__(self):
         return self.nombre_parque
+
+
+    class Meta:
+        verbose_name = "Parque Eólico"
+        verbose_name_plural = "Parques Eólicos"

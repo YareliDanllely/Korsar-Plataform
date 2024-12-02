@@ -27,3 +27,7 @@ class ImagenAnomalia(models.Model):
 
     def __str__(self):
         return f"Imagen Anomalía {self.uuid_imagen_anomalia}"
+
+    class Meta:
+        verbose_name = "Imagen Anomalía"
+        verbose_name_plural = "Imagenes Anomalías"

@@ -17,7 +17,6 @@ class AnomaliaAdmin(admin.ModelAdmin):
         'get_aerogenerador',  # Mostrar el número del aerogenerador
         'get_componente',  # Mostrar el tipo de componente
         'get_inspeccion',  # Mostrar la fecha de inspección
-        'get_tecnico'  # Mostrar el nombre del técnico
     )
 
     # Campos de búsqueda
@@ -39,6 +38,3 @@ class AnomaliaAdmin(admin.ModelAdmin):
         return obj.uuid_inspeccion.fecha_inspeccion  # Mostrar la fecha de la inspección
     get_inspeccion.short_description = 'Inspección'
 
-    def get_tecnico(self, obj):
-        return obj.uuid_tecnico.username  # Mostrar el nombre del técnico
-    get_tecnico.short_description = 'Técnico'

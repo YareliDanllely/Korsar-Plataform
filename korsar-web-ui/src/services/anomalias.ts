@@ -74,7 +74,7 @@ interface AnomaliaData {
 
       try {
         // Ajustamos la URL para incluir uuid_componente como parte del path
-        const response = await api.get(`/anomalias/siguiente-numero-dano/${uuid_componente}/`, {
+        const response = await api.get(`/anomalias/items/${uuid_componente}/siguiente-numero-dano/`, {
           headers: obtenerEncabezadosAutenticacion(),
 
         });

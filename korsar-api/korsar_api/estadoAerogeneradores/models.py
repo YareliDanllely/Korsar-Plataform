@@ -35,3 +35,8 @@ class EstadoAerogenerador(models.Model):
 
     def __str__(self):
         return f"Estado {self.estado_final_clasificacion} del Aerogenerador {self.uuid_aerogenerador}"
+
+
+    class Meta:
+        verbose_name = "Estado Aerogenerador"
+        verbose_name_plural = "Estados Aerogeneradores"

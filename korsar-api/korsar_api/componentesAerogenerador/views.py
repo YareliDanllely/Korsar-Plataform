@@ -37,13 +37,16 @@ class ComponenteAerogeneradorViewSet(viewsets.ModelViewSet):
             )
 
             # Obtener componente
-            componente = ComponenteAerogenerador.objects.get(pk=pk)
-            return Response({'tipo_componente': componente.tipo_componente}, status=status.HTTP_200_OK)
+            componente = ComponenteAerogenerador.objects.filter(pk=pk).first()
 
+            if not componente:
+                return Response({'mensaje': 'No disponible'}, status=status.HTTP_200_OK)
+
+            return Response({'tipo_componente': componente.tipo_componente}, status=status.HTTP_200_OK)
 
         # Manejo de excepciones
         except (ComponenteAerogenerador.DoesNotExist, ValueError) as e:
-              return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         except ValidationError as e:
             return Response({'error': e.detail}, status=status.HTTP_400_BAD_REQUEST)
@@ -53,8 +56,6 @@ class ComponenteAerogeneradorViewSet(viewsets.ModelViewSet):
 
         except Exception as e:
             return Response({'error': 'Error interno del servidor', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
 
 
 #----------------------------------------------------------------------------------------------------------#
@@ -74,19 +75,22 @@ class ComponenteAerogeneradorViewSet(viewsets.ModelViewSet):
             # Filtrar los componentes por aerogenerador
             componentes = ComponenteAerogenerador.objects.filter(uuid_aerogenerador=pk)
 
+            if not componentes.exists():
+                return Response({'mensaje': 'No disponible'}, status=status.HTTP_200_OK)
 
-            componentes_list = []
-            for componente in componentes:
-                componentes_list.append({
+            componentes_list = [
+                {
                     'uuid_componente': str(componente.uuid_componente),  # Convertir UUID a cadena
                     'tipo_componente': componente.tipo_componente
-                })
+                }
+                for componente in componentes
+            ]
 
             return Response(componentes_list, status=status.HTTP_200_OK)
 
         # Manejo de excepciones
         except (ComponenteAerogenerador.DoesNotExist, ValueError) as e:
-              return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         except ValidationError as e:
             return Response({'error': e.detail}, status=status.HTTP_400_BAD_REQUEST)
@@ -96,5 +100,3 @@ class ComponenteAerogeneradorViewSet(viewsets.ModelViewSet):
 
         except Exception as e:
             return Response({'error': 'Error interno del servidor', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-

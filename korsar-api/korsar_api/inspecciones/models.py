@@ -37,3 +37,7 @@ class Inspeccion(models.Model):
     def __str__(self):
         return f"Inspección {self.uuid_inspeccion} del Parque {self.uuid_parque_eolico.nombre_parque}"
 
+
+    class Meta:
+        verbose_name = "Inspección"
+        verbose_name_plural = "Inspecciones"

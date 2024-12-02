@@ -41,7 +41,7 @@ const api = axios.create({
 
       try {
         // Ajustamos la URL para incluir uuid_aerogenerador como parte del path
-        const response = await api.get(`/aerogeneradores/numero-aerogenerador/${uuid_aerogenerador}/`, {
+        const response = await api.get(`/aerogeneradores/items/${uuid_aerogenerador}/numero-aerogenerador/`, {
           headers: obtenerEncabezadosAutenticacion(),
 
         });

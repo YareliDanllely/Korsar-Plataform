@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import {claseColores} from "../../utils/colores";
 
 interface SelectorCategoriaProps {
   onCategoriaSelected: (number: number) => void;
@@ -9,16 +8,26 @@ interface SelectorCategoriaProps {
 const SelectorCategoria: React.FC<SelectorCategoriaProps> = ({ onCategoriaSelected, selectedCategoria = null }) => {
   const [selected, setSelected] = useState<number | null>(selectedCategoria);
 
-  const obtenerColor = (number: number) => claseColores[number] || "";
-  // Actualiza el estado `selected` cuando `selectedCategoria` cambie en el componente principal
-  useEffect(() => {
-    setSelected(selectedCategoria);
-  }, [selectedCategoria]);
+    const obtenerColor = (number: number): string => {
+      const colores: Record<number, string> = {
+        1: "bg-[#53AF0C]",
+        2: "bg-[#34B0AD]",
+        3: "bg-[#FCD023]",
+        4: "bg-[#FF9500]",
+        5: "bg-[#D9514E]",
+      };
+      return colores[number] || "bg-gray-200"; // Color por defecto
+    };
 
-  const handleSelection = (number: number): void => {
-    setSelected(number);
-    onCategoriaSelected(number);
-  };
+    // Actualiza el estado `selected` cuando `selectedCategoria` cambie en el componente principal
+    useEffect(() => {
+      setSelected(selectedCategoria);
+    }, [selectedCategoria]);
+
+    const handleSelection = (number: number): void => {
+      setSelected(number);
+      onCategoriaSelected(number);
+    };
 
   return (
     <div className="flex flex-col items-center">

@@ -42,3 +42,6 @@ class ComponenteAerogenerador(models.Model):
 
     def __str__(self):
         return f"Componente {self.get_tipo_componente_display()} del Aerogenerador {self.uuid_aerogenerador}"
+    class Meta:
+        verbose_name = "Componente Aerogenerador"
+        verbose_name_plural = "Componentes Aerogeneradores"

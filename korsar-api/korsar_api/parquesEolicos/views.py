@@ -75,8 +75,7 @@ class ParqueEolicoViewSet(viewsets.ModelViewSet):
         try:
             # Validar el acceso del usuario al recurso
             validador.validar_recurso(pk, ParquesEolicos.existe_parque_para_usuario)
-
-            parque = self.get_queryset().get(uuid_parque_eolico=uuid_parque_eolico)
+            parque = ParquesEolicos.objects.get(uuid_parque_eolico=pk)
             return Response({'abreviatura_parque': parque.abreviatura_parque}, status=status.HTTP_200_OK)
 
 

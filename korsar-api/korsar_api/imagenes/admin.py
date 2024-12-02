@@ -7,8 +7,8 @@ class ImagenAdmin(admin.ModelAdmin):
     Definiendo la clase ImagenAdmin para personalizar la interfaz de administrador de Django
     """
 
-    list_display = ('nombre_imagen', 'get_aerogenerador', 'get_componente', 'fecha_creacion', 'ruta_imagen', 'get_inspeccion', 'estado_clasificacion')
-    search_fields = ('nombre_imagen', 'estado_clasificacion')
+    list_display = ('nombre_imagen', 'get_aerogenerador', 'get_componente', 'fecha_creacion', 'ruta_imagen', 'get_inspeccion',)
+    search_fields = ('nombre_imagen',)
 
     def get_aerogenerador(self, obj):
         return obj.uuid_aerogenerador.numero_aerogenerador  # Mostrar número del aerogenerador
