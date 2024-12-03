@@ -13,6 +13,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from usuarios.models import Usuario
 from uuid import UUID
+from componentesAerogenerador.models import ComponenteAerogenerador
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
@@ -111,7 +112,7 @@ class InspeccionViewSet(viewsets.ModelViewSet):
         try:
 
             # Validar el pk y el acceso del usuario al recurso
-            validador.validar_recurso(pk, ParquesEolicos.existe_aerogenerador_para_usuario)
+            validador.validar_recurso(pk, ParquesEolicos.existe_parque_para_usuario)
 
             ultima_inspeccion = Inspeccion.objects.filter(uuid_parque_eolico=pk).latest('fecha_inspeccion')
 
@@ -199,39 +200,44 @@ class InspeccionViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['post'], url_path='cambiar-progreso')
     def cambiar_progreso(self, request):
-        """
-        Cambiar el progreso de una inspección.
-        Exclusiva de técnicos.
-        """
-        # Instanciar el validador
-        validador = ValidarAcceso(request.user)
-
-        try:
-            parametros = validador.validar_query_params(
-                parametros={
-                    'uuid_inspeccion': True,
-                    'progreso': False,
-                }
-            )
-
-            inspeccion = Inspeccion.objects.get(uuid_inspeccion=parametros['uuid_inspeccion'])
-            inspeccion.progreso = parametros['progreso']
-            inspeccion.save()
-
-            return Response({'mensaje': 'Progreso actualizado correctamente'}, status=status.HTTP_200_OK)
+            """
+            Cambiar el progreso de una inspección.
+            """
 
 
-        except (Inspeccion.DoesNotExist,ValueError) as e:
-            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            uuid_inspeccion = request.data.get('uuid_inspeccion')
+            progreso = request.data.get('progreso')
+            print(f"uuid_inspeccion: {uuid_inspeccion}, progreso: {progreso}")
 
-        except PermissionError as e:
-            return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
+            if not uuid_inspeccion or not progreso:
+                return Response({'error': 'uuid_inspeccion y progreso son requeridos.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        except ValidationError as e:
-            return Response({'error': e.detail}, status=status.HTTP_400_BAD_REQUEST)
+            try:
+                print("Buscando inspección")
+                # Busca la inspección y actualiza el progreso
 
-        except Exception as e:
-            return Response({'error': 'Error interno del servidor', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                uuid_obj = UUID(uuid_inspeccion)  # Convertir string a objeto UUID
+
+                inspeccion = Inspeccion.objects.get(uuid_inspeccion=uuid_obj)
+                print(f"Inspección encontrada: {inspeccion}")
+                inspeccion.progreso = progreso
+                inspeccion.save()
+
+
+                return Response({'message': 'Progreso actualizado exitosamente.'}, status=status.HTTP_200_OK)
+
+
+            except (Inspeccion.DoesNotExist,ValueError) as e:
+                return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+            except PermissionError as e:
+                return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
+
+            except ValidationError as e:
+                return Response({'error': e.detail}, status=status.HTTP_400_BAD_REQUEST)
+
+            except Exception as e:
+                return Response({'error': 'Error interno del servidor', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 #----------------------------------------------------------------------------------#
@@ -241,40 +247,51 @@ class InspeccionViewSet(viewsets.ModelViewSet):
     def cantidad_severidades_por_componente(self, request, pk=None):
         """
         Obtener la cantidad de severidades por tipo de componente en una inspección,
-        validando que el usuario tenga acceso a la inspección.
+        unificando los tipos de hélices en una sola categoría.
         """
-        # Instanciar el validador
         validador = ValidarAcceso(request.user)
 
         try:
+            # Validar acceso del usuario a la inspección
             validador.validar_recurso(pk, Inspeccion.existe_inspeccion_para_usuario)
 
-            # Obtener severidades
+            # Obtener las severidades agrupadas por tipo de componente
             severidades = (
                 Anomalia.objects
                 .filter(uuid_inspeccion=pk)
-                .values('ubicacion_componente', 'severidad_anomalia')
-                .annotate(total_severidades=Count('severidad_anomalia'))
-                .order_by('ubicacion_componente', 'severidad_anomalia')
+                .values('uuid_componente__tipo_componente', 'severidad_anomalia')  # Agrupar por tipo de componente y severidad
+                .annotate(total_severidades=Count('severidad_anomalia'))  # Contar anomalías por severidad
+                .order_by('uuid_componente__tipo_componente', 'severidad_anomalia')  # Ordenar por tipo y severidad
             )
 
-            # Procesar resultado
+            # Procesar el resultado
             respuesta = {}
             for item in severidades:
-                ubicacion = dict(Anomalia.UBICACION_COMPONENTE_CHOICES).get(item['ubicacion_componente'], 'Desconocido')
+                tipo_componente_original = item['uuid_componente__tipo_componente']
+
+                # Unificar las hélices en una sola categoría
+                if tipo_componente_original in ['helice_a', 'helice_b', 'helice_c']:
+                    tipo_componente = 'Hélice'
+                else:
+                    tipo_componente = dict(ComponenteAerogenerador.TIPO_COMPONENTE_CHOICES).get(
+                        tipo_componente_original, 'Desconocido'
+                    )
+
                 severidad = dict(Anomalia.SEVERIDAD_CHOICES).get(item['severidad_anomalia'], 'Desconocido')
 
-                if ubicacion not in respuesta:
-                    respuesta[ubicacion] = {}
+                if tipo_componente not in respuesta:
+                    respuesta[tipo_componente] = {}
 
-                respuesta[ubicacion][severidad] = item['total_severidades']
+                # Sumar la cantidad de severidades
+                if severidad not in respuesta[tipo_componente]:
+                    respuesta[tipo_componente][severidad] = 0
+
+                respuesta[tipo_componente][severidad] += item['total_severidades']
 
             return Response(respuesta, status=status.HTTP_200_OK)
 
-
-        # Manejo de excepciones
         except (Anomalia.DoesNotExist, ValueError) as e:
-            return Response({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         except ValidationError as e:
             return Response({'error': e.detail}, status=status.HTTP_400_BAD_REQUEST)
@@ -284,9 +301,6 @@ class InspeccionViewSet(viewsets.ModelViewSet):
 
         except Exception as e:
             return Response({'error': 'Error interno del servidor', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
-
 
 
 #----------------------------------------------------------------------------------#

@@ -1,11 +1,18 @@
 import { obtenerTodasLasEmpresas } from '../services/empresas';
 import { obtenerParquesPorEmpresa } from '../services/parquesEolicos';
 import { ultimaInspeccionParqueEmpresa } from '../services/inspecciones';
-import { InspeccionFront, ParqueEolico, Empresa } from '../utils/interfaces';
+import { InspeccionFront, ParqueEolico, Empresa, CoordenadasParque} from '../utils/interfaces';
 import SimpleMap from '../components/dashboard/mapaParques';
 import { useEffect, useState } from 'react';
 import EmpresaSelector from '../components/dashboard/selectorEmpresas';
 import ParqueEolicoList from '../components/dashboard/parquesEolicosInformacion';
+import { obtenerCoordenadasTodosParques } from '../services/parquesEolicos';
+
+interface Marker {
+    name: string;
+    coords: [number, number];
+}
+
 
 function Dashboard() {
     const [userId, setUserId] = useState<string | null>(null);
@@ -15,7 +22,9 @@ function Dashboard() {
     const [empresas, setEmpresas] = useState<Empresa[]>([]); // Lista de empresas (solo para técnicos)
     const [empresaSeleccionada, setEmpresaSeleccionada] = useState<string | null>(null); // Empresa seleccionada
     const [parquesEolicos, setParques] = useState<ParqueEolico[]>([]);
+    const [markers, setMarkers] = useState<Marker[]>([]);
     const [inspecciones, setInspecciones] = useState<InspeccionFront[]>([]);
+
 
     //----------------------------------------------------------------
 
@@ -116,11 +125,42 @@ function Dashboard() {
 
     //--------------------------------------------------------------------------
 
-        {/* CREAR MARCADORES PARA EL MAPA */}
-        const markers = parquesEolicos.map((parque) => ({
-            name: parque.nombre_parque,
-            coords: [parque.coordenada_latitud, parque.coordenada_longitud] as [number, number],
-        }));
+    useEffect(() => {
+        const fetchMarkers = async () => {
+            try {
+                let nuevosMarkers: Marker[] = [];
+
+                if (tipo_usuario === 1) {
+                    // Si es técnico, cargar todas las coordenadas
+                    const coordenadas: CoordenadasParque[] = await obtenerCoordenadasTodosParques();
+                    console.log('COORDENADAS:', coordenadas);
+                    nuevosMarkers = coordenadas.map((parque) => ({
+                        name: parque.nombre_parque || "Parque sin nombre", // Manejar nombres nulos
+                        coords: [parque.latitud, parque.longitud], // CORRECCIÓN: latitud primero, longitud después
+                    }));
+                } else if (tipo_usuario === 2 && empresaSeleccionada) {
+                    // Si es cliente, cargar solo los parques de la empresa seleccionada
+                    const parques: ParqueEolico[] = await obtenerParquesPorEmpresa(empresaSeleccionada);
+                    nuevosMarkers = parques.map((parque) => ({
+                        name: parque.nombre_parque,
+                        coords: [parque.coordenada_latitud, parque.coordenada_longitud], // CORRECCIÓN
+                    }));
+                }
+
+                // Actualizar los marcadores
+                setMarkers(nuevosMarkers);
+                console.log('MARCADORES ACTUALIZADOS:', nuevosMarkers);
+            } catch (error) {
+                console.error('Error al cargar marcadores:', error);
+            }
+        };
+
+        // Ejecutar fetchMarkers si se cumple la condición
+        if (tipo_usuario && (tipo_usuario === 1 || empresaSeleccionada)) {
+            fetchMarkers();
+        }
+    }, [tipo_usuario, empresaSeleccionada]);
+
 
 
     return (

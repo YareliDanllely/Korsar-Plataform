@@ -202,7 +202,7 @@ const RevisarInspeccionClientes: React.FC = () => {
 
 
       {/* Aerogenerador Carrusel */}
-      <div className="sm:col-span-2 sm:row-start-2 rounded-lg shadow-md p-4 flex items-center justify-center">
+      <div className="sm:col-span-2 sm:row-start-2 rounded-lg shadow-md p-4 flex ">
                 <AerogeneradorCarrusel
                 uuid_inspeccion={uuid_inspeccion || ''}
                 uuid_parque_eolico={uuid_parque || ''}
@@ -269,10 +269,10 @@ const RevisarInspeccionClientes: React.FC = () => {
              <div className="sm:col-span-2 sm:row-span-5 sm:col-start-3 sm:row-start-2 rounded-lg shadow-md p-4 ">
 
                        <div className='flex flex-col gap-10'>
-                                <div className='flex flex-row justify-between items-center'>
+                                <div className='flex flex-col justify-between items-start gap-2'>
                                         <h1 className="text-3xl font-light text-korsar-azul-noche">Detalles de la Anomalía</h1>
                                         {anomaliaSeleccionadaInformacion && (
-                                        <h2 className="text-xl text-korsar-text-1">{anomaliaSeleccionadaInformacion.codigo_anomalia}</h2>
+                                        <h2 className="text-lg text-korsar-text-1">{anomaliaSeleccionadaInformacion.codigo_anomalia}</h2>
                                     )}
                                 </div>
                          <div >

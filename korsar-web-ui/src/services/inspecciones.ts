@@ -28,15 +28,16 @@ export const obtenerInspecciones = async () => {
 
 //----------------------------------------------------------------------------------------------//
 
-  export const cambiarProgresoInspeccion = async (uuid_inspeccion: string, progreso: string) => {
+  export const cambiarProgresoInspeccion = async (uuid_inspeccion: string, progreso: number) => {
     if (!uuid_inspeccion || !progreso) {
       throw new Error('Los parámetros "uuid_inspeccion" y "progreso" son requeridos.');
     }
 
     try {
+      console.log('uuid_inspeccion:', uuid_inspeccion, 'progreso:', progreso);
       const response = await api.post(
-        `/inspecciones/items/${uuid_inspeccion}/cambiar-progreso/`, // Usar PK en la URL
-        { progreso },
+        `/inspecciones/items/cambiar-progreso/`, // URL sin uuid_inspeccion
+        { uuid_inspeccion, progreso }, // Enviar ambos parámetros en el cuerpo
         {
           headers: {
             ...obtenerEncabezadosAutenticacion(),
@@ -50,6 +51,7 @@ export const obtenerInspecciones = async () => {
       throw new Error('No se pudo cambiar el progreso de la inspección.');
     }
   };
+
 
 
 //----------------------------------------------------------------------------------------------//

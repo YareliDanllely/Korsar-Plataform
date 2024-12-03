@@ -160,9 +160,11 @@ const ParquesEolicos: React.FC = () => {
 
                   <div className="sm:col-span-3 sm:row-span-3 sm:col-start-3 sm:row-start-1 bg-white shadow-lg rounded-lg">
                       <div className="h-[700px] w-full items-center justify-center p-10 rounded-md">
-                          <h1 className="text-center text-2xl font-light text-korsar-text-1 mb-4">Mapa Aerogeneradores</h1>
-
-                          {/* {informacionParqueEolico && (
+                          <h1 className="text-center text-2xl font-normal text-korsar-azul-agua mb-4">Mapa Aerogeneradores</h1>
+                          <p className="text-center text-korsar-text-1 font-thin text-lg ">Haz click en un aerogenerador para ver más detalles.</p>
+                          <p className="text-center text-korsar-text-1 font-thin text-lg  ">El color del aerogenerador representa el estado basado en la mayor severidad detectada.</p>
+{/*
+                          {informacionParqueEolico && (
                           <MapaParqueEolico
                               latitud_parque_eolico={informacionParqueEolico.coordenada_latitud}
                               longitud_parque_eolico={informacionParqueEolico.coordenada_longitud}
@@ -174,33 +176,31 @@ const ParquesEolicos: React.FC = () => {
                   </div>
 
                   <div className="sm:col-span-5 sm:row-start-4 bg-white shadow-lg rounded-lg p-2 h-auto">
-                      {severidadesData && (
-                          <div className="flex flex-col justify-start gap-1 h-full w-full">
-                              <h3 className="text-center text-2xl font-light text-korsar-text-1 mb-4">
-                                  Severidades por Componentes
-                              </h3>
-
-                              <div className="grid grid-cols-1 p-2 sm:grid-cols-4 justify-start gap-2 h-full w-full">
-                                  <div>
-                                      <h1 className="text-korsar-text-1 font-thin text-lg">Aspa Interna</h1>
-                                      <DonutChartComponets data={severidadesData} componente="Aspa Interna" />
-                                  </div>
-                                  <div>
-                                      <h1 className="text-korsar-text-1 font-thin text-lg">Aspa Externa</h1>
-                                      <DonutChartComponets data={severidadesData} componente="Aspa Externa" />
-                                  </div>
-                                  <div>
-                                      <h1 className="text-korsar-text-1 font-thin text-lg">Torre</h1>
-                                      <DonutChartComponets data={severidadesData} componente="Torre" />
-                                  </div>
-                                  <div className="flex flex-col">
-                                      <h1 className="text-korsar-text-1 font-thin text-lg">Nacelle/Hub</h1>
-                                      <DonutChartComponets data={severidadesData} componente="Nacelle/Hub" />
-                                  </div>
-                              </div>
+                    {severidadesData && (
+                      <div className="flex flex-col items-center gap-1 h-full w-full">
+                        <h3 className="text-center text-2xl font-light text-korsar-text-1 mb-4">
+                          Severidades por Componentes
+                        </h3>
+                        <div className="grid grid-cols-1 p-2 sm:grid-cols-3 justify-items-center items-center gap-4 h-full w-full">
+                          <div className="flex flex-col items-center justify-center">
+                            <h1 className="text-korsar-text-1 font-thin text-lg">Aspas</h1>
+                            <DonutChartComponets data={severidadesData} componente="Hélice" />
                           </div>
-                      )}
+
+                          <div className="flex flex-col items-center justify-center">
+                            <h1 className="text-korsar-text-1 font-thin text-lg">Torre</h1>
+                            <DonutChartComponets data={severidadesData} componente="Torre" />
+                          </div>
+
+                          <div className="flex flex-col items-center justify-center">
+                            <h1 className="text-korsar-text-1 font-thin text-lg">Nacelle/Hub</h1>
+                            <DonutChartComponets data={severidadesData} componente="Nacelle/Hub" />
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
+
               </div>
           </div>
   </div>

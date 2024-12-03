@@ -148,12 +148,16 @@ const RevisarInspeccion: React.FC = () => {
       const enviarCambioProgresoInspeccion = async () => {
         if (uuid_inspeccion) {
           try {
+            console.log("Enviando cambio de progreso de inspección", uuid_inspeccion, 1);
             console.log("Enviando cambio de progreso de inspección", uuid_inspeccion);
-            await cambiarProgresoInspeccion(uuid_inspeccion, 'Finalizada');
+            await cambiarProgresoInspeccion(uuid_inspeccion, 1);
             setInspeccionTerminada(true);
             setAbrirModalTerminarInspeccion(false);
             setShowToast(true);
             setToastMessage("Inspección finalizada exitosamente");
+            setTimeout(() => {
+              setShowToast(false);
+            }, 3000);
           } catch (error) {
             console.error("Error al cambiar el progreso de la inspección:", error);
           }

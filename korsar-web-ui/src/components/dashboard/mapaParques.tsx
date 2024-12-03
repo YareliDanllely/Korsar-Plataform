@@ -34,10 +34,15 @@ function SimpleMap({ markers }: SimpleMapProps) {
                 selectedHover: { fill: "yellow" },
             },
             zoomButtons: true,
+            zoomLevel: 4, // Nivel de zoom inicial
+            focusOn: {
+                x: -71, // Longitud aproximada del centro de Chile
+                y: -35, // Latitud aproximada del centro de Chile
+                scale: 4, // Escala de zoom
+            },
             labels: {
                 markers: {
                     render: (marker: Marker) => `${marker.name}`,
-
                 },
             },
         });

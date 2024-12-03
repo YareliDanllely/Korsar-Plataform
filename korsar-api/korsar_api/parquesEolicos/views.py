@@ -92,3 +92,39 @@ class ParqueEolicoViewSet(viewsets.ModelViewSet):
         except Exception as e:
             return Response({'error': 'Error interno del servidor', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
+
+#-----------------------------------------------------------------------------------------#
+
+    # OBTENER COORDENADAS DE TODOS LOS PARQUES ELICOS
+    @action(detail=False, methods=['get'], url_path='coordenadas-parques')
+    def obtener_coordenadas_parques(self, request):
+        """
+        Obtener las coordenadas de todos los parques eólicos.
+        """
+        # Instanciar el validador
+        try:
+
+            print("Obteniendo coordenadas de parques eólicos")
+
+            if request.user.is_tecnico:
+                parques_eolicos = ParquesEolicos.objects.all()
+                print("Obteniendo coordenadas de parques eólicos")
+
+                # Serializar solo las coordenadas
+                coordenadas = [
+                    {
+                        "nombre_parque": parque.nombre_parque,
+                        "latitud": parque.coordenada_latitud,
+                        "longitud": parque.coordenada_longitud
+                    }
+                    for parque in parques_eolicos
+                ]
+
+                return Response(coordenadas, status=status.HTTP_200_OK)
+
+        except PermissionError as e:
+            return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
+
+        except Exception as e:
+            return Response({'error': 'Error interno del servidor', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

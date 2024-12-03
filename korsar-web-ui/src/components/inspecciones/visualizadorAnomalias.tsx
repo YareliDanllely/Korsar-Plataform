@@ -1,6 +1,6 @@
 import React, { useState } from "react";
+import { Accordion, Button, Pagination } from "flowbite-react";
 import { Anomalia } from "../../utils/interfaces";
-import {  Button, Pagination } from "flowbite-react";
 
 interface VisualizadorProps {
   anomalias: Anomalia[];
@@ -24,53 +24,49 @@ const VisualizadorAnomalias: React.FC<VisualizadorProps> = ({
   const onPageChange = (page: number) => setCurrentPage(page);
 
   return (
-    <div className="flex flex-col items-center space-y-6">
-      {/* Listado de Anomalías Paginado */}
-      {anomaliasPaginadas.map((anomalia) => (
-
-        <div
-        key={anomalia.uuid_anomalia}
-        className="w-full shadow-lg p-10 rounded-lg border border-gray-200"
-        >
-
-          <div className="flex flex-col gap-6">
-
-            {/* Información principal */}
-            <div className="flex flex-col gap-2">
-                <h1 className="text-lg font-bold text-gray-800">Anomalía</h1>
-                <h2 className="text-base text-gray-600">{anomalia.codigo_anomalia}</h2>
-            </div>
-
-             {/* SEVERIDAD */}
-            <div className="flex flex-row gap-52">
+    <div className="flex flex-col items-center space-y-6 w-full">
+      {/* Contenedor del Acordeón */}
+      <div className="w-full flex flex-col space-y-4">
+        <Accordion collapseAll className="w-full">
+          {anomaliasPaginadas.map((anomalia) => (
+            <Accordion.Panel
+              key={anomalia.uuid_anomalia}
+              className="w-full shadow-lg rounded-lg border border-gray-200"
+            >
+              {/* Título del acordeón */}
+              <Accordion.Title className="w-full">
+                {anomalia.codigo_anomalia}
+              </Accordion.Title>
+              {/* Contenido del acordeón */}
+              <Accordion.Content className="p-4 w-full">
+                <div className="flex flex-col space-y-4">
+                  {/* Información de la anomalía */}
                   <div>
-                    <h1 className="text-lg font-bold text-gray-800">Severidad</h1>
-                    <h2 className="text-base text-gray-600">{anomalia.severidad_anomalia}</h2>
+                    <p className="font-bold">Severidad:</p>
+                    <p className="text-gray-600">{anomalia.severidad_anomalia}</p>
                   </div>
-
-
-                  {/* DESCRIPCION */}
                   <div>
-                    <h1 className="text-lg font-bold text-gray-800">Descripción</h1>
-                    <h2 className="text-base text-gray-600">{anomalia.descripcion_anomalia}</h2>
+                    <p className="font-bold">Descripción:</p>
+                    <p className="text-gray-600">{anomalia.descripcion_anomalia}</p>
                   </div>
-            </div>
+                  {/* Botón de acción */}
+                  <div>
+                    <Button
+                      className="bg-korsar-turquesa-viento text-white rounded-2xl px-2 py-1"
+                      onClick={() => anomaliaSeleccionada(anomalia.uuid_anomalia)}
+                    >
+                      Ver Detalles
+                    </Button>
+                  </div>
+                </div>
+              </Accordion.Content>
+            </Accordion.Panel>
+          ))}
+        </Accordion>
+      </div>
 
-            {/* Botón de acción */}
-            <div className="flex justify-star">
-              <Button
-                className="bg-korsar-turquesa-viento text-white rounded-2xl px-2 py-1"
-                onClick={() => anomaliaSeleccionada(anomalia.uuid_anomalia)}
-              >
-                Ver Detalles
-              </Button>
-            </div>
-          </div>
-        </div>
-      ))}
-
-       {/* Paginación */}
-       <div className="flex justify-center w-full mt-4">
+      {/* Paginación directamente debajo */}
+      <div className="w-full flex justify-center mt-4">
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}

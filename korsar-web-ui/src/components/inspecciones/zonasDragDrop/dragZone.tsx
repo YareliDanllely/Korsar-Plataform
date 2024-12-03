@@ -178,25 +178,34 @@ export const DragZone: React.FC<DragZoneProps> = ({
       <Modal show={openModal} size="6xl" onClose={handleCloseModal}>
         <Modal.Header>Imagen ampliada</Modal.Header>
         <Modal.Body>
-          {selectedImage && (
-            <div className="flex flex-col items-center">
+            {selectedImage && (
               <div
-                className="overflow-hidden"
+                className="flex justify-center items-center overflow-auto"
                 style={{
-                  transform: `scale(${zoomLevel})`,
-                  transition: "transform 0.3s ease-in-out",
+                  width: "100%",
+                  height: "80vh", // Altura máxima del contenedor
+                  cursor: zoomLevel > 1 ? "grab" : "default", // Cambia el cursor al modo de arrastre
                 }}
               >
-                <img
-                  src={selectedImage.ruta_imagen}
-                  alt={`Imagen ampliada ${selectedImage.uuid_imagen}`}
-                  className="max-w-full max-h-[80vh] object-scale-down"
-                />
+                <div
+                  className="relative"
+                  style={{
+                    transform: `scale(${zoomLevel})`,
+                    transformOrigin: "center center",
+                    transition: "transform 0.3s ease-in-out",
+                  }}
+                >
+                  <img
+                    src={selectedImage.ruta_imagen}
+                    alt={`Imagen ampliada ${selectedImage.uuid_imagen}`}
+                    className="object-contain"
+                    draggable={false} // Evita el comportamiento de arrastre predeterminado del navegador
+                  />
+                </div>
               </div>
+            )}
+          </Modal.Body>
 
-            </div>
-          )}
-        </Modal.Body>
           <Modal.Footer>
                       <div className="relative w-full flex items-center">
                         {/* Botones de Zoom centrados */}

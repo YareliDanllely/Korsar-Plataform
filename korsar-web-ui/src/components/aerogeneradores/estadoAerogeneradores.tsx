@@ -41,7 +41,7 @@ const EstadoAerogeneradores: React.FC<TurbinaComponentesProps> = ({ colores, anc
   // Estado del tooltip
   const [tooltip, setTooltip] = useState({ visible: false, text: '', x: 0, y: 0 });
 
-  const isDamage = (color: string) => color !== "#6ABF4B" && color !== "#5DAF3E";
+  const isDamage = (color: string) => color !== "#E5E5E5" ;
 
   useEffect(() => {
     console.log('Colores:', colores);

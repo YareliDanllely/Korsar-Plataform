@@ -1,5 +1,5 @@
 import axios from 'axios';  // Importa axios para realizar las solicitudes HTTP
-import { ParqueEolico } from '../utils/interfaces';  // Importa la interfaz ParqueEolico desde el archivo de interfaces
+import { ParqueEolico, CoordenadasParque } from '../utils/interfaces';  // Importa la interfaz ParqueEolico desde el archivo de interfaces
 import { obtenerEncabezadosAutenticacion } from '../utils/apiUtils';
 
 // Define la URL base de la API
@@ -90,3 +90,24 @@ const api = axios.create({
         throw new Error('No se pudo obtener la información del parque eólico.');
       }
     };
+
+
+
+  //----------------------------------------------------------------------------------------------//
+
+
+  /**
+   * Servicio para obtener las coordenadas de todos los parques eólicos.
+   * @returns {Promise<CoordenadasParque[]>} Lista de coordenadas de parques eólicos.
+   */
+  export const obtenerCoordenadasTodosParques = async (): Promise<CoordenadasParque[]> => {
+    try {
+      const response = await  api.get('/parques-eolicos/items/coordenadas-parques/', {
+        headers: obtenerEncabezadosAutenticacion(), // Incluye los headers de autenticación
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error al obtener las coordenadas de los parques:', error);
+      throw error;
+    }
+  };

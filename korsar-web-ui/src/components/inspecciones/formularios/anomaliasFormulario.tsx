@@ -162,7 +162,7 @@ export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogen
 
       fetchSiguienteNumeroDano();
     }
-  }, [uuid_componente, uuid_aerogenerador, categoriaDaño, modoEditar]);
+  }, [uuid_componente, uuid_aerogenerador, categoriaDaño]);
 
 
 /** ----------------------------------------------------------------------------------**/
@@ -185,7 +185,7 @@ export function FormularioAnomalias({ droppedImages, onRemoveImage, uuid_aerogen
     if (uuid_parque) {
       fetchAbreviaturaParque();
     }
-  }, [uuid_componente, uuid_aerogenerador, categoriaDaño]);
+  }, [uuid_componente, uuid_aerogenerador]);
 
 
 /** ----------------------------------------------------------------------------------**/

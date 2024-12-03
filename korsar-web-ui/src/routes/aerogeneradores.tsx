@@ -111,12 +111,12 @@ function Aerogeneradores() {
 
        const colores: Record<number, string> = {
         1: "#E5E5E5",
-        2: "#34B0AD",
-        3: "#FCD023",
-        4: "#FF9500",
-        5: "#D9514E",
+        2: "#71d0cb",
+        3: "#eadd4b",
+        4: "#fcaf44",
+        5: "#f67c7a",
       };
-
+      // f3e546
 
       {/* OBTENER COLOR DE SEVERIDAD */}
       const obtenerColor = (number: number) => colores[number] || "";
@@ -140,6 +140,7 @@ function Aerogeneradores() {
         const obtenerAnomaliasAerogenerador = async () => {
           try {
             if (ultimaInspeccion && aerogeneradoSeleccionado) {
+              console.log("Aerogenerador seleccionado:", aerogeneradoSeleccionado);
               const response = await obtenerAnomaliasPorAerogenerador(aerogeneradoSeleccionado, ultimaInspeccion);
               console.log("Anomalías del aerogenerador:", response);
 

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Anomalia } from '../utils/interfaces';
+import { Anomalia, CantidadSeveridadesPorComponente } from '../utils/interfaces';
 import { AnomaliasAerogeneradores } from '../utils/interfaces';
 import { obtenerEncabezadosAutenticacion } from '../utils/apiUtils';
 
@@ -138,3 +138,6 @@ interface AnomaliaData {
         throw error;
       }
     };
+
+
+

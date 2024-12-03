@@ -142,3 +142,10 @@ type SeveridadCount = Partial<Record<Severidad, number>>;
 export interface CantidadSeveridadesPorComponente {
   [key: string]: SeveridadCount | undefined; // Cada clave representa un componente y tiene un SeveridadCount o es undefined
 }
+
+
+export interface CoordenadasParque {
+  nombre_parque: string;
+  latitud: number;
+  longitud: number;
+}
