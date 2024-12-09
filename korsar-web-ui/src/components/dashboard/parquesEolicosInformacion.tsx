@@ -11,15 +11,18 @@ interface ParqueEolicoListProps {
 
 const ParqueEolicoList: React.FC<ParqueEolicoListProps> = ({ parquesEolicos, inspecciones }) => {
     return (
-        <div className="w-full h-full flex">
+        <div className="flex-col w-full h-full ">
             {parquesEolicos.map((parque) => {
                 const inspeccion = inspecciones.find(i => i.uuid_parque_eolico === parque.uuid_parque_eolico);
 
                 return (
                     <div key={parque.uuid_parque_eolico}
-                        className='w-full h-full p-4 flex">
-'
-                    >
+                        className="p-6 bg-white rounded-lg shadow-md mb-10"
+                        style={{
+                            boxShadow: '0 0 15px rgba(0, 0, 0, 0.15)',
+                        }}
+                        >
+
 
                         <h1 className="text-3xl text-korsar-text-1 font-light">
                             {parque.nombre_parque}

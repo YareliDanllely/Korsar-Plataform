@@ -39,11 +39,13 @@ const Inspecciones = () => {
       }, []);  // El array vacío como dependencia significa que useEffect solo se ejecutará al montar el componente
 
       return (
-        <div className="p-6">
+        <div className="p-6" >
 
             <h2 className="text-xl font-semibold mb-4">Historial de Inspecciones</h2>
             {/* Contenedor blanco */}
-            <div className="bg-white shadow-md rounded-lg p-6">
+            <div className="bg-white shadow-md rounded-lg p-6" style={{
+                        boxShadow: '0 0 15px rgba(0, 0, 0, 0.15)', // Sombra uniforme en todos los lados
+                    }}>
             {/* Título del historial de inspecciones */}
 
             {/* Muestra un mensaje de error si existe */}

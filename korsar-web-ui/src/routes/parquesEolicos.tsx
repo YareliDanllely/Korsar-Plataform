@@ -163,7 +163,7 @@ const ParquesEolicos: React.FC = () => {
                           <h1 className="text-center text-2xl font-normal text-korsar-azul-agua mb-4">Mapa Aerogeneradores</h1>
                           <p className="text-center text-korsar-text-1 font-thin text-lg ">Haz click en un aerogenerador para ver más detalles.</p>
                           <p className="text-center text-korsar-text-1 font-thin text-lg  ">El color del aerogenerador representa el estado basado en la mayor severidad detectada.</p>
-{/*
+
                           {informacionParqueEolico && (
                           <MapaParqueEolico
                               latitud_parque_eolico={informacionParqueEolico.coordenada_latitud}
@@ -171,7 +171,7 @@ const ParquesEolicos: React.FC = () => {
                               markers={markers}
                               onMarkerClick={aerogeneradorEscogido}
                           />
-                          )} */}
+                          )}
                       </div>
                   </div>
 

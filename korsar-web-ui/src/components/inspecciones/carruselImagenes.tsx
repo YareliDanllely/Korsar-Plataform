@@ -92,7 +92,7 @@ const CarruselImagenes: React.FC<CarruselProps> = ({ imagenes }) => {
               <img
                 src={imagen.ruta_imagen}
                 alt={`Imagen ${imagen.uuid_imagen}`}
-                className="w-96 h-96 object-cover rounded-lg shadow-md"
+                className="w-97 h-96 object-cover rounded-lg shadow-md"
               />
             </div>
           ))}

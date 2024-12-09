@@ -33,19 +33,18 @@ function SimpleMap({ markers }: SimpleMapProps) {
                 selected: { fill: "green" },
                 selectedHover: { fill: "yellow" },
             },
-            zoomButtons: true,
-            zoomLevel: 4, // Nivel de zoom inicial
+
             focusOn: {
-                x: -71, // Longitud aproximada del centro de Chile
-                y: -35, // Latitud aproximada del centro de Chile
-                scale: 4, // Escala de zoom
-            },
+                regions: ['AR', 'CL', 'CO', 'PE', 'VE', 'BR', 'UY', 'PY', 'BO', 'EC', 'CR', 'PA', 'CU', 'GT', 'HN', 'NI', 'SV', 'PR', 'JM', 'DO', 'HT', 'BS', 'BB', 'TT', 'AG', 'LC', 'VC', 'GD', 'DM', 'KN', 'CW', 'BQ', 'SX', 'MF', 'AI', 'MS', 'VG', 'KN', 'KY', 'TC', 'BM', 'DM', 'LC', 'GD', 'AG', 'VC', 'BB', 'TT', 'BS', 'HT', 'DO', 'JM', 'PR', 'SV', 'NI', 'HN', 'GT', 'CU', 'PA', 'CR', 'EC', 'BO', 'PY', 'UY', 'BR', 'VE', 'PE', 'CO', 'CL', 'AR'],
+                animate: true
+              },
             labels: {
                 markers: {
                     render: (marker: Marker) => `${marker.name}`,
                 },
             },
         });
+
     }
 
     // Cleanup the map when the component is unmounted

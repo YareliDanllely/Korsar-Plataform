@@ -168,7 +168,10 @@ function Dashboard() {
             <div className="w-auto max-w-7xl space-y-7 p-10 px-10">
 
                     {/* Componente principal */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 w-auto bg-white rounded-lg shadow-md p-5  overflow-hidden">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 w-auto bg-white rounded-lg shadow-md p-5  overflow-hidden"
+                         style={{
+                            boxShadow: '0 0 15px rgba(0, 0, 0, 0.15)', // Sombra uniforme en todos los lados
+                        }}>
 
                             {/* Selector de empresas */}
                             <div className="flex-[1] p-4">
@@ -235,7 +238,8 @@ function Dashboard() {
 
 
                 {/* Div para cada parque eólico */}
-                <div className="flex flex-1 items-center justify-center bg-white gap-4 rounded-lg shadow-md">
+                <div className="grid-cols-1 items-center justify-center"
+                    >
                     <ParqueEolicoList parquesEolicos={parquesEolicos} inspecciones={inspecciones} />
                 </div>
 

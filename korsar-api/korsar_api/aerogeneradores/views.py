@@ -22,7 +22,7 @@ class AerogeneradorViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]  # Solo usuarios autenticados pueden acceder
 
 
- #----------------------------------------------------------------------------------------------------------#
+
 
 
     # OBTENER LISTADO DE TODOS LOS AEROGENERADORES CON SU ESTADO FINAL
